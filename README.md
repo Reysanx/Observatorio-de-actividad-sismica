@@ -20,6 +20,12 @@ Siguiendo la metodología **Spec-Driven Development (SDD)**, el proyecto se encu
 
 ```text
 Observatorio-de-actividad-s-smica/
+├── .agents/                    # Arquitectura Multi-Agente (MAS), Roles y Skills operativas
+│   ├── AGENTS.md               # Protocolo y jerarquía de orquestación padre-hijo
+│   ├── rules/                  # Reglas de observancia obligatoria (arquitectura, calidad 6D)
+│   ├── subagents/              # Definición de los 6 SubAgentes especialistas
+│   └── skills/                 # Procedimientos técnicos ejecutables (runbooks)
+│
 ├── .specify/
 │   └── memory/
 │       └── constitution.md     # Invariantes no negociables, principios de ingeniería y reglas arquitectónicas
@@ -43,6 +49,7 @@ Observatorio-de-actividad-s-smica/
 
 | Documento de Especificación | Propósito Principal | Enlace Directo |
 | :--- | :--- | :--- |
+| **Protocolo Multi-Agente (MAS)** | Jerarquía padre-hijo, catálogo de 6 SubAgentes especialistas y ciclo de traspaso. | [`.agents/AGENTS.md`](.agents/AGENTS.md) |
 | **Constitución del Proyecto** | Principios inmutables, aislamiento de 5 servicios Docker, política de túneles y seguridad. | [`.specify/memory/constitution.md`](.specify/memory/constitution.md) |
 | **Especificación Funcional** | Requisitos funcionales (FR-01 a FR-09), no funcionales (NFR), personas y reglas de negocio. | [`specs/001-observatorio-sismico/spec.md`](specs/001-observatorio-sismico/spec.md) |
 | **Plan Técnico y Arquitectura** | Diagramas de flujo, configuración de Kafka KRaft, modelo físico PostgreSQL y DDL de índices. | [`specs/001-observatorio-sismico/plan.md`](specs/001-observatorio-sismico/plan.md) |

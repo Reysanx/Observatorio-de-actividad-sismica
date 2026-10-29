@@ -204,3 +204,8 @@ gantt
   - **Objetivo:** Redactar el informe de evidencias con código ejecutable antes/después y 3 conclusiones analíticas fundamentadas.
   - **Archivos a crear/modificar:** `notebooks/analisis_calidad_y_sismicidad.ipynb` o `docs/memoria_calidad.md`.
   - **Criterio de Aceptación:** Cumple exhaustivamente con los criterios de Sobresaliente (9–10) de la rúbrica oficial.
+
+- [ ] **TASK-8.5: Guía Didáctica de Defensa Técnica y Aprendizaje Paso a Paso**
+  - **Objetivo:** Redactar un manual pedagógico continuo que explique con claridad meridiana qué hace cada componente, cómo interactúa, por qué se tomó cada decisión técnica y cómo defender el proyecto ante las preguntas del profesor.
+  - **Archivos a crear/modificar:** `docs/guia_defensa_y_aprendizaje.md`.
+  - **Criterio de Aceptación:** Documento modular y progresivo con diagramas, analogías claras, justificación técnica formal de cada decisión y preguntas tipo examen con respuestas modelo para la defensa en clase.
