@@ -1,0 +1,6 @@
+## [t1] Recorded canonical MVP scenario decisions
+- Codebase/domain discoveries: The approved constitution fixes exactly five Compose service IDs; product docs vary between dotted and hyphenated replay topic names. The project spec expects `NAME_ES`, which is not guaranteed by Natural Earth's source GeoJSON.
+- Wrong assumptions and corrections: Do not assume a submitted clarification form exists; the user directly supplied decisions and explicitly declined another form. Do not treat the requested broad implementation as completed by this scenario-decision task.
+- Debugging dead-ends and what actually worked: `context.md`, `decisions.md`, teamlead inbox/log history, and clarification answers markdown were absent. The read-only board and repository specs/constitution supplied the t1 evidence. The official Natural Earth terms and country-page URLs verified the public-domain status and public source. A PowerShell assertion on the accented replay badge text was unreliable; reading UTF-8 in Python and comparing the exact code point verified it.
+- Techniques/patterns worth reusing: Keep Compose IDs canonical from the constitution, normalize replay topics to the dotted style in the plan/tasks, and document data-source license and schema-attribute gaps before downstream implementation.
+- Learnings consumed: [none]

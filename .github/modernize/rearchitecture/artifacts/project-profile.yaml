@@ -1,0 +1,43 @@
+project:
+  scope_path: "."
+  loc: 0
+  languages: []
+  git: true
+  structure:
+    ".agents": "Repository-specific role, skill, and subagent guidance"
+    ".specify/memory": "Project constitution"
+    "specs/001-observatorio-sismico": "SDD requirements, plan, task, data, and acceptance specifications"
+  notes: "Specification-led workspace with no existing application source; implement the local seismic observatory MVP in place."
+
+assessment:
+  change_type: rewrite
+  rationale: |
+    Recon found no source LOC or detected implementation language. The request creates
+    the first complete runnable implementation from the existing specifications, covering
+    ingestion, processing, persistence, API, and Angular presentation. The target architecture
+    is sufficiently bounded to plan now, but needs coordinated domain design before execution.
+  transformations:
+    - fromStack: "Specification-only workspace"
+      toStack: "Python/FastAPI, PostgreSQL, Kafka, Angular"
+  grouping_needed: false
+  deep_planning: true
+
+progress_sync:
+  run_id: "4257fb09-8aa4-4660-8bb6-565ae0e5e1e4"
+  grouping_mode: none
+  execution_mode: all-at-once
+  plan_start_time: "2026-11-02T15:42:08Z"
+  plan_completed_time: null
+  execution_start_time: null
+  execution_completed_time: null
+  validation_start_time: null
+  validation_completed_time: null
+  total_phases: 3
+  completed_phases: 1
+  total_modules: 0
+  completed_modules: 0
+  total_tasks: 6
+  completed_tasks: 1
+  total_commits: 0
+  build_verified: false
+  test_verified: false

@@ -1,0 +1,490 @@
+{
+  "schema": "clarification-questions/v1",
+  "generated_at": "2026-11-02T15:42:08Z",
+  "user_input": "Implement the first complete, runnable local MVP in the workspace at C:\\Users\\jasam\\Desktop\\BD&IA\\Observatorio-de-actividad-s-smica. Use SDD source of truth specs/001-observatorio-sismico/{spec.md,plan.md,tasks.md,data-spec.md,acceptance-tests.md}, .specify/memory/constitution.md, and .agents role/skill files. User explicitly requests multi-agent execution where useful. Create missing code/assets, including minimal Angular frontend and licensed Natural Earth countries GeoJSON from authoritative/public source with attribution/license. Build vertical path: Compose exactly five required services, PostgreSQL schema, USGS live + 2025 historical partitioned ingestion, Kafka producer, quality/quarantine + Shapely STRtree enrichment, idempotent consumer DB commit before Kafka offset, FastAPI contracts and analytics, frontend map/dashboard, replay isolation/badge, focused automated acceptance coverage. Preserve no-secrets, no public Kafka/Postgres, replay isolation, UTC, null magnitude ND. Resolve naming inconsistencies consistently and record choice. Provide local run/deploy instructions and .env.example. Do not attempt Netlify/ngrok publication, use credentials, or claim publication. Run smallest meaningful validation and report exact changed files, commands/results, blockers/next steps. Stop after MVP validated; do not claim unverified academic deliverables. Bound scope to this MVP and implement, not advice. Follow repository guidance and use additional agents only for independent useful work.",
+  "title": "Local seismic activity MVP",
+  "assessment_snapshot": {
+    "intro": "The workspace is specification-led and requests the first local, full-stack implementation:",
+    "bullets": [
+      "No application source is present in the repository shape; an existing UI is not available for screenshot-based reproduction.",
+      "The requested stack includes Angular, FastAPI, PostgreSQL, Kafka, Shapely, and a local Compose deployment.",
+      "SDD specifications and repository-specific agent guidance are named as authoritative inputs but have not yet been assessed by implementation workers."
+    ]
+  },
+  "proposed_outcome": "Implement in place a runnable, local-only seismic activity MVP that follows the SDD contracts, uses a five-service Compose topology, and validates the data path through focused acceptance tests without publishing services or claiming unverified deliverables.",
+  "scope": [
+    "frontend",
+    "backend",
+    "generic"
+  ],
+  "status": "awaiting_answers",
+  "questions": [
+    {
+      "id": "F1",
+      "kit": "frontend",
+      "field": "target.framework",
+      "title": "Angular version",
+      "question": "Which Angular major version should the MVP use? The request specifies Angular but no major version.",
+      "importance": "required",
+      "impact": 5,
+      "recommended": "Angular — latest compatible stable version",
+      "default": null,
+      "prefilled": true,
+      "prefilled_value": "Angular (major version unspecified)",
+      "answer": null,
+      "depends_on": null,
+      "options": [
+        {
+          "value": "Angular — latest compatible stable version",
+          "label": "Angular — latest compatible stable version"
+        }
+      ],
+      "allow_other": true,
+      "type": "single_select"
+    },
+    {
+      "id": "F2",
+      "kit": "frontend",
+      "field": "target.component_library",
+      "title": "Angular UI library",
+      "question": "Which component/UI library should the Angular dashboard use?",
+      "importance": "required",
+      "impact": 4,
+      "recommended": "Angular Material",
+      "default": null,
+      "prefilled": false,
+      "prefilled_value": null,
+      "answer": null,
+      "depends_on": null,
+      "options": [
+        {
+          "value": "Angular Material",
+          "label": "Angular Material"
+        },
+        {
+          "value": "PrimeNG",
+          "label": "PrimeNG"
+        },
+        {
+          "value": "NG-ZORRO",
+          "label": "NG-ZORRO"
+        },
+        {
+          "value": "Custom CSS (no component library)",
+          "label": "Custom CSS (no component library)"
+        }
+      ],
+      "allow_other": true,
+      "type": "single_select"
+    },
+    {
+      "id": "F4",
+      "kit": "frontend",
+      "field": "visual.design_system",
+      "title": "Visual design system",
+      "question": "What design-system or design-token source should guide the new dashboard?",
+      "importance": "required",
+      "impact": 4,
+      "recommended": null,
+      "default": "match existing pixel-by-pixel using extracted CSS custom properties",
+      "prefilled": false,
+      "prefilled_value": null,
+      "answer": null,
+      "depends_on": null,
+      "type": "text",
+      "options": []
+    },
+    {
+      "id": "F5",
+      "kit": "frontend",
+      "field": "compliance.accessibility",
+      "title": "Accessibility target",
+      "question": "Which accessibility standard should the MVP target?",
+      "importance": "recommended",
+      "impact": 3,
+      "recommended": "WCAG 2.1 AA",
+      "default": "WCAG 2.1 AA",
+      "prefilled": false,
+      "prefilled_value": null,
+      "answer": null,
+      "depends_on": null,
+      "options": [
+        {
+          "value": "WCAG 2.1 AA",
+          "label": "WCAG 2.1 AA"
+        },
+        {
+          "value": "WCAG 2.2 AA",
+          "label": "WCAG 2.2 AA"
+        },
+        {
+          "value": "Section 508",
+          "label": "Section 508"
+        },
+        {
+          "value": "None / not required",
+          "label": "None / not required"
+        }
+      ],
+      "allow_other": true,
+      "type": "single_select"
+    },
+    {
+      "id": "F6",
+      "kit": "frontend",
+      "field": "compatibility.browsers",
+      "title": "Browser targets",
+      "question": "Which browser targets should be supported?",
+      "importance": "recommended",
+      "impact": 2,
+      "recommended": "Modern evergreen browsers (latest 2 major versions)",
+      "default": "modern evergreen (Chrome, Firefox, Safari, Edge — latest 2 major versions)",
+      "prefilled": false,
+      "prefilled_value": null,
+      "answer": null,
+      "depends_on": null,
+      "options": [
+        {
+          "value": "Modern evergreen browsers (latest 2 major versions)",
+          "label": "Modern evergreen browsers (latest 2 major versions)"
+        },
+        {
+          "value": "Custom browser list",
+          "label": "Custom browser list"
+        }
+      ],
+      "allow_other": true,
+      "type": "single_select"
+    },
+    {
+      "id": "F7",
+      "kit": "frontend",
+      "field": "responsive.breakpoints",
+      "title": "Responsive layout",
+      "question": "What responsive strategy should the dashboard use?",
+      "importance": "recommended",
+      "impact": 3,
+      "recommended": "Mobile-first",
+      "default": "mobile-first using existing breakpoints detected from codebase",
+      "prefilled": false,
+      "prefilled_value": null,
+      "answer": null,
+      "depends_on": null,
+      "options": [
+        {
+          "value": "Mobile-first",
+          "label": "Mobile-first"
+        },
+        {
+          "value": "Desktop-first",
+          "label": "Desktop-first"
+        },
+        {
+          "value": "Desktop-only",
+          "label": "Desktop-only"
+        }
+      ],
+      "allow_other": true,
+      "type": "single_select"
+    },
+    {
+      "id": "F8",
+      "kit": "frontend",
+      "field": "i18n.locales",
+      "title": "Dashboard locales",
+      "question": "Which interface locales are in scope?",
+      "importance": "optional",
+      "impact": 1,
+      "recommended": null,
+      "default": "preserve current locales; keep existing i18n library if present",
+      "prefilled": false,
+      "prefilled_value": null,
+      "answer": null,
+      "depends_on": null,
+      "type": "text",
+      "options": []
+    },
+    {
+      "id": "F9",
+      "kit": "frontend",
+      "field": "state_mgmt.preference",
+      "title": "Frontend state management",
+      "question": "Do you have a preference for client-side state management?",
+      "importance": "optional",
+      "impact": 2,
+      "recommended": null,
+      "default": "preserve existing pattern if identifiable; otherwise recommend minimal (component state + server-state library)",
+      "prefilled": false,
+      "prefilled_value": null,
+      "answer": null,
+      "depends_on": null,
+      "type": "text",
+      "options": []
+    },
+    {
+      "id": "F10",
+      "kit": "frontend",
+      "field": "routing.preference",
+      "title": "Frontend routing",
+      "question": "Do you have a routing library or strategy preference?",
+      "importance": "optional",
+      "impact": 1,
+      "recommended": null,
+      "default": "use the de-facto router for the chosen target framework",
+      "prefilled": false,
+      "prefilled_value": null,
+      "answer": null,
+      "depends_on": null,
+      "type": "text",
+      "options": []
+    },
+    {
+      "id": "B1",
+      "kit": "backend",
+      "field": "target.framework",
+      "title": "FastAPI version",
+      "question": "Which FastAPI version policy should the backend use? The request names FastAPI but does not state a version.",
+      "importance": "required",
+      "impact": 5,
+      "recommended": "Latest compatible stable FastAPI release",
+      "default": null,
+      "prefilled": true,
+      "prefilled_value": "FastAPI (version unspecified)",
+      "answer": null,
+      "depends_on": null,
+      "options": [
+        {
+          "value": "Latest compatible stable FastAPI release",
+          "label": "Latest compatible stable FastAPI release"
+        },
+        {
+          "value": "Pin a specific version",
+          "label": "Pin a specific version"
+        }
+      ],
+      "allow_other": true,
+      "type": "single_select"
+    },
+    {
+      "id": "B2",
+      "kit": "backend",
+      "field": "api.contract_preservation",
+      "title": "API contract policy",
+      "question": "How should API contracts described by the SDD be treated?",
+      "importance": "required",
+      "impact": 5,
+      "recommended": "must preserve",
+      "default": "must preserve",
+      "prefilled": true,
+      "prefilled_value": "Preserve the API contracts specified by the SDD",
+      "answer": null,
+      "depends_on": null,
+      "options": [
+        {
+          "value": "must preserve",
+          "label": "Preserve all SDD-specified API paths, payloads, and status codes"
+        },
+        {
+          "value": "can break with versioning",
+          "label": "Breaking changes allowed only with API versioning"
+        },
+        {
+          "value": "can break",
+          "label": "Redesign contracts freely; no clients to preserve"
+        },
+        {
+          "value": "partial: specify contracts",
+          "label": "Preserve selected contracts only"
+        }
+      ],
+      "allow_other": true,
+      "type": "single_select"
+    },
+    {
+      "id": "B3",
+      "kit": "backend",
+      "field": "data.migration_strategy",
+      "title": "Database initialization",
+      "question": "What data migration strategy applies to this first local MVP?",
+      "importance": "required",
+      "impact": 4,
+      "recommended": "new schema",
+      "default": "TBD / assess in research phase",
+      "prefilled": true,
+      "prefilled_value": "new schema; first local MVP, no legacy application/database mentioned",
+      "answer": null,
+      "depends_on": null,
+      "options": [
+        {
+          "value": "new schema",
+          "label": "Create a new schema; no legacy data migration"
+        },
+        {
+          "value": "in-place",
+          "label": "Migrate an existing database in place"
+        },
+        {
+          "value": "dual-write",
+          "label": "Run a new schema alongside an existing database"
+        },
+        {
+          "value": "no migration",
+          "label": "No database migration"
+        },
+        {
+          "value": "TBD / assess in research phase",
+          "label": "Assess and decide during implementation planning"
+        }
+      ],
+      "allow_other": true,
+      "type": "single_select"
+    },
+    {
+      "id": "B4",
+      "kit": "backend",
+      "field": "auth.framework",
+      "title": "Authentication policy",
+      "question": "What authentication policy should this local MVP follow?",
+      "importance": "recommended",
+      "impact": 2,
+      "recommended": null,
+      "default": "preserve existing auth mechanism; detect from codebase",
+      "prefilled": false,
+      "prefilled_value": null,
+      "answer": null,
+      "depends_on": null,
+      "type": "text",
+      "options": []
+    },
+    {
+      "id": "B5",
+      "kit": "backend",
+      "field": "nfr.sla",
+      "title": "Performance targets",
+      "question": "Are there concrete latency, throughput, or availability targets for this MVP?",
+      "importance": "recommended",
+      "impact": 2,
+      "recommended": null,
+      "default": "match current production baseline; no regression",
+      "prefilled": false,
+      "prefilled_value": null,
+      "answer": null,
+      "depends_on": null,
+      "type": "text",
+      "options": []
+    },
+    {
+      "id": "G1",
+      "kit": "generic",
+      "field": "success.definition",
+      "title": "Definition of done",
+      "question": "What outcome defines success for this MVP?",
+      "importance": "required",
+      "impact": 5,
+      "recommended": null,
+      "default": "feature parity with the current system; all existing user-facing behaviors preserved",
+      "prefilled": true,
+      "prefilled_value": "Runnable local vertical path across the required services, validated by focused automated acceptance coverage, with no public deployment claim.",
+      "answer": null,
+      "depends_on": null,
+      "type": "text",
+      "options": []
+    },
+    {
+      "id": "G2",
+      "kit": "generic",
+      "field": "out_of_scope",
+      "title": "Out-of-scope boundaries",
+      "question": "Confirm any explicit exclusions or work that must not be touched.",
+      "importance": "recommended",
+      "impact": 3,
+      "recommended": null,
+      "default": "no explicit exclusions; agent will infer from project structure",
+      "prefilled": true,
+      "prefilled_value": "Do not publish to Netlify/ngrok, use credentials, expose Kafka/PostgreSQL publicly, or claim unverified academic deliverables; stop after MVP validation.",
+      "answer": null,
+      "depends_on": null,
+      "type": "text",
+      "options": []
+    },
+    {
+      "id": "G3",
+      "kit": "generic",
+      "field": "existing_tests.posture",
+      "title": "Test policy",
+      "question": "What test policy should apply to existing tests, if any?",
+      "importance": "recommended",
+      "impact": 2,
+      "recommended": "must pass",
+      "default": "must pass",
+      "prefilled": true,
+      "prefilled_value": "must pass; add focused automated acceptance coverage",
+      "answer": null,
+      "depends_on": null,
+      "options": [
+        {
+          "value": "must pass",
+          "label": "Existing tests must pass; add focused acceptance coverage"
+        },
+        {
+          "value": "can rewrite",
+          "label": "Tests may be replaced with equivalent coverage"
+        },
+        {
+          "value": "ignore",
+          "label": "Existing tests are not a gate; create new focused coverage"
+        },
+        {
+          "value": "partial: specify suites",
+          "label": "Only named suites must pass"
+        }
+      ],
+      "allow_other": true,
+      "type": "single_select"
+    },
+    {
+      "id": "G4",
+      "kit": "generic",
+      "field": "target.output_location",
+      "title": "Implementation location",
+      "question": "Where should the MVP code be created?",
+      "importance": "required",
+      "impact": 4,
+      "recommended": "in-place",
+      "default": "new sibling directory: Observatorio-de-actividad-s-smica-new",
+      "prefilled": true,
+      "prefilled_value": "in-place at the specified workspace path",
+      "answer": null,
+      "depends_on": null,
+      "options": [
+        {
+          "value": "in-place",
+          "label": "In this existing workspace"
+        },
+        {
+          "value": "Observatorio-de-actividad-s-smica-new",
+          "label": "A new sibling directory named Observatorio-de-actividad-s-smica-new"
+        }
+      ],
+      "allow_other": true,
+      "type": "single_select"
+    },
+    {
+      "id": "G5",
+      "kit": "generic",
+      "field": "constraints.additional",
+      "title": "Additional constraints",
+      "question": "Any additional constraints, exclusions, dependencies, compliance rules, or operational requirements?",
+      "importance": "optional",
+      "impact": 3,
+      "recommended": null,
+      "default": "None beyond the decisions listed in this specification.",
+      "prefilled": true,
+      "prefilled_value": "Exactly five required Compose services; no secrets or public Kafka/PostgreSQL; replay isolation and a visible replay badge; timestamps in UTC; missing magnitude represented as ND; Natural Earth country GeoJSON must include source attribution and license; choose and document consistent naming; do not publish; stop after locally validated MVP.",
+      "answer": null,
+      "depends_on": null,
+      "type": "text",
+      "options": []
+    }
+  ]
+}
