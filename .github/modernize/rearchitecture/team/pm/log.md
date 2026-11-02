@@ -1,0 +1,6 @@
+## [t2] Traced local MVP behaviors to product contracts
+- Codebase/domain discoveries: The approved specifications already cover live/historical USGS ingestion, quality, spatial assignment, persistence, API, UI, and 11 acceptance scenarios. t1 narrows the active request to a local MVP and resolves service/topic/table naming. The replay persistence/query boundary remains unspecified; Natural Earth Spanish names require mapping; ngrok-specific acceptance needs a local failure/recovery simulation.
+- Wrong assumptions and corrections: Monthly historical request partitioning is specified; PostgreSQL physical table partitioning is not explicitly required. A separate Kafka replay topic alone does not establish isolation of persistence or analytics.
+- Debugging dead-ends and what actually worked: `view` could not read several larger specification files in one call; reading them in line ranges provided the full relevant content.
+- Techniques/patterns worth reusing for future tasks: Use t1 as the canonical source when the approved specs disagree on service/topic names; trace acceptance IDs into implementation evidence rather than treating a passing build as behavior proof.
+- Learnings consumed: [(none)]

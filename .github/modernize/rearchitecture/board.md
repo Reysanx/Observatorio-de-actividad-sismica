@@ -8,7 +8,7 @@
 
 ### Phase: Scenario & Product Definition
 - ✅ t1 [teamlead] Resolve the provided scenario decisions and record canonical clarification (2026-11-02T15:44:21Z→2026-11-02T16:10:09Z, 25m 48s) [deps: none]
-- ⏳ t2 [pm] Trace requested MVP behaviors to the existing specifications [deps: t1]
+- ✅ t2 [pm] Trace requested MVP behaviors to the existing specifications (2026-11-02T16:11:00Z→2026-11-02T16:15:04Z, 4m 4s) [deps: t1]
 
 ### Phase: Architecture & Plan
 - ⏳ t3 [architect] Design the five-service architecture and API/event contracts [deps: t2]
