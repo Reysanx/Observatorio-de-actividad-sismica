@@ -1,0 +1,19 @@
+FROM python:3.11.9-slim-bookworm
+
+ENV PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
+
+WORKDIR /app
+
+COPY requirements.txt /app/requirements.txt
+RUN python -m pip install --requirement /app/requirements.txt \
+    && groupadd --gid 10001 app \
+    && useradd --uid 10001 --gid app --create-home --shell /usr/sbin/nologin app \
+    && chown -R app:app /app
+
+COPY --chown=app:app . /app
+
+USER app
+CMD ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8000"]

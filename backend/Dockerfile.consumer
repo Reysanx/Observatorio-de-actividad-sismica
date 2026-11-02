@@ -1,0 +1,20 @@
+FROM python:3.11.9-slim-bookworm
+
+ENV PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
+
+WORKDIR /app
+
+COPY requirements.txt /app/requirements.txt
+RUN python -m pip install --requirement /app/requirements.txt \
+    && groupadd --gid 10001 app \
+    && useradd --uid 10001 --gid app --create-home --shell /usr/sbin/nologin app \
+    && mkdir -p /var/lib/observatorio/cache /app/data \
+    && chown -R app:app /app /var/lib/observatorio
+
+COPY --chown=app:app . /app
+
+USER app
+CMD ["python", "-m", "consumer.main"]

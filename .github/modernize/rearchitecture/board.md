@@ -17,11 +17,11 @@
 - ✅ t5 [ux] Specify the Angular map/dashboard and replay-mode interactions (2026-11-02T16:32:09Z→2026-11-02T16:36:17Z, 4m 8s) [deps: t2, t3]
 - ✅ t6 [teamlead] Produce the implementation plan, task breakdown, and focused validation strategy (2026-11-02T16:44:13Z→2026-11-02T16:53:02Z, 8m 49s) [deps: t2, t3, t4, t5]
 
-### Phase: Environment Preparation
+### Phase: Environment Preparation 📌 c73e2f2
 - ✅ t7 [devops] Prepare Python 3.11, Node 22.15, Docker Compose, and Playwright (2026-11-02T17:23:19Z→2026-11-02T17:30:53Z, 7m 34s) [deps: none]
 
 ### Phase: Scaffold
-- ⏳ t8 [devops] Scaffold the five-service local runtime [deps: t7, t3]
+- ✅ t8 [devops] Scaffold the five-service local runtime (2026-11-02T17:30:53Z→2026-11-02T17:42:51Z, 11m 58s) [deps: t7, t3]
 
 ### Phase: Implementation
 - ⏳ t9 [backend] Implement the USGS live producer [deps: t7, t8, t3]

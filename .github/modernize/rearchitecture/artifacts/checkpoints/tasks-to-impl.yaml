@@ -1,0 +1,97 @@
+metadata:
+  generated: "2026-11-02T17:32:09Z"
+  source_tasks: "specs/001-observatorio-sismico/tasks.md"
+  last_updated: "2026-11-02T17:32:09Z"
+
+summary:
+  total_tasks: 1
+  completed_tasks: 1
+  in_progress_tasks: 0
+  pending_tasks: 0
+  completion_percentage: 100.0
+
+tasks:
+  - task_id: "t8"
+    description: "Scaffold the five-service local runtime"
+    status: "completed"
+    implementation:
+      files_changed:
+        - file: "compose.yaml"
+          changes:
+            - change_type: "added"
+              description: "Five canonical Compose services, health/dependency policy, private service network, and named volumes."
+        - file: "backend/scripts/start_kafka.sh"
+          changes:
+            - change_type: "added"
+              description: "KRaft startup and idempotent live/replay topic provisioning."
+        - file: "backend/Dockerfile.producer"
+          changes:
+            - change_type: "added"
+              description: "Pinned producer container image and entrypoint."
+        - file: "backend/Dockerfile.consumer"
+          changes:
+            - change_type: "added"
+              description: "Pinned consumer container image and entrypoint."
+        - file: "backend/Dockerfile.api"
+          changes:
+            - change_type: "added"
+              description: "Pinned API container image and Uvicorn entrypoint."
+        - file: ".env.example"
+          changes:
+            - change_type: "added"
+              description: "Secret-free local configuration template."
+        - file: ".gitignore"
+          changes:
+            - change_type: "added"
+              description: "Ignores local secrets and generated/runtime data."
+        - file: ".gitattributes"
+          changes:
+            - change_type: "added"
+              description: "Forces LF for shell scripts to preserve Linux container compatibility."
+        - file: "backend/.dockerignore"
+          changes:
+            - change_type: "added"
+              description: "Filters sensitive/local files from the backend build context."
+        - file: "docs/deployment.md"
+          changes:
+            - change_type: "added"
+              description: "Local Compose run, health, log, and cleanup instructions."
+    verification:
+      build_passed: false
+      test_results:
+        command: "docker compose --env-file .env.example config --quiet; rendered-model assertions; isolated Kafka Compose smoke"
+        passed: 3
+        failed: 0
+        skipped: 2
+        failures: []
+      notes: "Scaffold validation passed. Full application build/start is deferred until requirements, producer/consumer/API modules, and Natural Earth GeoJSON are added by downstream implementation tasks."
+    upstream_trace:
+      plan_item: "4.1"
+      requirements:
+        - "Constitution §2.1: five local containers"
+        - "Constitution §2.2: only API is exposed; DB and Kafka remain private"
+      full_trace: "Constitution §2.1-2.2 -> plan.md §4.1 -> TASK-1.2 / t8 -> compose.yaml and service Dockerfiles"
+
+pending_tasks: []
+untracked_changes: []
+traceability_chain:
+  - chain_id: "TRACE-t8-runtime"
+    requirement: "Five-service local runtime and private API perimeter"
+    plan_phase: "Phase 1"
+    plan_item: "4.1"
+    tasks:
+      - "t8"
+    files:
+      - "compose.yaml"
+      - "backend/scripts/start_kafka.sh"
+      - "backend/Dockerfile.producer"
+      - "backend/Dockerfile.consumer"
+      - "backend/Dockerfile.api"
+    status: "complete"
+
+validation:
+  passed: true
+  errors: []
+  warnings:
+    - "The full application cannot yet build/start because implementation-owned requirements, runtime modules, and Natural Earth GeoJSON are pending."
+  blocking_issues: []

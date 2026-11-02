@@ -1,0 +1,79 @@
+batch_id: "t8"
+completed_tasks:
+  - "t8: Scaffold the five-service local runtime"
+blocked_tasks: []
+files_changed:
+  "t8":
+    - file: "compose.yaml"
+      change_type: "created"
+      description: "Defines exactly five canonical services, private service network, healthchecks, named volumes, and API loopback-only port."
+    - file: "backend/scripts/start_kafka.sh"
+      change_type: "created"
+      description: "Starts the KRaft broker and idempotently provisions the live and replay topics."
+    - file: "backend/Dockerfile.producer"
+      change_type: "created"
+      description: "Pinned Python 3.11 producer image, shared requirements install, non-root runtime entrypoint."
+    - file: "backend/Dockerfile.consumer"
+      change_type: "created"
+      description: "Pinned Python 3.11 consumer image, shared requirements install, non-root runtime entrypoint."
+    - file: "backend/Dockerfile.api"
+      change_type: "created"
+      description: "Pinned Python 3.11 API image and Uvicorn entrypoint."
+    - file: "backend/.dockerignore"
+      change_type: "created"
+      description: "Excludes credentials, caches, and local data from backend image build context."
+    - file: ".env.example"
+      change_type: "created"
+      description: "Provides only local placeholder settings."
+    - file: ".gitignore"
+      change_type: "created"
+      description: "Excludes local env, runtime state, caches, and generated build output."
+    - file: ".gitattributes"
+      change_type: "created"
+      description: "Enforces LF line endings for mounted shell scripts on Windows checkouts."
+    - file: "docs/deployment.md"
+      change_type: "created"
+      description: "Documents local setup, health/log checks, shutdown, and volume reset."
+upstream_artifacts_consumed:
+  "t8":
+    - artifact: ".github/modernize/rearchitecture/artifacts/t7-devops.md"
+      used_for: "Verified Docker, Compose, and Python runtime assumptions."
+    - artifact: ".github/modernize/rearchitecture/artifacts/t3-architect.md"
+      used_for: "Canonical service names, topics, dependency edges, volumes, and private network policy."
+evidence_mapping:
+  "t8":
+    - upstream: "t3-architect.md#Service Catalog and #Startup dependencies"
+      output: "compose.yaml"
+      evidence: "Rendered Compose JSON assertions: five services, healthchecks, restart policies, and expected dependency edges."
+    - upstream: "t3-architect.md#Kafka topics and delivery"
+      output: "backend/scripts/start_kafka.sh"
+      evidence: "Healthy broker topic descriptions: live 3 partitions, replay 1 partition, both retention.ms=172800000."
+    - upstream: "t3-architect.md#Security posture"
+      output: "compose.yaml"
+      evidence: "Rendered Compose JSON shows only 127.0.0.1:8000 published; no broker/PostgreSQL host ports."
+traceability:
+  - requirement: "Constitution §2.1-2.2: exactly five isolated containers and private broker/database"
+    plan_item: "plan.md §4.1; tasks.md TASK-1.2"
+    task: "t8"
+    files:
+      - "compose.yaml"
+      - "backend/Dockerfile.producer"
+      - "backend/Dockerfile.consumer"
+      - "backend/Dockerfile.api"
+    status: "implemented; full application startup awaits implementation modules"
+protocol_violation: false
+errors: []
+warnings:
+  - severity: INFO
+    message: "Full stack build/start not run: backend/requirements.txt, three application entrypoints, and Natural Earth GeoJSON are downstream implementation inputs not yet present."
+  - severity: INFO
+    message: "Initial broker smoke run exposed CRLF in the mounted Bash script; normalized the script, added LF enforcement, and reran successfully."
+  - severity: INFO
+    message: "Optional YAML artifact parse was skipped because PyYAML is not installed; Compose YAML parsed successfully with Docker Compose."
+test_results:
+  "t8":
+    command: "docker compose --env-file .env.example config --quiet; rendered-model assertions; isolated docker compose -p t8-scaffold-check --env-file .env.example up -d broker and kafka-topics --describe"
+    passed: 3
+    failed: 0
+    skipped: 2
+    failures: []

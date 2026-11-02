@@ -1,0 +1,176 @@
+name: observatorio-sismico
+
+services:
+  productor:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.producer
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: broker:9092
+      POSTGRES_HOST: almacenamiento
+      POSTGRES_PORT: "5432"
+      POSTGRES_DB: ${POSTGRES_DB:-observatorio}
+      POSTGRES_USER: ${POSTGRES_USER:-observatorio}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env (copy .env.example)}
+      USGS_LIVE_URL: https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_day.geojson
+      USGS_POLL_INTERVAL_SECONDS: ${USGS_POLL_INTERVAL_SECONDS:-60}
+      USGS_CACHE_DIR: /var/lib/observatorio/cache
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+    volumes:
+      - usgs_cache:/var/lib/observatorio/cache
+    depends_on:
+      broker:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - import socket; socket.create_connection(("broker", 9092), timeout=2).close()
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    networks:
+      - sismos-network
+
+  broker:
+    image: apache/kafka:3.7.0
+    command: ["/bin/bash", "/usr/local/bin/start-kafka.sh"]
+    environment:
+      CLUSTER_ID: 5L6g3nShT-eMCtK--X86sw
+      KAFKA_NODE_ID: "1"
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker:9092
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@broker:9093
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: "1"
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: "1"
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: "1"
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: "0"
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
+      KAFKA_NUM_PARTITIONS: "3"
+      KAFKA_LOG_RETENTION_HOURS: "48"
+      KAFKA_LOG_DIRS: /var/lib/kafka/data
+    volumes:
+      - kafka_data:/var/lib/kafka/data
+      - ./backend/scripts/start_kafka.sh:/usr/local/bin/start-kafka.sh:ro
+    restart: unless-stopped
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - /opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list >/dev/null 2>&1
+      interval: 10s
+      timeout: 10s
+      retries: 12
+      start_period: 30s
+    networks:
+      - sismos-network
+
+  consumidor:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.consumer
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: broker:9092
+      KAFKA_LIVE_TOPIC: earthquakes.live
+      KAFKA_REPLAY_TOPIC: earthquakes.replay
+      POSTGRES_HOST: almacenamiento
+      POSTGRES_PORT: "5432"
+      POSTGRES_DB: ${POSTGRES_DB:-observatorio}
+      POSTGRES_USER: ${POSTGRES_USER:-observatorio}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env (copy .env.example)}
+      NATURAL_EARTH_GEOJSON: /app/data/paises.geojson
+      USGS_CACHE_DIR: /var/lib/observatorio/cache
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+    volumes:
+      - usgs_cache:/var/lib/observatorio/cache:ro
+      - type: bind
+        source: ./frontend/public/datos/paises.geojson
+        target: /app/data/paises.geojson
+        read_only: true
+        bind:
+          create_host_path: false
+    depends_on:
+      broker:
+        condition: service_healthy
+      almacenamiento:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - import socket; socket.create_connection(("broker", 9092), timeout=2).close(); socket.create_connection(("almacenamiento", 5432), timeout=2).close()
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - sismos-network
+
+  almacenamiento:
+    image: postgres:16.4-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-observatorio}
+      POSTGRES_USER: ${POSTGRES_USER:-observatorio}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env (copy .env.example)}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/db/init.sql:/docker-entrypoint-initdb.d/001-init.sql:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
+    networks:
+      - sismos-network
+
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.api
+    environment:
+      POSTGRES_HOST: almacenamiento
+      POSTGRES_PORT: "5432"
+      POSTGRES_DB: ${POSTGRES_DB:-observatorio}
+      POSTGRES_USER: ${POSTGRES_USER:-observatorio}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env (copy .env.example)}
+      API_HOST: 0.0.0.0
+      API_PORT: "8000"
+      CORS_ORIGINS: http://localhost:4200
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+    ports:
+      - "127.0.0.1:${API_PORT:-8000}:8000"
+    depends_on:
+      almacenamiento:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - import urllib.request; urllib.request.urlopen("http://127.0.0.1:8000/api/v1/health", timeout=3).close()
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    networks:
+      - sismos-network
+
+volumes:
+  kafka_data:
+  postgres_data:
+  usgs_cache:
+
+networks:
+  sismos-network:
+    driver: bridge
