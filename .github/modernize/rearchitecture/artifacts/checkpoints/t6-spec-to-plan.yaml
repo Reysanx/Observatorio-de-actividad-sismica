@@ -1,0 +1,213 @@
+metadata:
+  generated: "2026-11-02"
+  source_spec: "specs/001-observatorio-sismico/spec.md"
+  target_plan: ".github/modernize/rearchitecture/artifacts/t6-teamlead-plan.md"
+
+summary:
+  total_requirements: 13
+  covered_requirements: 13
+  missing_requirements: 0
+  coverage_percentage: 100.0
+
+requirements:
+  - req_id: "FR-01"
+    req_description: "Poll and filter the USGS live feed every 60 seconds."
+    priority: "P1"
+    plan_mapping:
+      phase: "Phase-2"
+      phase_name: "Live ingestion and correct persistence"
+      items:
+        - item_id: "2.1"
+          description: "Ingest and publish the rolling USGS live feed."
+    notes: "Unit and integration evidence required."
+  - req_id: "FR-02"
+    req_description: "Download, cache, partition, and deduplicate the 2025 baseline."
+    priority: "P1"
+    plan_mapping:
+      phase: "Phase-3"
+      phase_name: "Historical baseline and queryable analytics"
+      items:
+        - item_id: "3.1"
+          description: "Cache, partition, and import the 2025 catalog."
+    notes: "Includes monthly source requests and database partitions."
+  - req_id: "FR-03"
+    req_description: "Enrich events using Natural Earth country polygons and deterministic maritime/border behavior."
+    priority: "P1"
+    plan_mapping:
+      phase: "Phase-1/2/4"
+      phase_name: "Setup, processing, and dashboard"
+      items:
+        - item_id: "1.3"
+          description: "Source and attribute Natural Earth countries."
+        - item_id: "2.2"
+          description: "Validate, quarantine, spatially enrich, and persist events."
+        - item_id: "4.1"
+          description: "Create the minimal Angular/Leaflet map shell."
+    notes: "Do not infer country from nearest polygon or place text."
+  - req_id: "FR-04"
+    req_description: "Track event revisions and apply only strictly newer updates."
+    priority: "P1"
+    plan_mapping:
+      phase: "Phase-1/2/5"
+      phase_name: "Persistence, processing, and replay"
+      items:
+        - item_id: "1.2"
+          description: "Use the PostgreSQL schema and verify partition/idempotency contracts."
+        - item_id: "2.2"
+          description: "Validate, quarantine, spatially enrich, and persist events."
+        - item_id: "5.1"
+          description: "Publish and persist run-scoped replay events."
+    notes: "Current state and version history are transactionally verified."
+  - req_id: "FR-05"
+    req_description: "Apply quality rules and quarantine invalid raw events."
+    priority: "P1"
+    plan_mapping:
+      phase: "Phase-1/2/3/4"
+      phase_name: "Schema, processing, historical import, and display"
+      items:
+        - item_id: "1.2"
+          description: "Use the PostgreSQL schema and verify partition/idempotency contracts."
+        - item_id: "2.2"
+          description: "Validate, quarantine, spatially enrich, and persist events."
+        - item_id: "3.1"
+          description: "Cache, partition, and import the 2025 catalog."
+        - item_id: "4.1"
+          description: "Create the minimal Angular/Leaflet map shell."
+    notes: "NULL/ND and valid negative measurements remain preserved."
+  - req_id: "FR-06"
+    req_description: "Use keyed at-least-once Kafka and commit offsets only after PostgreSQL."
+    priority: "P1"
+    plan_mapping:
+      phase: "Phase-1/2/5"
+      phase_name: "Schema, live pipeline, and replay"
+      items:
+        - item_id: "1.2"
+          description: "Use the PostgreSQL schema and verify partition/idempotency contracts."
+        - item_id: "2.1"
+          description: "Ingest and publish the rolling USGS live feed."
+        - item_id: "2.2"
+          description: "Validate, quarantine, spatially enrich, and persist events."
+        - item_id: "5.1"
+          description: "Publish and persist run-scoped replay events."
+    notes: "Consumer commit order is an integration acceptance."
+  - req_id: "FR-07"
+    req_description: "Expose health, filtered data, analytics, and historical comparison through FastAPI."
+    priority: "P1"
+    plan_mapping:
+      phase: "Phase-3/5"
+      phase_name: "Historical/API analytics and replay API"
+      items:
+        - item_id: "3.1"
+          description: "Cache, partition, and import the 2025 catalog."
+        - item_id: "3.2"
+          description: "Implement the FastAPI contracts and analytics."
+        - item_id: "5.2"
+          description: "Expose and visualize replay state safely."
+    notes: "Historical comparison is live-only and uses a 365-day denominator."
+  - req_id: "FR-08"
+    req_description: "Provide an Angular/Leaflet map and synchronized analytical dashboard."
+    priority: "P1"
+    plan_mapping:
+      phase: "Phase-1/4/5"
+      phase_name: "Country data, dashboard, and replay UI"
+      items:
+        - item_id: "1.3"
+          description: "Source and attribute Natural Earth countries."
+        - item_id: "4.1"
+          description: "Create the minimal Angular/Leaflet map shell."
+        - item_id: "4.2"
+          description: "Build synchronized dashboard views and failure retention."
+        - item_id: "5.2"
+          description: "Expose and visualize replay state safely."
+    notes: "Local Angular host, not a sixth Compose service."
+  - req_id: "FR-09"
+    req_description: "Replay historical data in isolation with a visible badge."
+    priority: "P1"
+    plan_mapping:
+      phase: "Phase-1/2/5"
+      phase_name: "Schema, processing, and replay"
+      items:
+        - item_id: "1.2"
+          description: "Use the PostgreSQL schema and verify partition/idempotency contracts."
+        - item_id: "2.2"
+          description: "Validate, quarantine, spatially enrich, and persist events."
+        - item_id: "5.1"
+          description: "Publish and persist run-scoped replay events."
+        - item_id: "5.2"
+          description: "Expose and visualize replay state safely."
+    notes: "Run ID scopes all replay queries and writes."
+  - req_id: "NFR-01"
+    req_description: "Meet local query and batch latency targets."
+    priority: "P1"
+    plan_mapping:
+      phase: "Phase-2/3/4/6"
+      phase_name: "Ingestion, API, UI, and validation"
+      items:
+        - item_id: "2.1"
+          description: "Ingest and publish the rolling USGS live feed."
+        - item_id: "3.2"
+          description: "Implement the FastAPI contracts and analytics."
+        - item_id: "4.2"
+          description: "Build synchronized dashboard views and failure retention."
+        - item_id: "6.1"
+          description: "Add deterministic integration and browser acceptance tests."
+    notes: "Measure; no performance result is pre-claimed."
+  - req_id: "NFR-02"
+    req_description: "Provide healthchecks, retries, restart behavior, and local outage resilience."
+    priority: "P1"
+    plan_mapping:
+      phase: "Phase-1/2/4/6"
+      phase_name: "Infrastructure, ingestion, dashboard, and validation"
+      items:
+        - item_id: "1.1"
+          description: "Secure five-service local runtime."
+        - item_id: "2.1"
+          description: "Ingest and publish the rolling USGS live feed."
+        - item_id: "2.2"
+          description: "Validate, quarantine, spatially enrich, and persist events."
+        - item_id: "4.2"
+          description: "Build synchronized dashboard views and failure retention."
+        - item_id: "6.1"
+          description: "Add deterministic integration and browser acceptance tests."
+    notes: "Test each service health contract and client recovery."
+  - req_id: "NFR-03"
+    req_description: "Keep secrets private, broker/database private, and API access local."
+    priority: "P1"
+    plan_mapping:
+      phase: "Phase-1/3/4/6"
+      phase_name: "Runtime, API, UI, and run guide"
+      items:
+        - item_id: "1.1"
+          description: "Secure five-service local runtime."
+        - item_id: "3.2"
+          description: "Implement the FastAPI contracts and analytics."
+        - item_id: "4.1"
+          description: "Create the minimal Angular/Leaflet map shell."
+        - item_id: "6.2"
+          description: "Document reproducible local execution and scope limits."
+    notes: "No credentials or public hosting/tunnel activity."
+  - req_id: "NFR-04"
+    req_description: "Make the local system reproducible with pinned dependencies and documented startup."
+    priority: "P1"
+    plan_mapping:
+      phase: "Phase-1/3/4/6"
+      phase_name: "Setup, historical import, frontend, and run guide"
+      items:
+        - item_id: "1.1"
+          description: "Secure five-service local runtime."
+        - item_id: "1.2"
+          description: "Use the PostgreSQL schema and verify partition/idempotency contracts."
+        - item_id: "3.1"
+          description: "Cache, partition, and import the 2025 catalog."
+        - item_id: "4.1"
+          description: "Create the minimal Angular/Leaflet map shell."
+        - item_id: "6.2"
+          description: "Document reproducible local execution and scope limits."
+    notes: "Lock files and commands must be checked during implementation."
+
+missing_requirements: []
+orphan_plan_items: []
+validation:
+  passed: true
+  errors: []
+  warnings: []

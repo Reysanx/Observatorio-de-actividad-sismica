@@ -1,0 +1,159 @@
+metadata:
+  generated: "2026-11-02"
+  source_plan: ".github/modernize/rearchitecture/artifacts/t6-teamlead-plan.md"
+  target_tasks: ".github/modernize/rearchitecture/artifacts/t6-teamlead-plan.md#Task-Breakdown"
+
+summary:
+  total_plan_items: 13
+  covered_plan_items: 13
+  missing_plan_items: 0
+  coverage_percentage: 100.0
+  total_tasks_generated: 14
+  orphan_tasks: 0
+
+phases:
+  - phase_id: "Phase-1"
+    phase_name: "Setup and foundational tasks"
+    items:
+      - item_id: "1.1"
+        description: "Secure five-service local runtime."
+        tasks:
+          - task_id: "T001"
+            description: "Create Compose, Dockerfiles, env template, and ignore rules."
+      - item_id: "1.2"
+        description: "Use PostgreSQL schema and verify partition/idempotency contracts."
+        tasks:
+          - task_id: "T002"
+            description: "Verify and integrate the existing DBA-owned DDL."
+      - item_id: "1.3"
+        description: "Source and attribute Natural Earth countries."
+        tasks:
+          - task_id: "T003"
+            description: "Add licensed GeoJSON and source/attribution record."
+  - phase_id: "Phase-2"
+    phase_name: "US1 — Live ingestion and correct persistence"
+    items:
+      - item_id: "2.1"
+        description: "Ingest and publish the rolling USGS live feed."
+        tasks:
+          - task_id: "T004"
+            description: "Implement live polling, envelope, filtering, retries, and Kafka publishing."
+      - item_id: "2.2"
+        description: "Validate, quarantine, spatially enrich, and persist events."
+        tasks:
+          - task_id: "T005"
+            description: "Implement consumer validation, STRtree, transactional writes, and offset ordering."
+  - phase_id: "Phase-3"
+    phase_name: "US2 — Historical baseline and API analytics"
+    items:
+      - item_id: "3.1"
+        description: "Cache, partition, and import the 2025 catalog."
+        tasks:
+          - task_id: "T006"
+            description: "Download, cache, deduplicate, and import monthly historical slices."
+      - item_id: "3.2"
+        description: "Implement the FastAPI contracts and analytics."
+        tasks:
+          - task_id: "T007"
+            description: "Implement health, event, statistics, and comparison endpoints."
+  - phase_id: "Phase-4"
+    phase_name: "US3 — Angular map and dashboard"
+    items:
+      - item_id: "4.1"
+        description: "Create the minimal Angular/Leaflet map shell."
+        tasks:
+          - task_id: "T008"
+            description: "Scaffold Angular, runtime config, map, detail, and attribution."
+      - item_id: "4.2"
+        description: "Build synchronized dashboard views and failure retention."
+        tasks:
+          - task_id: "T009"
+            description: "Implement filters, table/charts, comparison, and connection state."
+  - phase_id: "Phase-5"
+    phase_name: "US4 — Isolated historical replay"
+    items:
+      - item_id: "5.1"
+        description: "Publish and persist run-scoped replay events."
+        tasks:
+          - task_id: "T010"
+            description: "Publish replay controls/events and persist only replay relations."
+      - item_id: "5.2"
+        description: "Expose and visualize replay state safely."
+        tasks:
+          - task_id: "T011"
+            description: "Add replay state/query APIs and isolated UI scope/badge."
+  - phase_id: "Phase-6"
+    phase_name: "Acceptance and local run guidance"
+    items:
+      - item_id: "6.1"
+        description: "Add deterministic integration and browser acceptance tests."
+        tasks:
+          - task_id: "T012"
+            description: "Add ingestion, pipeline, and API acceptance test files."
+          - task_id: "T013"
+            description: "Add Playwright E2E and npm build/test/e2e scripts."
+      - item_id: "6.2"
+        description: "Document reproducible local execution and scope limits."
+        tasks:
+          - task_id: "T014"
+            description: "Document local setup, health, historical import, replay, tests, and boundaries."
+
+missing_plan_items: []
+orphan_tasks: []
+upstream_trace:
+  - plan_item: "1.1"
+    source_requirements: ["NFR-02", "NFR-03", "NFR-04"]
+    tasks: ["T001"]
+    full_trace: "NFR-02,NFR-03,NFR-04 → Plan 1.1 → T001"
+  - plan_item: "1.2"
+    source_requirements: ["FR-04", "FR-05", "FR-06", "FR-09", "NFR-04"]
+    tasks: ["T002"]
+    full_trace: "FR-04,FR-05,FR-06,FR-09,NFR-04 → Plan 1.2 → T002"
+  - plan_item: "1.3"
+    source_requirements: ["FR-03", "FR-08", "FR-09"]
+    tasks: ["T003"]
+    full_trace: "FR-03,FR-08,FR-09 → Plan 1.3 → T003"
+  - plan_item: "2.1"
+    source_requirements: ["FR-01", "FR-06", "NFR-01", "NFR-02"]
+    tasks: ["T004"]
+    full_trace: "FR-01,FR-06,NFR-01,NFR-02 → Plan 2.1 → T004"
+  - plan_item: "2.2"
+    source_requirements: ["FR-03", "FR-04", "FR-05", "FR-06", "NFR-02"]
+    tasks: ["T005"]
+    full_trace: "FR-03,FR-04,FR-05,FR-06,NFR-02 → Plan 2.2 → T005"
+  - plan_item: "3.1"
+    source_requirements: ["FR-02", "FR-03", "FR-05", "FR-07", "NFR-04"]
+    tasks: ["T006"]
+    full_trace: "FR-02,FR-03,FR-05,FR-07,NFR-04 → Plan 3.1 → T006"
+  - plan_item: "3.2"
+    source_requirements: ["FR-07", "NFR-01", "NFR-03"]
+    tasks: ["T007"]
+    full_trace: "FR-07,NFR-01,NFR-03 → Plan 3.2 → T007"
+  - plan_item: "4.1"
+    source_requirements: ["FR-03", "FR-08", "NFR-03", "NFR-04"]
+    tasks: ["T008"]
+    full_trace: "FR-03,FR-08,NFR-03,NFR-04 → Plan 4.1 → T008"
+  - plan_item: "4.2"
+    source_requirements: ["FR-07", "FR-08", "NFR-01", "NFR-02"]
+    tasks: ["T009"]
+    full_trace: "FR-07,FR-08,NFR-01,NFR-02 → Plan 4.2 → T009"
+  - plan_item: "5.1"
+    source_requirements: ["FR-04", "FR-06", "FR-09"]
+    tasks: ["T010"]
+    full_trace: "FR-04,FR-06,FR-09 → Plan 5.1 → T010"
+  - plan_item: "5.2"
+    source_requirements: ["FR-07", "FR-08", "FR-09"]
+    tasks: ["T011"]
+    full_trace: "FR-07,FR-08,FR-09 → Plan 5.2 → T011"
+  - plan_item: "6.1"
+    source_requirements: ["FR-01", "FR-02", "FR-03", "FR-04", "FR-05", "FR-06", "FR-07", "FR-08", "FR-09", "NFR-01", "NFR-02", "NFR-03", "NFR-04"]
+    tasks: ["T012", "T013"]
+    full_trace: "FR-01–FR-09,NFR-01–NFR-04 → Plan 6.1 → T012,T013"
+  - plan_item: "6.2"
+    source_requirements: ["NFR-02", "NFR-03", "NFR-04"]
+    tasks: ["T014"]
+    full_trace: "NFR-02,NFR-03,NFR-04 → Plan 6.2 → T014"
+validation:
+  passed: true
+  errors: []
+  warnings: []

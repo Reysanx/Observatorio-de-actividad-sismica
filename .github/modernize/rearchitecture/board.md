@@ -6,14 +6,15 @@
 
 ## Tasks
 
-### Phase: Scenario & Product Definition
+### Phase: Scenario & Product Definition 📌 64a3956
 - ✅ t1 [teamlead] Resolve the provided scenario decisions and record canonical clarification (2026-11-02T15:44:21Z→2026-11-02T16:10:09Z, 25m 48s) [deps: none]
 - ✅ t2 [pm] Trace requested MVP behaviors to the existing specifications (2026-11-02T16:11:00Z→2026-11-02T16:15:04Z, 4m 4s) [deps: t1]
 
 ### Phase: Architecture & Plan
-- ⏳ t3 [architect] Design the five-service architecture and API/event contracts [deps: t2]
-- ⏳ t4 [dba] Define PostgreSQL schema, time partitions, and idempotent persistence model [deps: t3]
-- ⏳ t5 [ux] Specify the Angular map/dashboard and replay-mode interactions [deps: t2, t3]
-- ⏳ t6 [teamlead] Produce the implementation plan, task breakdown, and focused validation strategy [deps: t2, t3, t4, t5]
+- ✅ t3 [architect] Design the five-service architecture and API/event contracts (2026-11-02T16:27:23Z→2026-11-02T16:32:09Z, 4m 46s) [deps: t2, t3.1]
+- ✅ t3.1 [teamlead] Resolve the five-service Compose health-dependency policy (2026-11-02T16:21:46Z→2026-11-02T16:27:23Z, 5m 37s) [deps: t2]
+- ✅ t4 [dba] Define PostgreSQL schema, time partitions, and idempotent persistence model (2026-11-02T16:36:17Z→2026-11-02T16:44:13Z, 7m 56s) [deps: t3]
+- ✅ t5 [ux] Specify the Angular map/dashboard and replay-mode interactions (2026-11-02T16:32:09Z→2026-11-02T16:36:17Z, 4m 8s) [deps: t2, t3]
+- ✅ t6 [teamlead] Produce the implementation plan, task breakdown, and focused validation strategy (2026-11-02T16:44:13Z→2026-11-02T16:53:02Z, 8m 49s) [deps: t2, t3, t4, t5]
 
 ⏳ [Execute + Validate phases — pending deep planning completion]

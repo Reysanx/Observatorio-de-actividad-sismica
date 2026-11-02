@@ -4,3 +4,17 @@
 - Debugging dead-ends and what actually worked: `context.md`, `decisions.md`, teamlead inbox/log history, and clarification answers markdown were absent. The read-only board and repository specs/constitution supplied the t1 evidence. The official Natural Earth terms and country-page URLs verified the public-domain status and public source. A PowerShell assertion on the accented replay badge text was unreliable; reading UTF-8 in Python and comparing the exact code point verified it.
 - Techniques/patterns worth reusing: Keep Compose IDs canonical from the constitution, normalize replay topics to the dotted style in the plan/tasks, and document data-source license and schema-attribute gaps before downstream implementation.
 - Learnings consumed: [none]
+
+## [t3.1] Resolved five-service Compose health dependencies
+- Codebase/domain discoveries: All five Compose services require healthchecks, but infrastructure roots cannot all have meaningful `depends_on` edges without artificial coupling or a cycle. The API reads PostgreSQL and has no direct Kafka dependency; the producer publishes to Kafka but does not require PostgreSQL.
+- Wrong assumptions and corrections: Treat `depends_on: service_healthy` as a gate for real direct dependencies, not a blanket requirement that every service have at least one dependency; Compose does not restart dependents merely because a dependency later becomes unhealthy.
+- Debugging dead-ends and what actually worked: Compose validation was unavailable because `compose.yaml` has not yet been created; record this instead of claiming a runtime check.
+- Techniques/patterns worth reusing: Keep the dependency graph acyclic, probe Kafka protocol readiness rather than only an open port, and make worker health reflect application heartbeat/readiness rather than PID existence.
+- Learnings consumed: [teamlead/canonical-compose-replay-names]
+
+## [t6] Produced local MVP plan, task breakdown, and validation strategy
+- Codebase/domain discoveries: This remains a specification-only workspace except for the DBA's `backend/db/init.sql`; there is no canonical test command or Angular project to inherit. The architecture and DBA artifacts settle replay relations/API run scope and monthly historical partitions. Project context/decisions/topology files were absent; no topology groups apply.
+- Wrong assumptions and corrections: The user requested implementation, but the assigned teamlead task is a planning task and the charter prohibits production-code implementation. TC-09/10 are translated to local API outage/recovery because ngrok/Netlify are explicitly out of scope. The unauthenticated local API has no auth-failure contract; use query validation as the negative-path test.
+- Debugging dead-ends and what actually worked: Docker CLI exists but `docker info` fails because the Docker Engine named pipe is missing. Node is v22.15.0; host Python is 3.15.0, while the planned service runtime remains Python 3.11 in containers. PyYAML is unavailable; installing it failed because Python 3.15 requires a native build and MSVC is absent. Standard-library traceability/indentation checks passed.
+- Techniques/patterns worth reusing: Keep integration and browser tiers independent; write down exact local outage simulations and gaps rather than attempting public services; use the two traceability checkpoints to enforce every FR/NFR and plan item.
+- Learnings consumed: [teamlead/canonical-compose-replay-names, teamlead/compose-health-dependencies]
