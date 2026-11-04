@@ -1,0 +1,117 @@
+batch_id: "t15"
+completed_tasks:
+  - "T007"
+blocked_tasks: []
+files_changed:
+  T007:
+    - file: "backend/api/__init__.py"
+      change_type: "created"
+      description: "Declares the FastAPI package."
+    - file: "backend/api/db.py"
+      change_type: "created"
+      description: "Creates and exposes the asynchronous PostgreSQL pool."
+    - file: "backend/api/filters.py"
+      change_type: "created"
+      description: "Validates UTC/date/range/scope filters and builds parameterized predicates."
+    - file: "backend/api/main.py"
+      change_type: "created"
+      description: "Wires application lifespan, routes, CORS, and generic database error handling."
+    - file: "backend/api/models.py"
+      change_type: "created"
+      description: "Defines immutable response DTOs and UTC Z serialization."
+    - file: "backend/api/routes/__init__.py"
+      change_type: "created"
+      description: "Declares versioned route modules."
+    - file: "backend/api/routes/comparison.py"
+      change_type: "created"
+      description: "Compares live M4+ events with the 2025 M4+ daily average over 365 days."
+    - file: "backend/api/routes/earthquakes.py"
+      change_type: "created"
+      description: "Implements filtered, paginated live or explicitly run-scoped replay event listing."
+    - file: "backend/api/routes/health.py"
+      change_type: "created"
+      description: "Reports database readiness and persisted live-ingestion freshness."
+    - file: "backend/api/routes/stats.py"
+      change_type: "created"
+      description: "Implements geography, fixed UTC hourly, and magnitude/depth distribution analytics."
+    - file: "backend/requirements.txt"
+      change_type: "modified"
+      description: "Pins FastAPI, Pydantic, Uvicorn, and pytest for the API and test image."
+    - file: "backend/tests/test_api_contract.py"
+      change_type: "created"
+      description: "Adds seven route, validation, serialization, replay-isolation, comparison, and CORS contract tests."
+upstream_artifacts_consumed:
+  T007:
+    - artifact: ".github/modernize/rearchitecture/artifacts/t3-architect.md"
+      used_for: "Canonical route paths, DTO semantics, filters, UTC handling, replay scoping, and comparison rules."
+    - artifact: ".github/modernize/rearchitecture/artifacts/t7-devops.md"
+      used_for: "Verified Python and Docker environment."
+    - artifact: ".github/modernize/rearchitecture/artifacts/t8-devops.md"
+      used_for: "API container, loopback binding, and CORS configuration."
+    - artifact: ".github/modernize/rearchitecture/artifacts/t10-dba.md"
+      used_for: "Database relation and field names, partitioning, and country dimension."
+    - artifact: ".github/modernize/rearchitecture/artifacts/t12-backend.md"
+      used_for: "Live normalized fields and persisted country assignment."
+    - artifact: ".github/modernize/rearchitecture/artifacts/t14-backend.md"
+      used_for: "Historical baseline load and persistence boundary."
+    - artifact: "specs/001-observatorio-sismico/{spec.md,plan.md,tasks.md,data-spec.md,acceptance-tests.md}"
+      used_for: "FR-07, Task 5 acceptance criteria, analytics, UTC, and null preservation."
+    - artifact: ".specify/memory/constitution.md and .agents/{AGENTS.md,rules/architecture_invariants.md,rules/data_quality_rules.md,subagents/04-backend-modeler/AGENT.md}"
+      used_for: "Backend ownership, security boundaries, and quality requirements."
+    - artifact: ".github/modernize/rearchitecture/learnings/backend/{consumer-quality-spatial-persistence.md,historical-2025-baseline.md,usgs-live-envelope-and-dedupe.md}"
+      used_for: "Schema names, source semantics, and live/baseline separation."
+evidence_mapping:
+  T007:
+    - upstream: "t3-architect.md#API Endpoints Inventory"
+      output: "backend/api/routes/health.py, earthquakes.py, stats.py, comparison.py"
+      evidence: "All implemented routes returned HTTP 200 in runtime probes."
+    - upstream: "t3-architect.md#Common filters"
+      output: "backend/api/filters.py"
+      evidence: "Contract tests assert invalid ranges return 422 and replay requires run_id; replay queries use only the replay relation."
+    - upstream: "t10-dba.md#Contract Verified"
+      output: "backend/api/routes/*.py"
+      evidence: "Queries executed successfully against the actual PostgreSQL schema."
+    - upstream: "t14-backend.md#Test Results"
+      output: "backend/api/routes/comparison.py"
+      evidence: "Runtime comparison returned 18,302 baseline events and a 365-day denominator."
+    - upstream: "spec.md#FR-07; tasks.md#TASK-5.1–5.5; t6-teamlead-plan.md#T007"
+      output: "backend/api/"
+      evidence: "Seven focused API tests and the complete 52-pass backend suite (5 skipped) pass; all HTTP routes respond in a PostgreSQL-backed runtime."
+traceability:
+  - requirement: "FR-07"
+    plan_item: "3.2"
+    task: "T007"
+    files:
+      - "backend/api/"
+      - "backend/requirements.txt"
+      - "backend/tests/test_api_contract.py"
+    status: "completed"
+protocol_violation: false
+errors: []
+warnings:
+  - severity: "INFO"
+    message: "The complete suite requires the consumer image's Natural Earth data mount; the API-only image does not include that asset. Use the consumer image for the aggregate backend suite."
+  - severity: "INFO"
+    message: "Starlette emitted a TestClient deprecation warning; tests pass."
+test_results:
+  T007_focused_api:
+    command: "docker compose --env-file .env.example run --build --rm --no-deps api python -m pytest -q tests/test_api_contract.py"
+    passed: 7
+    failed: 0
+    skipped: 0
+    failures: []
+  T007_full_backend:
+    command: "docker compose --env-file .env.example run --build --rm --no-deps consumidor python -m pytest -q tests"
+    passed: 52
+    failed: 0
+    skipped: 5
+    failures: []
+additional_verification:
+  - command: "Runtime GET probes for health, earthquakes, geo, hourly, distributions, historical-comparison, and OpenAPI."
+    result: "All HTTP 200; API and PostgreSQL containers healthy."
+  - command: "Filtered comparison, replay-scoped queries for an unknown run, and CORS preflight."
+    result: "All route probes HTTP 200; preflight allows localhost:4200 and ngrok-skip-browser-warning; unknown replay returned no live rows."
+  - command: "docker compose --env-file .env.example run --build --rm --no-deps api python -m pytest -q tests"
+    result: "Initial attempt: 48 passed, 4 setup errors, 5 skipped because API-only image lacked Natural Earth (the four SpatialIndexTests setup cases); rerun in consumidor passed 52 with 5 skipped."
+  - command: "docker compose --env-file .env.example config --quiet; git diff --check; python -m compileall -q /app/api /app/tests/test_api_contract.py"
+    result: "All checks passed."

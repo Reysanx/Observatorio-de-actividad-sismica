@@ -1,0 +1,82 @@
+metadata:
+  generated: "2026-11-02"
+  source_tasks: "Task assignment t16; specs/001-observatorio-sismico/tasks.md TASK-7.2"
+  last_updated: "2026-11-02"
+summary:
+  total_tasks: 1
+  completed_tasks: 1
+  in_progress_tasks: 0
+  pending_tasks: 0
+  completion_percentage: 100.0
+tasks:
+  - task_id: "t16"
+    description: "Implement isolated replay production and persistence."
+    status: "completed"
+    implementation:
+      files_changed:
+        - file: "backend/scripts/replay_producer.py"
+          changes:
+            - change_type: "added"
+              description: "Load verified 2025 cache and publish ordered replay controls/events with optional controlled demo cases."
+        - file: "backend/consumer/quality.py"
+          changes:
+            - change_type: "modified"
+              description: "Validate replay-mode event envelopes and replay lifecycle controls."
+        - file: "backend/consumer/main.py"
+          changes:
+            - change_type: "modified"
+              description: "Subscribe to live and replay; persist mode-specific records before offset commit."
+        - file: "backend/consumer/db_writer.py"
+          changes:
+            - change_type: "modified"
+              description: "Write only run-scoped replay relations with strict-newer revisions and offset-idempotent quarantine."
+        - file: "backend/tests/test_consumer_db.py"
+          changes:
+            - change_type: "modified"
+              description: "Add run-scoped PostgreSQL integration tests."
+        - file: "backend/tests/test_consumer_replay.py"
+          changes:
+            - change_type: "added"
+              description: "Test replay control and event processing contracts."
+        - file: "backend/tests/test_replay_producer.py"
+          changes:
+            - change_type: "added"
+              description: "Test replay publishing and controlled fixtures."
+    verification:
+      build_passed: true
+      test_results:
+        command: "docker compose --env-file .env.example run --build --rm --no-deps consumidor python -m unittest discover -s tests -v"
+        passed: 53
+        failed: 0
+        skipped: 5
+        failures: []
+      notes: "Five DB-gated tests passed separately; a real replay run persisted and committed to Kafka log-end with lag 0."
+    upstream_trace:
+      plan_item: "Plan section 6; tasks.md TASK-7.2"
+      requirements:
+        - "FR-09"
+      full_trace: "FR-09 → replay architecture/TASK-7.2 → t16 → isolated Kafka producer, validator, consumer writer, and tests"
+pending_tasks: []
+untracked_changes: []
+traceability_chain:
+  - chain_id: "TRACE-t16-FR09"
+    requirement: "FR-09"
+    plan_phase: "Phase 7"
+    plan_item: "Replay"
+    tasks:
+      - "t16"
+    files:
+      - "backend/scripts/replay_producer.py"
+      - "backend/consumer/quality.py"
+      - "backend/consumer/main.py"
+      - "backend/consumer/db_writer.py"
+      - "backend/tests/test_consumer_db.py"
+      - "backend/tests/test_consumer_replay.py"
+      - "backend/tests/test_replay_producer.py"
+    status: "complete"
+validation:
+  passed: true
+  errors: []
+  warnings:
+    - "Replay-state API and UI badge are downstream tasks."
+  blocking_issues: []

@@ -1,0 +1,91 @@
+metadata:
+  generated: "2026-11-02T18:09:34Z"
+  source_tasks: "specs/001-observatorio-sismico/tasks.md"
+  last_updated: "2026-11-02T18:09:34Z"
+summary:
+  total_tasks: 1
+  completed_tasks: 1
+  in_progress_tasks: 0
+  pending_tasks: 0
+  completion_percentage: 100.0
+tasks:
+  - task_id: "T005"
+    description: "Validate, quarantine, spatially enrich, and persist live events idempotently; commit Kafka only after PostgreSQL."
+    status: "completed"
+    implementation:
+      files_changed:
+        - file: "backend/consumer/__init__.py"
+          changes:
+            - change_type: "added"
+              description: "Mark the consumer package."
+        - file: "backend/consumer/quality.py"
+          changes:
+            - change_type: "added"
+              description: "Validate the v1 live-event and poll-audit contracts, numeric bounds, timestamp consistency, and nullable magnitude."
+        - file: "backend/consumer/spatial.py"
+          changes:
+            - change_type: "added"
+              description: "Load Natural Earth WGS84 data into a Shapely STRtree; resolve boundaries and ocean events deterministically."
+        - file: "backend/consumer/db_writer.py"
+          changes:
+            - change_type: "added"
+              description: "Seed country dimension and write event/version/audit/quarantine records using the existing schema."
+        - file: "backend/consumer/main.py"
+          changes:
+            - change_type: "added"
+              description: "Consume earthquakes.live with manual offsets and commit only after successful database transactions."
+        - file: "backend/requirements.txt"
+          changes:
+            - change_type: "modified"
+              description: "Add exact asyncpg and Shapely runtime pins."
+        - file: "backend/tests/test_consumer_quality.py"
+          changes:
+            - change_type: "added"
+              description: "Exercise quality rules and explicit rejection reasons."
+        - file: "backend/tests/test_consumer_spatial.py"
+          changes:
+            - change_type: "added"
+              description: "Exercise Natural Earth, ocean, shared-boundary, and coordinate-range behavior."
+        - file: "backend/tests/test_consumer_pipeline.py"
+          changes:
+            - change_type: "added"
+              description: "Verify quarantine, enrichment calls, and no commit when persistence fails."
+        - file: "backend/tests/test_consumer_db.py"
+          changes:
+            - change_type: "added"
+              description: "Verify strict-newer SQL behavior and quarantine deduplication in PostgreSQL."
+      commit_hash: ""
+      pr_link: ""
+    verification:
+      build_passed: true
+      test_results:
+        command: "docker compose -p t12-consumer-check --env-file .env.example run --build --rm --no-deps -e RUN_DB_INTEGRATION=1 consumidor python -m unittest discover -s tests -p \"test_consumer_*.py\" -v"
+        passed: 22
+        failed: 0
+        skipped: 0
+        failures: []
+      notes: "PostgreSQL 16.4 integration, including Kafka tombstone quarantine; live Kafka-to-PostgreSQL smoke; exact-five-service Compose config; and 9 producer regression tests also passed. Temporary Compose stack/volumes were removed."
+    upstream_trace:
+      plan_item: "2.2"
+      requirements: ["FR-03", "FR-04", "FR-05", "FR-06"]
+      full_trace: "FR-03–FR-06 → Plan 2.2 → T005 → backend/consumer/{quality,spatial,db_writer,main}.py"
+pending_tasks: []
+untracked_changes: []
+traceability_chain:
+  - chain_id: "TRACE-t12-consumer-pipeline"
+    requirement: "Live-event quality validation, country enrichment, idempotent persistence, and DB-before-offset commit"
+    plan_phase: "Phase 2 — User Story 1"
+    plan_item: "2.2"
+    tasks: ["T005"]
+    files:
+      - "backend/consumer/quality.py"
+      - "backend/consumer/spatial.py"
+      - "backend/consumer/db_writer.py"
+      - "backend/consumer/main.py"
+    status: "complete"
+validation:
+  passed: true
+  errors: []
+  warnings:
+    - "Replay topic processing is not part of T005 and remains a later assigned task."
+  blocking_issues: []

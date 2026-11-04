@@ -1,0 +1,59 @@
+metadata:
+  generated: "2026-11-02T17:49:49Z"
+  source_tasks: "specs/001-observatorio-sismico/tasks.md"
+  last_updated: "2026-11-02T17:49:49Z"
+summary:
+  total_tasks: 1
+  completed_tasks: 1
+  in_progress_tasks: 0
+  pending_tasks: 0
+  completion_percentage: 100.0
+tasks:
+  - task_id: "t11"
+    description: "Source and attribute Natural Earth countries"
+    status: "completed"
+    implementation:
+      files_changed:
+        - file: "frontend/public/datos/paises.geojson"
+          changes:
+            - change_type: "added"
+              description: "Pinned Natural Earth Admin-0 countries release at the required consumer/public path."
+        - file: "frontend/public/datos/ATTRIBUTION.md"
+          changes:
+            - change_type: "added"
+              description: "Documents source URL, pinned release, public-domain terms, recommended citation, CRS, and fallback."
+    verification:
+      build_passed: null
+      test_results:
+        command: "py -3.11 - (GeoJSON schema/coordinates); docker compose --env-file .env.example config --quiet"
+        passed: 3
+        failed: 0
+        skipped: 1
+        failures: []
+      notes: "Data structure and Compose syntax passed. Shapely is absent on the host, and full app/consumer runtime verification is outside t11."
+    upstream_trace:
+      plan_item: "spec.md FR-03; data-spec.md §1.3; tasks.md TASK-2.1 asset-source portion"
+      requirements:
+        - "Natural Earth countries GeoJSON at frontend/public/datos/paises.geojson"
+        - "WGS84/CRS84 coordinates and required Admin-0 country attributes"
+        - "Public-domain terms and recommended attribution recorded alongside the data"
+      full_trace: "spec.md FR-03 / data-spec.md §1.3 -> t11 -> frontend/public/datos/paises.geojson + ATTRIBUTION.md"
+pending_tasks: []
+untracked_changes: []
+traceability_chain:
+  - chain_id: "TRACE-t11-natural-earth"
+    requirement: "Natural Earth country-boundary asset and documented provenance"
+    plan_phase: "Geospatial data"
+    plan_item: "TASK-2.1 asset-source portion"
+    tasks:
+      - "t11"
+    files:
+      - "frontend/public/datos/paises.geojson"
+      - "frontend/public/datos/ATTRIBUTION.md"
+    status: "complete for source/provenance"
+validation:
+  passed: true
+  errors: []
+  warnings:
+    - "No host Shapely installation; STRtree consumer smoke test belongs to downstream spatial implementation."
+  blocking_issues: []

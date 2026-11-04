@@ -1,0 +1,88 @@
+metadata:
+  generated: "2026-11-02T19:07:33Z"
+  source_tasks: "specs/001-observatorio-sismico/tasks.md"
+  last_updated: "2026-11-02T19:07:33Z"
+
+summary:
+  total_tasks: 1
+  completed_tasks: 1
+  in_progress_tasks: 0
+  pending_tasks: 0
+  completion_percentage: 100.0
+
+tasks:
+  - task_id: "TASK-6.3"
+    description: "Integrate synchronized distribution charts and hourly temporal views."
+    status: "completed"
+    implementation:
+      files_changed:
+        - file: "frontend/src/app/app.ts"
+          changes:
+            - change_type: "modified"
+              description: "Apply one validated filter snapshot to the event page and supported analytics."
+        - file: "frontend/src/app/app.html"
+          changes:
+            - change_type: "modified"
+              description: "Render synchronized map, histograms, hourly chart, geographic summary, comparison card, and event table."
+        - file: "frontend/src/app/app.css"
+          changes:
+            - change_type: "modified"
+              description: "Add responsive dashboard and data-view styles."
+        - file: "frontend/src/app/api/earthquake-api.service.ts"
+          changes:
+            - change_type: "modified"
+              description: "Add typed API requests for filterable analytics and fixed-live comparison."
+        - file: "frontend/src/app/map/earthquake-map.component.ts"
+          changes:
+            - change_type: "modified"
+              description: "Synchronize marker selection and highlighting with table selection."
+        - file: "frontend/src/app/dashboard-utils.mjs"
+          changes:
+            - change_type: "added"
+              description: "Validate UTC filter values and provide deterministic chart/search helpers."
+        - file: "frontend/tests/dashboard-utils.test.mjs"
+          changes:
+            - change_type: "added"
+              description: "Cover filter validation, UTC handling, chart coordinates, and loaded-page search."
+    verification:
+      build_passed: true
+      test_results:
+        command: "Set-Location frontend; npm test"
+        passed: 8
+        failed: 0
+        skipped: 0
+        failures: []
+      notes: "npm run build passed. Live API and static UI routes returned HTTP 200; live event page was empty."
+    upstream_trace:
+      plan_item: "TASK-6.3"
+      requirements:
+        - "FR-08"
+      full_trace: "FR-08 → Fase 6 / TASK-6.3 → t17 → frontend/src/app dashboard views and tests"
+
+pending_tasks: []
+untracked_changes: []
+traceability_chain:
+  - chain_id: "TRACE-T17-FR08"
+    requirement: "FR-08"
+    plan_phase: "Fase 6: Panel de Control e Interfaz Cartográfica"
+    plan_item: "TASK-6.3"
+    tasks:
+      - "TASK-6.3"
+    files:
+      - "frontend/src/app/app.ts"
+      - "frontend/src/app/app.html"
+      - "frontend/src/app/app.css"
+      - "frontend/src/app/api/earthquake-api.service.ts"
+      - "frontend/src/app/map/earthquake-map.component.ts"
+      - "frontend/src/app/dashboard-utils.mjs"
+      - "frontend/tests/dashboard-utils.test.mjs"
+    status: "complete"
+
+validation:
+  passed: true
+  errors: []
+  warnings:
+    - "Angular component CSS warning budget exceeded by 1.44 kB; production build remains below the 10 kB error budget."
+    - "Current live API has no events; actual non-empty map marker rendering remains unverified."
+    - "Compose inspection found only almacenamiento and api healthy (2/5); pipeline ingestion needs recovery before end-to-end validation."
+  blocking_issues: []

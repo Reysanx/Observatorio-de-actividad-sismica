@@ -1,0 +1,438 @@
+<main class="page-shell">
+  <header class="topbar">
+    <div>
+      <div class="title-with-badge">
+        <p class="eyebrow">Datos sísmicos globales · USGS</p>
+        @if (isReplayMode()) {
+          <span class="badge badge--replay" role="status" aria-label="Modo reproducción activa">REPRODUCCIÓN</span>
+        }
+      </div>
+      <h1>Observatorio de actividad sísmica</h1>
+      <p class="subtitle">
+        {{ isReplayMode() ? 'Visualización aislada de topic earthquakes.replay · Sin mezclar con feed en vivo' : 'Mapa, distribuciones y actividad horaria sincronizados · En vivo · UTC' }}
+      </p>
+    </div>
+    <div class="topbar-actions">
+      <div class="scope-toggle" role="group" aria-label="Modo de datos">
+        <button
+          type="button"
+          class="scope-button"
+          [class.scope-button--active]="!isReplayMode()"
+          (click)="setViewScope('live')"
+        >
+          En vivo
+        </button>
+        <button
+          type="button"
+          class="scope-button"
+          [class.scope-button--active]="isReplayMode()"
+          [class.scope-button--has-data]="replayState()?.run_id !== null"
+          (click)="setViewScope('replay')"
+        >
+          Reproducción
+          @if (hasActiveReplay()) {
+            <span class="pulse-dot" title="Ejecución activa"></span>
+          }
+        </button>
+      </div>
+      <div
+        class="connection"
+        [class.connection--online]="connection() === 'connected'"
+        [class.connection--offline]="connection() === 'disconnected'"
+        role="status"
+        aria-live="polite"
+      >
+        <span class="connection__dot" aria-hidden="true"></span>
+        {{ connection() === 'connected' ? 'API conectada' : connection() === 'disconnected' ? 'API desconectada' : 'Conectando…' }}
+      </div>
+    </div>
+  </header>
+
+  @if (isReplayMode()) {
+    <section class="banner banner--replay" role="status">
+      <div class="banner__icon" aria-hidden="true">🎬</div>
+      <div class="banner__body">
+        <div class="banner__title">
+          <strong>MODO REPRODUCCIÓN HISTÓRICA AISLADO</strong>
+          <span class="badge badge--replay-tag">REPRODUCCIÓN</span>
+        </div>
+        @if (replayState()?.run_id; as runId) {
+          <p>
+            Ejecución <code>{{ runId }}</code> · Estado: <strong>{{ replayState()?.status }}</strong> ·
+            Eventos recibidos: <strong>{{ replayState()?.events_received }}</strong> ·
+            Procesados: <strong>{{ replayState()?.events_processed }}</strong> ·
+            Cuarentena: <strong>{{ replayState()?.events_quarantined }}</strong>
+          </p>
+        } @else {
+          <p>No se ha detectado ninguna ejecución en <code>replay_runs</code>. Ejecute el script de reproducción (<code>replay_producer.py</code>) para poblar este ámbito aislado.</p>
+        }
+      </div>
+    </section>
+  }
+
+  @if (connection() === 'disconnected' || dataError()) {
+    <section class="alert" role="alert">
+      <strong>Sin conexión con la API. Se conservan los últimos datos recibidos.</strong>
+      @if (events().length === 0 && eventTotal() === null) {
+        <span>Todavía no hay datos recibidos; se volverá a intentar automáticamente.</span>
+      } @else {
+        <span>Los valores visibles pueden estar desactualizados.</span>
+      }
+      @if (dataError() || errorMessage()) {
+        <span class="alert__detail">{{ dataError() || errorMessage() }}</span>
+      }
+    </section>
+  }
+
+  <section class="data-status" aria-label="Estado de actualización">
+    <p>
+      <span>Última actualización correcta del panel</span>
+      <strong>{{ lastRefresh() ? (lastRefresh() | date:'yyyy-MM-dd HH:mm:ss':'UTC') + ' UTC' : 'Pendiente' }}</strong>
+    </p>
+    <p>
+      <span>{{ isReplayMode() ? 'Estado de la reproducción' : 'Última ingesta sísmica' }}</span>
+      <strong>
+        @if (isReplayMode()) {
+          {{ replayState()?.status ? 'Estado: ' + replayState()?.status : 'Sin ejecución' }}
+        } @else {
+          {{ latestIngestion() ? (latestIngestion() | date:'yyyy-MM-dd HH:mm:ss':'UTC') + ' UTC' : 'No disponible' }}
+        }
+      </strong>
+    </p>
+    <p class="event-count">
+      <span>Eventos que coinciden con los filtros</span>
+      <strong>{{ eventTotal() === null ? '—' : eventTotal() }}</strong>
+    </p>
+  </section>
+
+  <section class="filters-panel" aria-labelledby="filters-heading">
+    <div class="section-title">
+      <div>
+        <h2 id="filters-heading">Filtros compartidos</h2>
+        <p>Los filtros aplicados actualizan juntos el mapa, los indicadores, los gráficos y la tabla.</p>
+      </div>
+      @if (dashboardLoading()) {
+        <span class="loading-label" role="status">Actualizando…</span>
+      }
+    </div>
+
+    <form class="filter-form" (submit)="applyFilters($event)">
+      <fieldset class="range-presets">
+        <legend>Periodo en UTC</legend>
+        <div class="button-row" role="group" aria-label="Periodo">
+          <button type="button" [class.preset--active]="rangePreset() === '1h'" (click)="setRangePreset('1h')">1 h</button>
+          <button type="button" [class.preset--active]="rangePreset() === '6h'" (click)="setRangePreset('6h')">6 h</button>
+          <button type="button" [class.preset--active]="rangePreset() === '24h'" (click)="setRangePreset('24h')">24 h</button>
+          <button type="button" [class.preset--active]="rangePreset() === 'custom'" (click)="setRangePreset('custom')">Personalizado</button>
+        </div>
+      </fieldset>
+
+      <div class="filter-grid">
+        <label>
+          Desde (UTC)
+          <input type="datetime-local" step="60" [value]="filterDraft().start_utc" (input)="updateDraft('start_utc', $event)">
+        </label>
+        <label>
+          Hasta (UTC, exclusivo)
+          <input type="datetime-local" step="60" [value]="filterDraft().end_utc" (input)="updateDraft('end_utc', $event)">
+        </label>
+        <label>
+          Magnitud mínima
+          <input type="number" step="any" [value]="filterDraft().mag_min" (input)="updateDraft('mag_min', $event)">
+        </label>
+        <label>
+          Magnitud máxima
+          <input type="number" step="any" [value]="filterDraft().mag_max" (input)="updateDraft('mag_max', $event)">
+        </label>
+        <label>
+          Profundidad mínima (km)
+          <input type="number" step="any" [value]="filterDraft().depth_min_km" (input)="updateDraft('depth_min_km', $event)">
+        </label>
+        <label>
+          Profundidad máxima (km)
+          <input type="number" step="any" [value]="filterDraft().depth_max_km" (input)="updateDraft('depth_max_km', $event)">
+        </label>
+        <label>
+          País
+          <select [value]="filterDraft().adm0_a3" (change)="updateDraft('adm0_a3', $event)">
+            <option value="">Todos los países</option>
+            @for (country of countryOptions(); track country.adm0_a3) {
+              <option [value]="country.adm0_a3">{{ country.adm0_a3 === 'N/A' ? 'Sin país asignado' : country.country_name }} ({{ country.adm0_a3 }})</option>
+            }
+          </select>
+        </label>
+        <label>
+          Continente
+          <select [value]="filterDraft().continent" (change)="updateDraft('continent', $event)">
+            <option value="">Todos los continentes</option>
+            @for (continent of continentOptions(); track continent) {
+              <option [value]="continent">{{ continent }}</option>
+            }
+          </select>
+        </label>
+        <label>
+          Subregión
+          <select [value]="filterDraft().subregion" (change)="updateDraft('subregion', $event)">
+            <option value="">Todas las subregiones</option>
+            @for (subregion of subregionOptions(); track subregion) {
+              <option [value]="subregion">{{ subregion }}</option>
+            }
+          </select>
+        </label>
+      </div>
+
+      @if (filterError()) {
+        <p class="filter-error" role="alert">{{ filterError() }}</p>
+      }
+      <div class="filter-actions">
+        <button class="button button--primary" type="submit">Aplicar filtros</button>
+        <button class="button" type="button" (click)="resetFilters()">Limpiar</button>
+      </div>
+    </form>
+  </section>
+
+  <section class="dashboard-grid" aria-label="Mapa y análisis">
+    <div class="map-panel panel">
+      <div class="panel-heading">
+        <div>
+          <h2 id="map-heading">Mapa de terremotos</h2>
+          <p>Resultados de la página actual · círculos por magnitud · color por profundidad</p>
+        </div>
+      </div>
+
+      <app-earthquake-map
+        [events]="events()"
+        [selectedEventId]="selectedEventId()"
+        (eventSelected)="selectEventId($event)"
+      ></app-earthquake-map>
+
+      <div class="legend" aria-label="Leyenda de profundidad">
+        <span><i class="legend-dot depth-shallow"></i> &lt;30 km</span>
+        <span><i class="legend-dot depth-mid"></i> 30–70 km</span>
+        <span><i class="legend-dot depth-deep"></i> &gt;70–300 km</span>
+        <span><i class="legend-dot depth-very-deep"></i> &gt;300 km</span>
+        <span><i class="legend-dot depth-unknown"></i> ND</span>
+        <span class="legend-note">El tamaño representa la magnitud; ND indica dato no disponible.</span>
+      </div>
+      <footer class="attribution">
+        Made with Natural Earth. Free vector and raster map data
+        <a href="https://www.naturalearthdata.com/about/terms-of-use/" target="_blank" rel="noopener noreferrer">@ naturalearthdata.com</a>.
+        Fondo cartográfico:
+        <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a>.
+      </footer>
+    </div>
+
+    <aside class="analytics-column" aria-label="Resumen analítico">
+      <section class="panel metric-panel" aria-labelledby="total-heading">
+        <p class="eyebrow">{{ isReplayMode() ? 'Vista de reproducción' : 'Vista en vivo' }}</p>
+        <h2 id="total-heading">Eventos filtrados</h2>
+        <strong class="metric-value">{{ eventTotal() === null ? '—' : eventTotal() }}</strong>
+        <span class="metric-caption">{{ dashboardLoading() ? 'Consultando el mismo conjunto de filtros…' : 'Total del intervalo seleccionado' }}</span>
+      </section>
+
+      <section class="panel chart-panel" aria-labelledby="magnitude-heading">
+        <div class="section-title">
+          <div>
+            <h2 id="magnitude-heading">Distribución de magnitudes</h2>
+            <p>Intervalos de 0,5 · incluidos valores negativos</p>
+          </div>
+        </div>
+        @if (magnitudeBars().length > 0) {
+          <div class="histogram">
+            @for (bin of magnitudeBars(); track bin.bin_start) {
+              <div class="histogram-row">
+                <span>{{ formatBin(bin.bin_start) }}–{{ formatBin(bin.bin_end) }}</span>
+                <div class="bar-track" aria-hidden="true"><span class="bar bar--magnitude" [style.width.%]="bin.width"></span></div>
+                <strong>{{ bin.count }}</strong>
+              </div>
+            }
+          </div>
+        } @else {
+          <p class="empty-inline">{{ dashboardLoading() ? 'Cargando distribución…' : 'Sin magnitudes en este intervalo.' }}</p>
+        }
+        @if (distributions(); as distribution) {
+          <p class="null-count">Magnitud ND: {{ distribution.magnitude_null_count }}</p>
+        }
+      </section>
+
+      <section class="panel chart-panel" aria-labelledby="depth-heading">
+        <div class="section-title">
+          <div>
+            <h2 id="depth-heading">Distribución de profundidad</h2>
+            <p>Intervalos de 20 km · profundidad en km</p>
+          </div>
+        </div>
+        @if (depthBars().length > 0) {
+          <div class="histogram">
+            @for (bin of depthBars(); track bin.bin_start) {
+              <div class="histogram-row">
+                <span>{{ formatBin(bin.bin_start) }}–{{ formatBin(bin.bin_end) }}</span>
+                <div class="bar-track" aria-hidden="true"><span class="bar bar--depth" [style.width.%]="bin.width"></span></div>
+                <strong>{{ bin.count }}</strong>
+              </div>
+            }
+          </div>
+        } @else {
+          <p class="empty-inline">{{ dashboardLoading() ? 'Cargando distribución…' : 'Sin profundidades en este intervalo.' }}</p>
+        }
+        @if (distributions(); as distribution) {
+          <p class="null-count">Profundidad ND: {{ distribution.depth_null_count }}</p>
+        }
+      </section>
+
+      <section class="panel chart-panel" aria-labelledby="hourly-heading">
+        <div class="section-title">
+          <div>
+            <h2 id="hourly-heading">Actividad por hora UTC</h2>
+            <p>Recuento por ventana horaria de ocurrencia</p>
+          </div>
+        </div>
+        @if (hourlyStats().length > 0) {
+          <svg class="hourly-chart" viewBox="0 0 640 180" role="img" aria-label="Serie temporal de eventos sísmicos por hora UTC">
+            <line x1="12" y1="168" x2="628" y2="168" class="chart-axis"></line>
+            <polyline [attr.points]="hourlyPoints()" class="hourly-line"></polyline>
+            @for (point of hourlyStats(); track point.hour_utc) {
+              <circle
+                [attr.cx]="hourlyStats().length === 1 ? 320 : 12 + ($index / (hourlyStats().length - 1)) * 616"
+                [attr.cy]="168 - (point.event_count / (hourlyPeak() || 1)) * 156"
+                r="4"
+                class="hourly-point"
+              >
+                <title>{{ point.hour_utc | date:'yyyy-MM-dd HH:mm':'UTC' }} UTC: {{ point.event_count }}</title>
+              </circle>
+            }
+          </svg>
+          <div class="chart-range">
+            <span>{{ hourlyStats()[0].hour_utc | date:'MM-dd HH:mm':'UTC' }} UTC</span>
+            <span>Máximo: {{ hourlyPeak() }} eventos/h</span>
+            <span>{{ hourlyStats()[hourlyStats().length - 1].hour_utc | date:'MM-dd HH:mm':'UTC' }} UTC</span>
+          </div>
+        } @else {
+          <p class="empty-inline">{{ dashboardLoading() ? 'Cargando serie horaria…' : 'Sin actividad horaria en este intervalo.' }}</p>
+        }
+      </section>
+
+      <section class="panel comparison-panel" aria-labelledby="comparison-heading">
+        <p class="eyebrow">Solo vista en vivo · ventana fija M≥4</p>
+        <h2 id="comparison-heading">Últimas 24 h frente a la media diaria de 2025</h2>
+        @if (isReplayMode()) {
+          <p class="empty-inline">La comparativa con la media anual 2025 está disponible únicamente en el feed en vivo para preservar el aislamiento de la simulación.</p>
+        } @else if (comparison(); as comparisonResult) {
+          <strong class="metric-value">{{ compareRatio(comparisonResult.ratio_to_historical_daily_average) }}</strong>
+          <div class="comparison-values">
+            <span>Últimas 24 h <b>{{ comparisonResult.recent_event_count }}</b></span>
+            <span>Media diaria 2025 <b>{{ comparisonResult.historical_daily_average | number:'1.0-2' }}</b></span>
+          </div>
+          <p class="metric-caption">
+            {{ comparisonResult.historical_2025_event_count }} eventos históricos / {{ comparisonResult.historical_days }} días.
+            Se aplican los filtros geográficos; el intervalo y el umbral M≥4 son fijos en el contrato de comparación.
+          </p>
+        } @else {
+          <p class="empty-inline">{{ dashboardLoading() ? 'Calculando comparación…' : 'Comparación no disponible.' }}</p>
+        }
+      </section>
+
+      <section class="panel geo-panel" aria-labelledby="geo-heading">
+        <h2 id="geo-heading">Actividad por país</h2>
+        @if (geoStats().length > 0) {
+          <ol class="geo-list">
+            @for (item of geoStats(); track item.adm0_a3) {
+              <li>
+                <span>{{ item.country_name }} <small>{{ item.adm0_a3 }}</small></span>
+                <strong>{{ item.event_count }}</strong>
+              </li>
+            }
+          </ol>
+        } @else {
+          <p class="empty-inline">{{ dashboardLoading() ? 'Cargando resumen geográfico…' : 'Sin actividad geográfica en este intervalo.' }}</p>
+        }
+      </section>
+    </aside>
+  </section>
+
+  @if (events().length === 0 && connection() === 'connected' && !dashboardLoading()) {
+    <p class="empty-state">
+      {{ isReplayMode() ? 'No hay eventos en la ejecución de reproducción seleccionada o que coincidan con los filtros.' : 'No hay eventos que coincidan con el periodo y los filtros seleccionados.' }}
+    </p>
+  }
+
+  <section class="panel table-panel" aria-labelledby="events-heading">
+    <div class="section-title table-heading">
+      <div>
+        <h2 id="events-heading">Eventos sísmicos {{ isReplayMode() ? '(Reproducción)' : '' }}</h2>
+        <p>{{ pageLabel() }} · orden inicial: hora del evento descendente</p>
+      </div>
+      <label class="table-search">
+        Buscar en eventos cargados
+        <input type="search" [value]="tableSearch()" (input)="searchRows($event)" placeholder="ID, lugar o país">
+      </label>
+    </div>
+    @if (eventTotal() !== null && eventTotal()! > events().length) {
+      <p class="table-note">La búsqueda se limita a los {{ events().length }} registros de esta página; usa la paginación para consultar otros eventos.</p>
+    }
+
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col" [attr.aria-sort]="sortColumn() === 'time_utc' ? (sortDescending() ? 'descending' : 'ascending') : 'none'">
+              <button type="button" class="sort-button" (click)="sortBy('time_utc')">Hora UTC</button>
+            </th>
+            <th scope="col" [attr.aria-sort]="sortColumn() === 'mag' ? (sortDescending() ? 'descending' : 'ascending') : 'none'">
+              <button type="button" class="sort-button" (click)="sortBy('mag')">Magnitud</button>
+            </th>
+            <th scope="col">Profundidad</th>
+            <th scope="col">Lugar</th>
+            <th scope="col" [attr.aria-sort]="sortColumn() === 'country_name' ? (sortDescending() ? 'descending' : 'ascending') : 'none'">
+              <button type="button" class="sort-button" (click)="sortBy('country_name')">País</button>
+            </th>
+            <th scope="col">ID</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (event of visibleEvents(); track event.event_id) {
+            <tr [class.event-row--selected]="selectedEventId() === event.event_id">
+              <td>
+                <button class="event-cell-button" type="button" (click)="selectEvent(event)">
+                  {{ event.time_utc | date:'yyyy-MM-dd HH:mm:ss':'UTC' }} UTC
+                </button>
+              </td>
+              <td>{{ formatMagnitude(event.mag) }}</td>
+              <td>{{ formatDepth(event.depth_km) }}</td>
+              <td>{{ event.place || 'Lugar no indicado' }}</td>
+              <td>{{ event.adm0_a3 === 'N/A' ? 'Sin país asignado' : event.country_name }}</td>
+              <td><code>{{ event.event_id }}</code></td>
+            </tr>
+          } @empty {
+            <tr><td class="table-empty" colspan="6">{{ tableSearch() ? 'No hay filas cargadas que coincidan con la búsqueda.' : 'No hay eventos en la página actual.' }}</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <nav class="pagination" aria-label="Paginación de eventos">
+      <button class="button" type="button" [disabled]="!canGoBack()" (click)="selectPage(offset() - 100)">Anterior</button>
+      <span>{{ pageLabel() }}</span>
+      <button class="button" type="button" [disabled]="!canGoForward()" (click)="selectPage(offset() + 100)">Siguiente</button>
+    </nav>
+  </section>
+
+  @if (selectedEvent(); as selected) {
+    <section class="selected-event" aria-labelledby="selected-heading" aria-live="polite">
+      <div>
+        <h2 id="selected-heading">Evento seleccionado</h2>
+        <p>
+          {{ formatMagnitude(selected.mag) }} · {{ formatDepth(selected.depth_km) }} ·
+          {{ selected.time_utc | date:'yyyy-MM-dd HH:mm:ss':'UTC' }} UTC ·
+          {{ selected.adm0_a3 === 'N/A' ? 'Sin país asignado' : selected.country_name }}
+        </p>
+      </div>
+      <button class="button" type="button" (click)="clearSelection()">Cerrar detalle</button>
+    </section>
+  }
+
+  <footer class="attribution page-attribution">
+    Made with Natural Earth. Free vector and raster map data
+    <a href="https://www.naturalearthdata.com/about/terms-of-use/" target="_blank" rel="noopener noreferrer">@ naturalearthdata.com</a>.
+    Attribution and public-domain terms are documented with the local map asset.
+  </footer>
+</main>

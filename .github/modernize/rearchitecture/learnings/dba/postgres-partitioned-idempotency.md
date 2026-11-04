@@ -10,3 +10,4 @@ Before partitioning a table with an idempotent UPSERT key, check whether the par
 
 ## History
 - 2026-11-02 (001-observatorio-sismico/t4): initial
+- 2026-11-02 (001-observatorio-sismico/t10): applied the schema twice on PostgreSQL 16.4 and verified partition, constraint, strict-newer, and replay-isolation behavior with disposable rows

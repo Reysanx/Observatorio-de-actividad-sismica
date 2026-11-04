@@ -1,0 +1,102 @@
+batch_id: "t14"
+completed_tasks:
+  - "TASK-2.2"
+blocked_tasks: []
+files_changed:
+  TASK-2.2:
+    - file: "backend/scripts/__init__.py"
+      change_type: "created"
+      description: "Makes backend scripts importable for the Compose command."
+    - file: "backend/scripts/download_historical_2025.py"
+      change_type: "created"
+      description: "Downloads/cache-resumes twelve partitioned USGS 2025 monthly GeoJSON files with a checksum manifest."
+    - file: "backend/consumer/historical.py"
+      change_type: "created"
+      description: "Validates and normalizes historical USGS features."
+    - file: "backend/consumer/historical_import.py"
+      change_type: "created"
+      description: "Consumer-owned cache verification, country enrichment, and baseline bootstrap CLI."
+    - file: "backend/consumer/db_writer.py"
+      change_type: "modified"
+      description: "Adds an immutable, one-transaction writer for the baseline registry and monthly facts."
+    - file: "backend/tests/test_historical_2025.py"
+      change_type: "created"
+      description: "Adds focused downloader and historical validation tests."
+upstream_artifacts_consumed:
+  TASK-2.2:
+    - artifact: ".github/modernize/rearchitecture/artifacts/t3-architect.md"
+      used_for: "Named cache volume, consumer-owned bootstrap, and live/baseline isolation."
+    - artifact: ".github/modernize/rearchitecture/artifacts/t7-devops.md"
+      used_for: "Prepared Python 3.11 and Docker runtime."
+    - artifact: ".github/modernize/rearchitecture/artifacts/t8-devops.md"
+      used_for: "Compose cache volume and container configuration."
+    - artifact: ".github/modernize/rearchitecture/artifacts/t9-backend.md"
+      used_for: "Producer cache environment and shared dependency manifest."
+    - artifact: ".github/modernize/rearchitecture/artifacts/t10-dba.md"
+      used_for: "Historical tables, global ID registry, and month partitions."
+    - artifact: ".github/modernize/rearchitecture/artifacts/t11-frontend.md"
+      used_for: "Natural Earth GeoJSON path."
+    - artifact: ".github/modernize/rearchitecture/artifacts/t12-backend.md"
+      used_for: "Spatial index and country-dimension seeding."
+    - artifact: "specs/001-observatorio-sismico/{spec.md,plan.md,tasks.md,data-spec.md,acceptance-tests.md}"
+      used_for: "FR-02/TASK-2.2 partitioning, filters, threshold, cache, and domain rules."
+    - artifact: ".specify/memory/constitution.md and .agents/{AGENTS.md,subagents/02-data-ingestion/AGENT.md,subagents/04-backend-modeler/AGENT.md,rules/architecture_invariants.md,rules/data_quality_rules.md,skills/usgs-ingestion/SKILL.md}"
+      used_for: "Service boundaries, UTC, data validation, and source-download behavior."
+evidence_mapping:
+  TASK-2.2:
+    - upstream: "t3-architect.md#Decisions-and-Naming"
+      output: "backend/scripts/download_historical_2025.py"
+      evidence: "Monthly cache uses the persistent producer volume; consumer imports the cache into baseline-only relations."
+    - upstream: "data-spec.md#1.2"
+      output: "backend/scripts/download_historical_2025.py#fetch_interval"
+      evidence: "12-month UTC query and recursive split behavior; all 12 live source queries returned HTTP 200."
+    - upstream: "t10-dba.md#Contract-Verified"
+      output: "backend/consumer/db_writer.py#persist_historical_events"
+      evidence: "Database check confirms 18,302 unique baseline facts and registry IDs across 12 partitions; second import preserves count."
+    - upstream: "t11-frontend.md#Summary; t12-backend.md#Processing-and-Naming-Decisions"
+      output: "backend/consumer/historical_import.py#import_historical_cache"
+      evidence: "Full import ran with Natural Earth country seeding and spatial lookup."
+    - upstream: "tasks.md#TASK-2.2; spec.md#FR-02"
+      output: "backend/tests/test_historical_2025.py"
+      evidence: "Focused downloader/validation tests pass."
+traceability:
+  - requirement: "FR-02"
+    plan_item: "2.2"
+    task: "TASK-2.2"
+    files:
+      - "backend/scripts/download_historical_2025.py"
+      - "backend/consumer/historical.py"
+      - "backend/consumer/historical_import.py"
+      - "backend/consumer/db_writer.py"
+      - "backend/tests/test_historical_2025.py"
+    status: "completed"
+protocol_violation: false
+errors: []
+warnings:
+  - severity: "INFO"
+    message: "Full-stack runtime/API and the complete acceptance suite are downstream tasks; this batch verified the baseline and backend regression suite only."
+test_results:
+  TASK-2.2:
+    command: "docker compose --env-file .env.example run --build --rm -e RUN_DB_INTEGRATION=1 consumidor python -m unittest discover -s tests -q"
+    passed: 37
+    failed: 0
+    skipped: 0
+    failures: []
+  focused_historical_tests:
+    command: "docker compose --env-file .env.example run --build --rm --no-deps productor python -m unittest discover -s tests -p test_historical_2025.py -v"
+    passed: 6
+    failed: 0
+    skipped: 0
+    failures: []
+additional_verification:
+  - command: "docker compose --env-file .env.example run --build --rm --no-deps productor python -m scripts.download_historical_2025"
+    result: "12 monthly HTTP 200 responses; 18,302 unique features cached."
+  - command: "docker compose --env-file .env.example run --rm --no-deps productor python -m scripts.download_historical_2025"
+    result: "Persistent cache was reused (cache_hit=True); no requests were sent."
+  - command: "docker compose --env-file .env.example run --build --rm consumidor python -m consumer.historical_import"
+    result: "Executed twice; each run validated/enriched 18,302 unique baseline events."
+  - command: >-
+      docker compose --env-file .env.example exec -T almacenamiento psql -U observatorio -d observatorio -v ON_ERROR_STOP=1 -c "SELECT count(*) AS baseline_rows, count(DISTINCT event_id) AS unique_ids, min(time_utc) AS first_utc, max(time_utc) AS last_utc, min(mag) AS min_mag, count(*) FILTER (WHERE mag < 4.0) AS below_threshold FROM historical_2025;" -c "SELECT count(*) AS registry_rows FROM historical_2025_event_keys;" -c "SELECT inhrelid::regclass AS partition_name FROM pg_inherits WHERE inhparent = 'historical_2025'::regclass ORDER BY 1;"
+    result: "18,302 facts, 18,302 registry rows, all 12 partitions, no M<4 rows, and all occurrence times in 2025."
+  - command: "git diff --check; docker compose --env-file .env.example config --quiet; rendered service-set assertion"
+    result: "Passed; exact five canonical Compose services retained."

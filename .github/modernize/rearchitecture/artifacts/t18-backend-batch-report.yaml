@@ -1,0 +1,65 @@
+batch_id: "t18"
+completed_tasks:
+  - "t18"
+blocked_tasks: []
+files_changed:
+  t18:
+    - file: "backend/api/models.py"
+      change_type: "modified"
+      description: "Added immutable replay-state response DTO."
+    - file: "backend/api/routes/replay.py"
+      change_type: "created"
+      description: "Added newest-run state endpoint backed only by replay_runs."
+    - file: "backend/api/main.py"
+      change_type: "modified"
+      description: "Registered the replay-state router."
+    - file: "backend/tests/test_api_contract.py"
+      change_type: "modified"
+      description: "Added idle, active, completed, query-isolation, and UTC response tests."
+upstream_artifacts_consumed:
+  t18:
+    - artifact: ".github/modernize/rearchitecture/artifacts/t7-devops.md"
+      used_for: "Docker and Python 3.11 test/runtime environment."
+    - artifact: ".github/modernize/rearchitecture/artifacts/t15-backend.md"
+      used_for: "FastAPI route/model conventions, DB pool use, and UTC serialization."
+    - artifact: ".github/modernize/rearchitecture/artifacts/t16-backend.md"
+      used_for: "Replay lifecycle persistence handoff and run-state schema behavior."
+    - artifact: ".github/modernize/rearchitecture/artifacts/t3-architect.md"
+      used_for: "Replay state endpoint, newest-run scope, and response semantics."
+    - artifact: "backend/db/init.sql#replay_runs"
+      used_for: "Persisted statuses, timestamps, and lifecycle counters."
+evidence_mapping:
+  t18:
+    - upstream: "t3-architect.md#API Endpoints Inventory"
+      output: "backend/api/routes/replay.py"
+      evidence: "HTTP probe returned 200 with explicit idle state."
+    - upstream: "t3-architect.md#DTOs & Contracts"
+      output: "backend/api/models.py"
+      evidence: "Response DTO is immutable and UTC timestamp serialization is covered by contract tests."
+    - upstream: "t16-backend.md#Handoff / Remaining Scope"
+      output: "backend/api/routes/replay.py"
+      evidence: "SQL reads only replay_runs; contract tests assert no current_earthquakes reference."
+    - upstream: "plan.md#6 and acceptance-tests.md#TC-11"
+      output: "backend/tests/test_api_contract.py"
+      evidence: "Idle, active, completed, and replay-state response behavior covered."
+traceability:
+  - requirement: "FR-09"
+    plan_item: "Plan §6 — Arquitectura del Modo Reproducción Histórica"
+    task: "t18"
+    files:
+      - "backend/api/models.py"
+      - "backend/api/routes/replay.py"
+      - "backend/api/main.py"
+      - "backend/tests/test_api_contract.py"
+    status: "completed"
+protocol_violation: false
+errors: []
+warnings:
+  - "One Starlette deprecation warning was emitted by the existing TestClient dependency."
+test_results:
+  t18:
+    command: "docker compose --env-file .env.example run --build --rm --no-deps api python -m pytest -q tests/test_api_contract.py"
+    passed: 10
+    failed: 0
+    skipped: 0
+    failures: []

@@ -1,0 +1,104 @@
+batch_id: "t17"
+completed_tasks:
+  - "TASK-6.3"
+blocked_tasks: []
+files_changed:
+  TASK-6.3:
+    - file: "frontend/src/app/app.ts"
+      change_type: "modified"
+      description: "Coordinate filter validation, all-or-nothing dashboard refresh, query state, sorting, pagination, and map/table selection."
+    - file: "frontend/src/app/app.html"
+      change_type: "modified"
+      description: "Render shared filters, map, analytics, historical comparison, and searchable event table."
+    - file: "frontend/src/app/app.css"
+      change_type: "modified"
+      description: "Style accessible filters, responsive map/analytics layout, charts, and table."
+    - file: "frontend/src/app/api/earthquake-api.service.ts"
+      change_type: "modified"
+      description: "Add typed live event and analytics endpoint requests using the common filter contract."
+    - file: "frontend/src/app/map/earthquake-map.component.ts"
+      change_type: "modified"
+      description: "Synchronize marker selection with the event table and highlight the selected marker."
+    - file: "frontend/src/app/dashboard-utils.mjs"
+      change_type: "created"
+      description: "Pure UTC input validation, chart scaling, and loaded-page search helpers."
+    - file: "frontend/tests/dashboard-utils.test.mjs"
+      change_type: "created"
+      description: "Focused tests for UTC conversion, filter validation, chart points, and table search."
+upstream_artifacts_consumed:
+  TASK-6.3:
+    - artifact: ".github/modernize/rearchitecture/artifacts/t7-devops.md"
+      used_for: "Node version and local test/runtime assumptions."
+    - artifact: ".github/modernize/rearchitecture/artifacts/t13-frontend.md"
+      used_for: "Existing Angular shell, API runtime configuration, and Leaflet map ownership."
+    - artifact: ".github/modernize/rearchitecture/artifacts/t13.1-devops.md"
+      used_for: "Patched frontend dependencies and validation baseline."
+    - artifact: ".github/modernize/rearchitecture/artifacts/t15-backend.md"
+      used_for: "Actual endpoint paths, DTO names, filter behavior, and comparison limitations."
+    - artifact: ".github/modernize/rearchitecture/artifacts/t5-ux.md"
+      used_for: "Spanish dashboard hierarchy, synchronized filters, pagination/search, and UTC presentation."
+    - artifact: "specs/001-observatorio-sismico/{spec.md,plan.md,tasks.md,data-spec.md,acceptance-tests.md}"
+      used_for: "FR-08/TASK-6.3 and earthquake display/data requirements."
+    - artifact: ".specify/memory/constitution.md and .agents frontend/rules/skills files"
+      used_for: "Local-only, accessibility, null/negative-value, and no-fabricated-data constraints."
+evidence_mapping:
+  TASK-6.3:
+    - upstream: "t7-devops.md#Target Environment Preparation"
+      output: "frontend/package.json"
+      evidence: "Existing Node 22.15.0 project scripts ran tests/build without requiring dependency changes."
+    - upstream: "t13-frontend.md#Summary"
+      output: "frontend/src/app/app.ts and frontend/src/app/map/earthquake-map.component.ts"
+      evidence: "Existing live map shell was extended with shared analytics requests and synchronized marker selection."
+    - upstream: "t13.1-devops.md#Test Results"
+      output: "frontend/package-lock.json (unchanged)"
+      evidence: "Dashboard implementation passed tests/build without changing the remediated dependency graph."
+    - upstream: "t5-ux.md#Shared filters"
+      output: "frontend/src/app/app.ts#applyFilters and app.html#Filtros compartidos"
+      evidence: "Browser rejected inverted magnitude bounds and retained existing data."
+    - upstream: "t5-ux.md#Dashboard Query and Refresh Behavior"
+      output: "frontend/src/app/api/earthquake-api.service.ts#getEarthquakes/getGeoStats/getHourlyStats/getDistributions/getHistoricalComparison"
+      evidence: "Browser network check confirmed matching UTC, magnitude, country, and live parameters on the filterable requests; comparison received only adm0_a3."
+    - upstream: "spec.md#FR-08; tasks.md#TASK-6.3"
+      output: "frontend/src/app/app.html and frontend/src/app/app.ts"
+      evidence: "Production Angular build passed; map and all dashboard views render from one accepted filter snapshot."
+    - upstream: "t15-backend.md#API Contract and Naming Decisions"
+      output: "frontend/src/app/api/earthquake-api.service.ts"
+      evidence: "Live probes of health, events, geo, hourly, distributions, and comparison all returned HTTP 200."
+    - upstream: "data-spec.md#1.1; data_quality_rules.md#1; acceptance-tests.md#TC-05"
+      output: "frontend/src/app/dashboard-utils.mjs and frontend/tests/dashboard-utils.test.mjs"
+      evidence: "Tests verify negative magnitude/depth filters remain numeric and UTC serialization is explicit; UI formats nulls as ND."
+traceability:
+  - requirement: "FR-08"
+    plan_item: "TASK-6.3"
+    task: "TASK-6.3"
+    files:
+      - "frontend/src/app/app.ts"
+      - "frontend/src/app/app.html"
+      - "frontend/src/app/app.css"
+      - "frontend/src/app/api/earthquake-api.service.ts"
+      - "frontend/src/app/map/earthquake-map.component.ts"
+      - "frontend/src/app/dashboard-utils.mjs"
+      - "frontend/tests/dashboard-utils.test.mjs"
+    status: "completed"
+protocol_violation: false
+errors: []
+warnings:
+  - severity: "MEDIUM"
+    message: "Production build succeeds, but app.css exceeds Angular's 6 kB component-style warning budget (7.44 kB); optional lmdb cache and Leaflet CommonJS warnings also remain."
+  - severity: "INFO"
+    message: "The running live API contains zero events, so real-data markers and non-empty analytics were not exercised; controlled browser acceptance coverage remains downstream."
+  - severity: "HIGH"
+    message: "Compose runtime inspection with .env.example showed only almacenamiento and api healthy (2/5); broker, productor, and consumidor were not running. Full ingestion validation is blocked pending service recovery."
+test_results:
+  TASK-6.3:
+    command: "Set-Location frontend; npm test"
+    passed: 8
+    failed: 0
+    skipped: 0
+    failures: []
+  build:
+    command: "Set-Location frontend; npm run build"
+    passed: 1
+    failed: 0
+    skipped: 0
+    failures: []

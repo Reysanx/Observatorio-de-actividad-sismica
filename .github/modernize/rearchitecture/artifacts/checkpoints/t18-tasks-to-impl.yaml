@@ -1,0 +1,85 @@
+metadata:
+  generated: "2026-11-02T18:48:19Z"
+  source_tasks: "Task assignment t18; specs/001-observatorio-sismico/plan.md §6"
+  last_updated: "2026-11-02T18:53:49Z"
+
+summary:
+  total_tasks: 1
+  completed_tasks: 1
+  in_progress_tasks: 0
+  pending_tasks: 0
+  completion_percentage: 100.0
+
+tasks:
+  - task_id: "t18"
+    description: "Expose run-scoped replay API state."
+    status: "completed"
+    implementation:
+      files_changed:
+        - file: "backend/api/models.py"
+          change_type: "modified"
+          description: "Added ReplayStateResponse."
+        - file: "backend/api/routes/replay.py"
+          change_type: "created"
+          description: "Added GET /api/v1/replay/state backed by replay_runs."
+        - file: "backend/api/main.py"
+          change_type: "modified"
+          description: "Registered replay router."
+        - file: "backend/tests/test_api_contract.py"
+          change_type: "modified"
+          description: "Added replay state contract tests."
+    verification:
+      build_passed: true
+      test_results:
+        command: "docker compose --env-file .env.example run --build --rm --no-deps api python -m pytest -q tests/test_api_contract.py"
+        passed: 10
+        failed: 0
+        skipped: 0
+        failures: []
+      notes: "Compose config and git diff checks passed; DB-backed HTTP probe returned 200."
+    upstream_trace:
+      plan_item: "Plan §6 — replay architecture"
+      requirements:
+        - "FR-09"
+      full_trace: "FR-09 → Plan §6 → t18 → replay-state endpoint/model and contract tests"
+
+pending_tasks: []
+untracked_changes: []
+traceability_chain:
+  - chain_id: "TRACE-t18-FR09"
+    requirement: "FR-09"
+    plan_phase: "Phase 6 — Replay"
+    plan_item: "Plan §6"
+    tasks:
+      - "t18"
+    files:
+      - "backend/api/models.py"
+      - "backend/api/routes/replay.py"
+      - "backend/api/main.py"
+      - "backend/tests/test_api_contract.py"
+    status: "complete"
+
+upstream_artifacts_consumed:
+  - artifact: ".github/modernize/rearchitecture/artifacts/t7-devops.md"
+    used_for: "Containerized validation environment."
+  - artifact: ".github/modernize/rearchitecture/artifacts/t15-backend.md"
+    used_for: "API implementation conventions."
+  - artifact: ".github/modernize/rearchitecture/artifacts/t16-backend.md"
+    used_for: "Replay run lifecycle handoff."
+  - artifact: ".github/modernize/rearchitecture/artifacts/t3-architect.md"
+    used_for: "Endpoint and response contract."
+
+evidence_mapping:
+  - upstream: "t3-architect.md#API Endpoints Inventory"
+    output: "backend/api/routes/replay.py"
+    evidence: "Runtime HTTP 200 probe and focused contract tests."
+  - upstream: "t16-backend.md#Handoff / Remaining Scope"
+    output: "backend/api/routes/replay.py"
+    evidence: "Route selects lifecycle rows only from replay_runs."
+
+validation:
+  passed: true
+  errors: []
+  warnings:
+    - "One Starlette TestClient deprecation warning."
+  blocking_issues: []

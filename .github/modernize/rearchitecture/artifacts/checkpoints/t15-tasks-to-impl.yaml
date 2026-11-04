@@ -1,0 +1,58 @@
+metadata:
+  generated: "2026-11-02T18:44:11Z"
+  source_tasks: "specs/001-observatorio-sismico/tasks.md; .github/modernize/rearchitecture/artifacts/t6-teamlead-plan.md"
+  last_updated: "2026-11-02T18:44:11Z"
+summary:
+  total_tasks: 1
+  completed_tasks: 1
+  in_progress_tasks: 0
+  pending_tasks: 0
+tasks:
+  - task_id: "T007"
+    description: "Implement FastAPI contracts and analytics."
+    status: "completed"
+    implementation:
+      files_changed:
+        - file: "backend/api/"
+          changes:
+            - change_type: "added"
+              description: "FastAPI health, filtered event listing, statistics, and historical comparison endpoints with validated DTO/filter contracts."
+        - file: "backend/requirements.txt"
+          changes:
+            - change_type: "modified"
+              description: "Pinned API runtime and pytest dependencies."
+        - file: "backend/tests/test_api_contract.py"
+          changes:
+            - change_type: "added"
+              description: "Seven focused API contract tests."
+    verification:
+      build_passed: true
+      test_results:
+        command: "docker compose --env-file .env.example run --build --rm --no-deps consumidor python -m pytest -q tests"
+        passed: 52
+        failed: 0
+        skipped: 5
+        failures: []
+      notes: "Focused API suite passed 7 tests; aggregate suite passed 52 with 5 skipped. All API routes passed PostgreSQL-backed runtime probes."
+    upstream_trace:
+      plan_item: "3.2"
+      requirements: ["FR-07"]
+      full_trace: "FR-07 → Phase-3.2 → T007 → backend/api/"
+pending_tasks: []
+untracked_changes: []
+traceability_chain:
+  - chain_id: "TRACE-T007-FR07"
+    requirement: "FR-07"
+    plan_phase: "Phase-3"
+    plan_item: "3.2"
+    tasks: ["T007"]
+    files:
+      - "backend/api/"
+      - "backend/requirements.txt"
+      - "backend/tests/test_api_contract.py"
+    status: "complete"
+validation:
+  passed: true
+  errors: []
+  warnings: []
+  blocking_issues: []

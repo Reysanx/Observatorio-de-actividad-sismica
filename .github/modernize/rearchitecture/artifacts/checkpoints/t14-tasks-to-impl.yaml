@@ -1,0 +1,88 @@
+metadata:
+  generated: "2026-11-02T18:26:21Z"
+  source_tasks: "specs/001-observatorio-sismico/tasks.md"
+  last_updated: "2026-11-02T18:26:21Z"
+summary:
+  total_tasks: 1
+  completed_tasks: 1
+  in_progress_tasks: 0
+  pending_tasks: 0
+  completion_percentage: 100.0
+tasks:
+  - task_id: "TASK-2.2"
+    description: "Download, cache, deduplicate, and import the partitioned 2025 USGS baseline."
+    status: "completed"
+    implementation:
+      files_changed:
+        - file: "backend/scripts/download_historical_2025.py"
+          changes:
+            - change_type: "added"
+              description: "Implemented monthly requests, recursive subdivision, resumable cache, and integrity manifest."
+        - file: "backend/consumer/historical.py"
+          changes:
+            - change_type: "added"
+              description: "Implemented historical-feature validation and normalization."
+        - file: "backend/consumer/historical_import.py"
+          changes:
+            - change_type: "added"
+              description: "Implemented consumer-owned cache import and STRtree country enrichment."
+        - file: "backend/consumer/db_writer.py"
+          changes:
+            - change_type: "modified"
+              description: "Added atomic, idempotent writes to the global event registry and partitioned facts."
+        - file: "backend/tests/test_historical_2025.py"
+          changes:
+            - change_type: "added"
+              description: "Added deterministic historical downloader and validation coverage."
+      commit_hash: ""
+      pr_link: ""
+    verification:
+      build_passed: true
+      test_results:
+        command: "docker compose --env-file .env.example run --build --rm -e RUN_DB_INTEGRATION=1 consumidor python -m unittest discover -s tests -q"
+        passed: 37
+        failed: 0
+        skipped: 0
+        failures: []
+      notes: "Actual USGS download and PostgreSQL import succeeded for 18,302 unique 2025 M4+ events; repeat import preserved row count."
+    upstream_trace:
+      plan_item: "2.2"
+      requirements:
+        - "FR-02"
+      full_trace: "FR-02 → Plan 2.2 → TASK-2.2 → monthly GeoJSON cache and immutable PostgreSQL baseline"
+pending_tasks: []
+untracked_changes: []
+traceability_chain:
+  - chain_id: "TRACE-T14-FR02"
+    requirement: "FR-02"
+    plan_phase: "Phase 2"
+    plan_item: "2.2"
+    tasks:
+      - "TASK-2.2"
+    files:
+      - "backend/scripts/download_historical_2025.py"
+      - "backend/consumer/historical.py"
+      - "backend/consumer/historical_import.py"
+      - "backend/consumer/db_writer.py"
+      - "backend/tests/test_historical_2025.py"
+    status: "complete"
+validation:
+  passed: true
+  errors: []
+  warnings:
+    - "Full application API and end-to-end acceptance validation belong to downstream tasks."
+  blocking_issues: []
+upstream_artifacts_consumed:
+  - ".github/modernize/rearchitecture/artifacts/t3-architect.md"
+  - ".github/modernize/rearchitecture/artifacts/t7-devops.md"
+  - ".github/modernize/rearchitecture/artifacts/t8-devops.md"
+  - ".github/modernize/rearchitecture/artifacts/t9-backend.md"
+  - ".github/modernize/rearchitecture/artifacts/t10-dba.md"
+  - ".github/modernize/rearchitecture/artifacts/t11-frontend.md"
+  - ".github/modernize/rearchitecture/artifacts/t12-backend.md"
+  - "specs/001-observatorio-sismico/{spec.md,plan.md,tasks.md,data-spec.md,acceptance-tests.md}"
+  - ".specify/memory/constitution.md and relevant .agents role/rule/skill files"
+evidence_mapping:
+  - "t3-architect.md#Decisions-and-Naming -> named-volume cache, consumer bootstrap, baseline/live isolation"
+  - "t10-dba.md#Contract-Verified -> registry and monthly fact tables, verified against 12 partitions"
+  - "data-spec.md#1.2 -> request filters, monthly UTC partitioning, 18,000-row subdivision, and event-ID deduplication"

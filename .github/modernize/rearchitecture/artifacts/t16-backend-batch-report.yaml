@@ -1,0 +1,94 @@
+batch_id: "t16"
+completed_tasks:
+  - "t16"
+blocked_tasks: []
+files_changed:
+  t16:
+    - file: "backend/scripts/replay_producer.py"
+      change_type: "created"
+      description: "Publish checksum-verified historical events and run controls to the isolated replay topic."
+    - file: "backend/consumer/quality.py"
+      change_type: "modified"
+      description: "Validate replay envelope topic/mode/source and run controls."
+    - file: "backend/consumer/main.py"
+      change_type: "modified"
+      description: "Consume both topics and route replay persistence/quarantine before per-record offset commit."
+    - file: "backend/consumer/db_writer.py"
+      change_type: "modified"
+      description: "Persist replay runs/events/versions/quarantine only in run-scoped tables."
+    - file: "backend/tests/test_consumer_db.py"
+      change_type: "modified"
+      description: "Add PostgreSQL integration checks for replay isolation and idempotency."
+    - file: "backend/tests/test_consumer_replay.py"
+      change_type: "created"
+      description: "Cover replay envelope/control validation, processing, quarantine, and commit order."
+    - file: "backend/tests/test_replay_producer.py"
+      change_type: "created"
+      description: "Cover controlled replay fixtures, topic routing, acknowledgements, and safe failure controls."
+upstream_artifacts_consumed:
+  t16:
+    - artifact: ".github/modernize/rearchitecture/artifacts/t7-devops.md"
+      used_for: "Container runtime/toolchain and Compose test execution."
+    - artifact: ".github/modernize/rearchitecture/artifacts/t8-devops.md"
+      used_for: "Five-service topology, replay topic, and persistent cache."
+    - artifact: ".github/modernize/rearchitecture/artifacts/t3-architect.md"
+      used_for: "Replay event/control contracts and ordering/isolation boundary."
+    - artifact: ".github/modernize/rearchitecture/artifacts/t10-dba.md"
+      used_for: "Existing replay schema and transaction contract."
+    - artifact: ".github/modernize/rearchitecture/artifacts/t12-backend.md"
+      used_for: "Live consumer validation, quarantine, and offset commit behavior."
+    - artifact: ".github/modernize/rearchitecture/artifacts/t14-backend.md"
+      used_for: "Verified historical cache and source feature format."
+evidence_mapping:
+  t16:
+    - upstream: "t3-architect.md#Kafka topics and delivery"
+      output: "backend/scripts/replay_producer.py and backend/consumer/main.py"
+      evidence: "1,159 replay event messages were acknowledged; the replay consumer offset reached log-end with zero lag."
+    - upstream: "t3-architect.md#Processing and persistence boundaries"
+      output: "backend/consumer/db_writer.py"
+      evidence: "PostgreSQL replay run/event/version/quarantine integration checks passed; no live-current replay row was created."
+    - upstream: "t10-dba.md#Contract Verified"
+      output: "backend/consumer/db_writer.py and backend/tests/test_consumer_db.py"
+      evidence: "Strict-newer revision and run-scoped identity/version behavior passed against PostgreSQL."
+    - upstream: "spec.md#FR-09 and acceptance-tests.md#TC-11"
+      output: "backend/scripts/replay_producer.py and replay tests"
+      evidence: "Dedicated topic and duplicate/revision/ocean replay cases were verified."
+traceability:
+  - requirement: "FR-09"
+    plan_item: "Plan section 6 / replay; tasks.md TASK-7.2"
+    task: "t16"
+    files:
+      - "backend/scripts/replay_producer.py"
+      - "backend/consumer/quality.py"
+      - "backend/consumer/main.py"
+      - "backend/consumer/db_writer.py"
+      - "backend/tests/test_consumer_replay.py"
+      - "backend/tests/test_replay_producer.py"
+      - "backend/tests/test_consumer_db.py"
+    status: "completed"
+protocol_violation: false
+errors: []
+warnings:
+  - "API replay-state contract and Angular replay badge are downstream tasks t18/t19."
+  - "The 11-case acceptance suite and full local MVP are not claimed complete by t16."
+test_results:
+  t16:
+    command: "docker compose --env-file .env.example run --build --rm --no-deps consumidor python -m unittest discover -s tests -v"
+    passed: 53
+    failed: 0
+    skipped: 5
+    failures: []
+    additional_checks:
+      - command: "docker compose --env-file .env.example run --build --rm --no-deps -e RUN_DB_INTEGRATION=1 consumidor python -m unittest discover -s tests -p test_consumer_db.py -v"
+        passed: 5
+        failed: 0
+        skipped: 0
+      - command: "docker compose --env-file .env.example run --build --rm --no-deps productor python -m scripts.replay_producer --run-id t16-smoke-2025-06 --month 2025-06 --speed 10000"
+        passed: 1
+        failed: 0
+        skipped: 0
+        details: "Published 1,159 events; PostgreSQL run completed with 1,157 unique replay rows, 1,158 versions, 0 quarantines; replay Kafka lag was 0."
+      - command: "docker compose --env-file .env.example config --format json; git diff --check"
+        passed: 2
+        failed: 0
+        skipped: 0

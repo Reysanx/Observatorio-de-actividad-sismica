@@ -1,0 +1,114 @@
+batch_id: "t12"
+completed_tasks:
+  - "T005"
+blocked_tasks: []
+files_changed:
+  T005:
+    - file: "backend/consumer/__init__.py"
+      change_type: "created"
+      description: "Mark the consumer package."
+    - file: "backend/consumer/quality.py"
+      change_type: "created"
+      description: "Validate live envelopes, UTC timestamps, event fields, and producer poll-audit records."
+    - file: "backend/consumer/spatial.py"
+      change_type: "created"
+      description: "Load Natural Earth, build a Shapely STRtree, repair invalid polygon topology in memory, and assign deterministic country/unassigned results."
+    - file: "backend/consumer/db_writer.py"
+      change_type: "created"
+      description: "Seed country dimension and persist events, versions, audit, and offset-idempotent quarantine transactionally."
+    - file: "backend/consumer/main.py"
+      change_type: "created"
+      description: "Consume the live topic with manual per-message commits after DB success."
+    - file: "backend/requirements.txt"
+      change_type: "modified"
+      description: "Pin asyncpg and Shapely for consumer persistence and spatial indexing."
+    - file: "backend/tests/test_consumer_quality.py"
+      change_type: "created"
+      description: "Cover null/negative measurements, timestamps, malformed fields, quarantine reasons, and poll audits."
+    - file: "backend/tests/test_consumer_spatial.py"
+      change_type: "created"
+      description: "Cover real Natural Earth lookup, ocean fallback, shared-boundary tie-breaking, and coordinate bounds."
+    - file: "backend/tests/test_consumer_pipeline.py"
+      change_type: "created"
+      description: "Cover message routing, quarantine, and DB-before-offset commit behavior."
+    - file: "backend/tests/test_consumer_db.py"
+      change_type: "created"
+      description: "Exercise strict-newer persistence/versioning and Kafka-position quarantine deduplication against PostgreSQL."
+upstream_artifacts_consumed:
+  T005:
+    - artifact: ".github/modernize/rearchitecture/artifacts/t7-devops.md"
+      used_for: "Python 3.11 and Docker test environment."
+    - artifact: ".github/modernize/rearchitecture/artifacts/t8-devops.md"
+      used_for: "Consumer container, environment, service names, and Natural Earth mount."
+    - artifact: ".github/modernize/rearchitecture/artifacts/t3-architect.md"
+      used_for: "Event/audit envelope, topic names, country assignment, and offset ordering."
+    - artifact: ".github/modernize/rearchitecture/artifacts/t10-dba.md"
+      used_for: "Canonical PostgreSQL schema and persistence contracts."
+    - artifact: ".github/modernize/rearchitecture/artifacts/t11-frontend.md"
+      used_for: "Natural Earth file path, property fields, and source data."
+    - artifact: ".github/modernize/rearchitecture/artifacts/t6-teamlead-plan.md"
+      used_for: "Task T005 scope and validation strategy."
+    - artifact: "specs/001-observatorio-sismico/{spec.md,plan.md,tasks.md,data-spec.md,acceptance-tests.md}"
+      used_for: "FR-03–FR-06, T005, quality rules, and focused acceptance behaviors."
+    - artifact: ".specify/memory/constitution.md and .agents/{AGENTS.md,rules/*,subagents/03-geospatial-quality/AGENT.md,skills/*}"
+      used_for: "Architecture, role, data-quality, consumer, spatial, and testing constraints."
+evidence_mapping:
+  T005:
+    - upstream: "artifacts/t3-architect.md#Versioned JSON envelope"
+      output: "backend/consumer/quality.py#validate_event"
+      evidence: "event envelope unit tests pass; live Kafka smoke was persisted."
+    - upstream: "artifacts/t3-architect.md#Processing and persistence boundaries"
+      output: "backend/consumer/{quality.py,spatial.py,main.py}"
+      evidence: "quarantine, ocean/border, and DB-before-offset tests pass."
+    - upstream: "artifacts/t10-dba.md#Persistence Contract"
+      output: "backend/consumer/db_writer.py#persist_live_event and #persist_quarantine"
+      evidence: "PostgreSQL test confirms newer-only UPSERT/versioning and idempotent quarantine."
+    - upstream: "artifacts/t11-frontend.md#Summary"
+      output: "backend/consumer/spatial.py#SpatialIndex.from_geojson"
+      evidence: "Natural Earth country load and Chile/ocean/border fixtures pass."
+    - upstream: "specs/001-observatorio-sismico/spec.md#FR-03–FR-06"
+      output: "backend/consumer/*"
+      evidence: "22 consumer tests pass with PostgreSQL integration enabled."
+traceability:
+  - requirement: "FR-03"
+    plan_item: "2.2"
+    task: "T005"
+    files:
+      - "backend/consumer/spatial.py"
+      - "backend/consumer/db_writer.py"
+    status: "completed"
+  - requirement: "FR-04"
+    plan_item: "2.2"
+    task: "T005"
+    files:
+      - "backend/consumer/quality.py"
+      - "backend/consumer/db_writer.py"
+    status: "completed"
+  - requirement: "FR-05"
+    plan_item: "2.2"
+    task: "T005"
+    files:
+      - "backend/consumer/quality.py"
+      - "backend/consumer/main.py"
+    status: "completed"
+  - requirement: "FR-06"
+    plan_item: "2.2"
+    task: "T005"
+    files:
+      - "backend/consumer/main.py"
+      - "backend/consumer/db_writer.py"
+    status: "completed"
+protocol_violation: false
+errors: []
+warnings:
+  - severity: INFO
+    message: "This task handles earthquakes.live only; the assigned replay task must add isolated replay routing."
+  - severity: INFO
+    message: "This task does not claim API, historical bootstrap, frontend, full-stack, or academic deliverables."
+test_results:
+  T005:
+    command: "docker compose -p t12-consumer-check --env-file .env.example run --build --rm --no-deps -e RUN_DB_INTEGRATION=1 consumidor python -m unittest discover -s tests -p \"test_consumer_*.py\" -v"
+    passed: 22
+    failed: 0
+    skipped: 0
+    failures: []

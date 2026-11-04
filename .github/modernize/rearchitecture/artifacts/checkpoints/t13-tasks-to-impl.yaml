@@ -1,0 +1,116 @@
+metadata:
+  generated: "2026-11-02T18:42:16Z"
+  source_tasks: "specs/001-observatorio-sismico/tasks.md"
+  last_updated: "2026-11-02T18:42:16Z"
+
+summary:
+  total_tasks: 1
+  completed_tasks: 1
+  in_progress_tasks: 0
+  pending_tasks: 0
+  completion_percentage: 100.0
+
+tasks:
+  - task_id: "t13"
+    description: "Build the minimal Angular map shell."
+    status: "completed"
+    implementation:
+      files_changed:
+        - file: "frontend/package.json"
+          change_type: "added"
+          description: "Pin Angular and Leaflet dependencies and define npm scripts."
+        - file: "frontend/package-lock.json"
+          change_type: "added"
+          description: "Lock frontend dependencies."
+        - file: "frontend/angular.json"
+          change_type: "added"
+          description: "Configure application build and local serving."
+        - file: "frontend/tsconfig.json"
+          change_type: "added"
+          description: "Strict TypeScript/Angular compiler configuration."
+        - file: "frontend/tsconfig.app.json"
+          change_type: "added"
+          description: "Application compiler input configuration."
+        - file: "frontend/public/config.json"
+          change_type: "added"
+          description: "Runtime configuration for loopback API."
+        - file: "frontend/src/main.ts"
+          change_type: "added"
+          description: "Load runtime config before application bootstrap."
+        - file: "frontend/src/index.html"
+          change_type: "added"
+          description: "Spanish document shell."
+        - file: "frontend/src/styles.css"
+          change_type: "added"
+          description: "Global style and focus defaults."
+        - file: "frontend/src/app/api/earthquake-api.service.ts"
+          change_type: "added"
+          description: "Define API endpoints and normalized response interfaces."
+        - file: "frontend/src/app/app.ts"
+          change_type: "added"
+          description: "Implement polling and retained-data status."
+        - file: "frontend/src/app/app.html"
+          change_type: "added"
+          description: "Build the Spanish status/map shell."
+        - file: "frontend/src/app/app.css"
+          change_type: "added"
+          description: "Responsive UI styling."
+        - file: "frontend/src/app/map/earthquake-map.component.ts"
+          change_type: "added"
+          description: "Render Leaflet country boundaries, earthquake circles, and popups."
+        - file: "frontend/src/app/map/map-utils.mjs"
+          change_type: "added"
+          description: "Provide shared marker and display rules."
+        - file: "frontend/tests/map-utils.test.mjs"
+          change_type: "added"
+          description: "Test null, negative, sizing, and depth-band display behavior."
+      recheck_files_changed:
+        - file: "frontend/package.json"
+          change_type: "modified"
+          description: "Use supported '--prebundle false' syntax with Angular CLI 21.2.29."
+        - file: "frontend/src/app/api/earthquake-api.service.ts"
+          change_type: "modified"
+          description: "Use the observed health response key last_event_ingested_at."
+        - file: "frontend/src/app/app.ts"
+          change_type: "modified"
+          description: "Map last_event_ingested_at to the freshness display."
+    verification:
+      build_passed: true
+      test_results:
+        command: "npm test; npm run build; npm audit --audit-level=low; npm ci; local asset/API probes; Playwright Chromium screenshot"
+        passed: 3
+        failed: 0
+        skipped: 0
+        failures: []
+      notes: "npm ci installed 398 packages and npm audit found 0 vulnerabilities. npm test: 3 passed; build passed with non-blocking lmdb-cache and Leaflet CommonJS warnings. Four frontend assets and both live API routes returned HTTP 200; Chromium rendered the country map and connected status. The API currently returns an empty live page, so event markers/popups are not verified. The health DTO was aligned to last_event_ingested_at and backend notified."
+    upstream_trace:
+      plan_item: "Phase 6: TASK-6.1–6.2"
+      requirements:
+        - "FR-08"
+        - "TC-05"
+        - "TC-07"
+      full_trace: "FR-08 → Phase 6 / TASK-6.1–6.2 → t13 → frontend Angular runtime config, Leaflet map, and presentation tests."
+
+pending_tasks: []
+untracked_changes: []
+traceability_chain:
+  - chain_id: "TRACE-t13-map-shell"
+    requirement: "FR-08"
+    plan_phase: "Phase 6"
+    plan_item: "TASK-6.1–6.2"
+    tasks:
+      - "t13"
+    files:
+      - "frontend/src/main.ts"
+      - "frontend/src/app/api/earthquake-api.service.ts"
+      - "frontend/src/app/map/earthquake-map.component.ts"
+      - "frontend/src/app/map/map-utils.mjs"
+    status: "complete"
+
+validation:
+  passed: true
+  errors: []
+  warnings:
+    - "The live API page is empty; non-empty event-marker and popup behavior remain unverified."
+    - "Build reports optional lmdb cache absence and Leaflet CommonJS usage; output builds successfully."
+  blocking_issues: []
