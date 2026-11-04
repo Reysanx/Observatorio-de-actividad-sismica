@@ -20,37 +20,39 @@
 ### Phase: Environment Preparation 📌 c73e2f2
 - ✅ t7 [devops] Prepare Python 3.11, Node 22.15, Docker Compose, and Playwright (2026-11-02T17:23:19Z→2026-11-02T17:30:53Z, 7m 34s) [deps: none]
 
-### Phase: Scaffold
+### Phase: Scaffold 📌 a121c74
 - ✅ t8 [devops] Scaffold the five-service local runtime (2026-11-02T17:30:53Z→2026-11-02T17:42:51Z, 11m 58s) [deps: t7, t3]
 
 ### Phase: Implementation
-- ⏳ t9 [backend] Implement the USGS live producer [deps: t7, t8, t3]
-- ⏳ t10 [dba] Verify the PostgreSQL schema contract [deps: t7, t8, t3, t4]
-- ⏳ t11 [frontend] Source and attribute Natural Earth countries [deps: t7, t8, t5]
-- ⏳ t12 [backend] Implement quality and spatial event processing [deps: t7, t8, t3, t10, t11]
-- ⏳ t13 [frontend] Build the minimal Angular map shell [deps: t7, t8, t3, t5, t11]
-- ⏳ t14 [backend] Import the partitioned 2025 baseline [deps: t7, t8, t3, t9, t10, t11, t12]
-- ⏳ t15 [backend] Implement FastAPI contracts and analytics [deps: t7, t8, t3, t10, t12, t14]
-- ⏳ t16 [backend] Implement isolated replay production and persistence [deps: t7, t8, t3, t10, t12, t14]
-- ⏳ t17 [frontend] Build synchronized dashboard views [deps: t7, t13, t15, t5]
-- ⏳ t18 [backend] Expose run-scoped replay API state [deps: t7, t15, t16, t3]
-- ⏳ t19 [frontend] Add isolated replay selection and badge [deps: t7, t17, t18, t5]
-- ⏳ t20 [tester] Add backend acceptance tests [deps: t7, t8, t9, t12, t14, t15, t16, t18, t2, t6]
-- ⏳ t21 [tester] Add browser acceptance tests [deps: t7, t8, t13, t16, t17, t18, t19, t2, t5, t6]
-- ⏳ t22 [devops] Scan and remediate dependency vulnerabilities via skill(cve-remediation) [deps: t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t18, t19, t20, t21]
-- ⏳ t23 [devops] Document reproducible local execution [deps: t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t18, t19, t20, t21, t22]
+- ✅ t9 [backend] Implement the USGS live producer (2026-11-02T17:42:51Z→2026-11-02T17:50:58Z, 8m 7s) [deps: t7, t8, t3]
+- ✅ t10 [dba] Verify the PostgreSQL schema contract (2026-11-02T17:42:51Z→2026-11-02T17:47:51Z, 5m) [deps: t7, t8, t3, t4]
+- ✅ t11 [frontend] Source and attribute Natural Earth countries (2026-11-02T17:42:51Z→2026-11-02T17:49:49Z, 6m 58s) [deps: t7, t8, t5]
+- ✅ t12 [backend] Implement quality and spatial event processing (2026-11-02T17:50:58Z→2026-11-02T18:09:34Z, 18m 36s) [deps: t7, t8, t3, t10, t11]
+- ✅ t13 [frontend] Build the minimal Angular map shell — clean recheck after dependency remediation (2026-11-02T18:27:48Z→2026-11-02T18:42:52Z, 15m 4s) [deps: t7, t8, t3, t5, t11, t13.1]
+- ✅ t13.1 [devops] Remediate frontend npm advisories via skill(cve-remediation) (2026-11-02T18:13:27Z→2026-11-02T18:26:18Z, 12m 51s) [deps: t7, t8]
+- ✅ t14 [backend] Import the partitioned 2025 baseline (2026-11-02T18:13:27Z→2026-11-02T18:27:48Z, 14m 21s) [deps: t7, t8, t3, t9, t10, t11, t12]
+- ✅ t15 [backend] Implement FastAPI contracts and analytics (2026-11-02T18:27:48Z→2026-11-02T18:44:11Z, 16m 23s) [deps: t7, t8, t3, t10, t12, t14]
+- ✅ t16 [backend] Implement isolated replay production and persistence (2026-11-02T18:27:48Z→2026-11-02T18:46:56Z, 19m 8s) [deps: t7, t8, t3, t10, t12, t14]
+- ✅ t17 [frontend] Build synchronized dashboard views — retry after Compose health remediation (2026-11-02T19:24:03Z→2026-11-02T19:55:00Z) [deps: t7, t13, t13.1, t15, t5, t17.1]
+- ✅ t18 [backend] Expose run-scoped replay API state (2026-11-02T18:46:56Z→2026-11-02T18:53:49Z, 6m 53s) [deps: t7, t15, t16, t3]
+- ✅ t17.1 [devops] Restore health for broker, producer, and consumer services (2026-11-02T19:10:58Z→2026-11-02T19:23:33Z, 12m 35s) [deps: t8, t9, t12, t16]
+- ✅ t19 [frontend] Add isolated replay selection and badge [deps: t7, t17, t17.1, t18, t5]
+- ✅ t20 [tester] Add backend acceptance tests (2026-11-02T19:10:58Z→2026-11-02T19:24:03Z, 13m 5s) [deps: t7, t8, t9, t12, t14, t15, t16, t18, t2, t6]
+- ✅ t21 [tester] Add browser acceptance tests and frontend unit validations [deps: t7, t8, t13, t13.1, t16, t17, t17.1, t18, t19, t2, t5, t6]
+- ✅ t22 [devops] Scan and remediate dependency vulnerabilities via skill(cve-remediation) [deps: t7, t8, t9, t10, t11, t12, t13, t13.1, t14, t15, t16, t17, t17.1, t18, t19, t20, t21]
+- ✅ t23 [devops] Document reproducible local execution [deps: t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t17.1, t18, t19, t20, t21, t22]
 
 ### Phase: Review
-- ⏳ t24 [architect] Review implementation against the architecture [deps: t3, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t18, t19, t20, t21, t22, t23]
-- ⏳ t25 [security] Audit local security boundaries [deps: t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t18, t19, t20, t21, t22, t23]
-- ⏳ t26 [ux] Review dashboard behavior and accessibility [deps: t5, t11, t13, t17, t19, t21]
+- ✅ t24 [architect] Review implementation against the architecture [deps: t3, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t17.1, t18, t19, t20, t21, t22, t23]
+- ✅ t25 [security] Audit local security boundaries [deps: t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t17.1, t18, t19, t20, t21, t22, t23]
+- ✅ t26 [ux] Review dashboard behavior and accessibility [deps: t5, t11, t13, t17, t17.1, t19, t21]
 
 ### Phase: Smoke Test
-- ⏳ t27 [architect] Run the full build and startup smoke test [deps: t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t18, t19, t20, t21, t22, t23, t24, t25, t26]
+- ✅ t27 [architect] Run the full build and startup smoke test [deps: t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t17.1, t18, t19, t20, t21, t22, t23, t24, t25, t26]
 
 ### Phase: Runtime Validation
-- ⏳ t28 [tester] Run end-to-end runtime validation [deps: t7, t6, t20, t21, t24, t25, t26, t27]
+- ✅ t28 [tester] Run end-to-end runtime validation [deps: t7, t6, t20, t21, t24, t25, t26, t27]
 
 ### Phase: Signoff
-- ⏳ t29 [pm] Sign off feature coverage [deps: t2, t28]
-- ⏳ t30 [teamlead] Verify validation conformance and completeness [deps: t6, t20, t21, t24, t25, t26, t27, t28, t29]
+- ✅ t29 [pm] Sign off feature coverage [deps: t2, t28]
+- ✅ t30 [teamlead] Verify validation conformance and completeness [deps: t6, t20, t21, t24, t25, t26, t27, t28, t29]
