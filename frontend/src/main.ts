@@ -1,9 +1,20 @@
-import { provideHttpClient } from '@angular/common/http';
+import {
+  HttpInterceptorFn,
+  provideHttpClient,
+  withInterceptors,
+} from '@angular/common/http';
 import { bootstrapApplication } from '@angular/platform-browser';
 import { App } from './app/app';
 import { API_BASE_URL } from './app/api/earthquake-api.service';
 
 const defaultApiUrl = 'http://127.0.0.1:8000';
+
+const ngrokWarningBypassInterceptor: HttpInterceptorFn = (request, next) =>
+  next(
+    request.clone({
+      setHeaders: { 'ngrok-skip-browser-warning': 'true' },
+    }),
+  );
 
 async function loadApiUrl(): Promise<string> {
   try {
@@ -33,7 +44,7 @@ async function loadApiUrl(): Promise<string> {
 void loadApiUrl().then((apiUrl) =>
   bootstrapApplication(App, {
     providers: [
-      provideHttpClient(),
+      provideHttpClient(withInterceptors([ngrokWarningBypassInterceptor])),
       { provide: API_BASE_URL, useValue: apiUrl },
     ],
   }).catch((error: unknown) => console.error('No se pudo iniciar Angular.', error)),

@@ -1,0 +1,152 @@
+{
+  "planHash": "cb06bcb35fba195012e8f68085f98eede104663a75321253db5a51fe38f507d4",
+  "phase": "standalone",
+  "recordedAtUtc": "2026-11-09T21:56:08.2762729Z",
+  "retryCount": 0,
+  "resetBaseline": false,
+  "complete": true,
+  "result": {
+    "setupSucceeded": true,
+    "setupDurationMs": 23046,
+    "setupFailureOutput": null,
+    "assertions": [
+      {
+        "name": "production-build",
+        "kind": "process",
+        "verificationMethod": "exit-code",
+        "passed": true,
+        "timedOut": false,
+        "skipped": false,
+        "skippedReason": null,
+        "exitCode": 0,
+        "outputSample": "\r\n\u003E observatorio-sismico-frontend@0.1.0 build\r\n\u003E node ./node_modules/@angular/cli/bin/ng.js build\r\n\r\n\u001B[33m\u003E\u001B[39m Building...\r\n\u001B[32m\u221A\u001B[39m Building...\r\n\u001B[1mInitial chunk files\u001B[22m\u001B[2m | \u001B[22m\u001B[1mNames\u001B[22m        \u001B[2m | \u001B[22m \u001B[1mRaw size\u001B[22m\u001B[2m | \u001B[22m\u001B[1mEstimated transfer size\u001B[22m\r\n\u001B[32mmain-25YISLDV.js\u001B[39m   \u001B[2m | \u001B[22m\u001B[2mmain\u001B[22m         \u001B[2m | \u001B[22m\u001B[36m373.24 kB\u001B[39m\u001B[2m | \u001B[22m              \u001B[36m100.97 kB\u001B[39m\r\n\u001B[32mstyles-R5EYUS34.css\u001B[39m\u001B[2m | \u001B[22m\u001B[2mstyles\u001B[22m       \u001B[2m | \u001B[22m \u001B[36m11.44 kB\u001B[39m\u001B[2m | \u001B[22m                \u001B[36m2.48 kB\u001B[39m\r\n\r\n\u001B[1m \u001B[22m                  \u001B[2m | \u001B[22m\u001B[1mInitial total\u001B[22m\u001B[2m | \u001B[22m\u001B[1m384.68 kB\u001B[22m\u001B[2m | \u001B[22m              \u001B[1m103.44 kB\u001B[22m\r\n\r\nApplication bundle generation complete. [4.889 seconds] - 2026-11-09T21:56:06.632Z\r\n\r\n\u001B[1m\u001B[33m\u001B[33m\u25B2 \u001B[43;33m[\u001B[43;30mWARNING\u001B[43;33m]\u001B[0m \u001B[1mUnable to initialize JavaScript cache storage.\u001B[0m \u001B[1m\u001B[35m[plugin angular-compiler]\u001B[0m\r\n\r\n  Cannot find module \u0027lmdb\u0027\r\n  This will not affect the build output content but may result in slower builds.\r\n\r\n\r\n\u001B[33m\u25B2 \u001B[43;33m[\u001B[43;30mWARNING\u001B[43;33m]\u001B[0m \u001B[1msrc/app/app.css exceeded maximum budget. Budget 6.00 kB was not met by 3.22 kB with a total of 9.22 kB.\u001B[0m\r\n\r\n\r\n\u001B[33m\u25B2 \u001B[43;33m[\u001B[43;30mWARNING\u001B[43;33m]\u001B[0m \u001B[1mModule \u0027leaflet\u0027 used by \u0027src/app/map/earthquake-map.component.ts\u0027 is not ESM\u001B[0m\r\n\r\n  CommonJS or AMD dependencies can cause optimization bailouts.\r\n  For more information see: \u001B[4mhttps://angular.dev/tools/cli/build#configuring-commonjs-dependencies\u001B[0m\r\n\r\n\u001B[39m\u001B[22m\r\nOutput location: C:\\Users\\jasam\\Desktop\\BD\u0026IA\\Observatorio-de-actividad-s-smica\\frontend\\dist\\observatorio-sismico-frontend\r\n\r\n",
+        "durationMs": 6942
+      },
+      {
+        "name": "netlify-runtime-api-config",
+        "kind": "process",
+        "verificationMethod": "exit-code",
+        "passed": true,
+        "timedOut": false,
+        "skipped": false,
+        "skippedReason": null,
+        "exitCode": 0,
+        "outputSample": "\r\n\u003E observatorio-sismico-frontend@0.1.0 configure:netlify\r\n\u003E node scripts/configure-netlify.mjs\r\n\r\nGenerated Netlify runtime API configuration.\r\n",
+        "durationMs": 602
+      },
+      {
+        "name": "tests-pass",
+        "kind": "process",
+        "verificationMethod": "test-results",
+        "passed": true,
+        "timedOut": false,
+        "skipped": false,
+        "skippedReason": null,
+        "exitCode": 0,
+        "outputSample": "\r\n\u003E observatorio-sismico-frontend@0.1.0 test\r\n\u003E node --test\r\n\r\nTAP version 13\r\n# Subtest: datetime-local filters are interpreted and serialized as UTC, not browser local time\r\nok 1 - datetime-local filters are interpreted and serialized as UTC, not browser local time\r\n  ---\r\n  duration_ms: 1.7624\r\n  type: \u0027test\u0027\r\n  ...\r\n# Subtest: filter validation preserves negative scientific values and sends only set filters\r\nok 2 - filter validation preserves negative scientific values and sends only set filters\r\n  ---\r\n  duration_ms: 0.7776\r\n  type: \u0027test\u0027\r\n  ...\r\n# Subtest: invalid range and inverted numeric bounds are rejected without filters\r\nok 3 - invalid range and inverted numeric bounds are rejected without filters\r\n  ---\r\n  duration_ms: 0.9353\r\n  type: \u0027test\u0027\r\n  ...\r\n# Subtest: hourly chart scales the returned buckets and handles a single observation\r\nok 4 - hourly chart scales the returned buckets and handles a single observation\r\n  ---\r\n  duration_ms: 0.2681\r\n  type: \u0027test\u0027\r\n  ...\r\n# Subtest: loaded-row search is case insensitive and does not mutate the source array\r\nok 5 - loaded-row search is case insensitive and does not mutate the source array\r\n  ---\r\n  duration_ms: 0.2568\r\n  type: \u0027test\u0027\r\n  ...\r\n# Subtest: replay badge formatting distinguishes live from replay and displays REPRODUCCION\r\nok 6 - replay badge formatting distinguishes live from replay and displays REPRODUCCION\r\n  ---\r\n  duration_ms: 0.1651\r\n  type: \u0027test\u0027\r\n  ...\r\n# Subtest: missing magnitude and depth are presented as ND\r\nok 7 - missing magnitude and depth are presented as ND\r\n  ---\r\n  duration_ms: 0.6679\r\n  type: \u0027test\u0027\r\n  ...\r\n# Subtest: negative values are preserved in labels and only marker size is clamped\r\nok 8 - negative values are preserved in labels and only marker size is clamped\r\n  ---\r\n  duration_ms: 0.1513\r\n  type: \u0027test\u0027\r\n  ...\r\n# Subtest: depth bands match the product legend, including their boundaries\r\nok 9 - depth bands match the product legend, including their boundaries\r\n  ---\r\n  duration_ms: 0.1698\r\n  type: \u0027test\u0027\r\n  ...\r\n1..9\r\n# tests 9\r\n# suites 0\r\n# pass 9\r\n# fail 0\r\n# cancelled 0\r\n# skipped 0\r\n# todo 0\r\n# duration_ms 113.0898\r\n",
+        "durationMs": 717,
+        "testResults": {
+          "testFramework": "unknown",
+          "runnerDetectedFrom": "none",
+          "testsTotal": 0,
+          "testsPassed": 0,
+          "testsFailed": 0,
+          "testsSkipped": 0,
+          "parseFailed": true
+        }
+      },
+      {
+        "name": "angular-home-serves",
+        "kind": "http-probe",
+        "verificationMethod": "http-status",
+        "passed": true,
+        "timedOut": false,
+        "skipped": false,
+        "skippedReason": null,
+        "exitCode": null,
+        "outputSample": "HTTP 200\n\u003C!doctype html\u003E\r\n\u003Chtml lang=\u0022es\u0022\u003E\r\n  \u003Chead\u003E\n    \u003Cscript type=\u0022module\u0022 src=\u0022/@vite/client\u0022\u003E\u003C/script\u003E\n\r\n    \u003Cmeta charset=\u0022utf-8\u0022/\u003E\r\n    \u003Ctitle\u003EObservatorio de actividad s\u00EDsmica\u003C/title\u003E\r\n    \u003Cbase href=\u0022/\u0022/\u003E\r\n    \u003Cmeta name=\u0022viewport\u0022 content=\u0022width=device-width, initial-scale=1\u0022/\u003E\r\n    \u003Cmeta name=\u0022description\u0022 content=\u0022Mapa local de actividad s\u00EDsmica con datos del USGS.\u0022/\u003E\r\n  \u003Clink rel=\u0022stylesheet\u0022 href=\u0022styles.css\u0022\u003E\u003C/head\u003E\r\n  \u003Cbody\u003E\r\n    \u003Capp-root\u003E\u003C/app-root\u003E\r\n  \u003Cscript src=\u0022main.js\u0022 type=\u0022module\u0022\u003E\u003C/script\u003E\u003C/body\u003E\r\n\u003C/html\u003E\r\n",
+        "durationMs": 21
+      }
+    ],
+    "executions": [
+      {
+        "source": "setup[0]",
+        "resolvedExecutable": "C:\\Program Files\\nodejs\\npm.CMD",
+        "args": [
+          "ci"
+        ],
+        "cwd": "C:\\Users\\jasam\\Desktop\\BD\u0026IA\\Observatorio-de-actividad-s-smica\\frontend",
+        "env": {},
+        "prependPath": [],
+        "platform": "win32"
+      },
+      {
+        "source": "devServer",
+        "resolvedExecutable": "C:\\Program Files\\nodejs\\npm.CMD",
+        "args": [
+          "run",
+          "start",
+          "--",
+          "--host",
+          "127.0.0.1"
+        ],
+        "cwd": "C:\\Users\\jasam\\Desktop\\BD\u0026IA\\Observatorio-de-actividad-s-smica\\frontend",
+        "env": {},
+        "prependPath": [],
+        "platform": "win32"
+      },
+      {
+        "source": "production-build",
+        "resolvedExecutable": "C:\\Program Files\\nodejs\\npm.CMD",
+        "args": [
+          "run",
+          "build"
+        ],
+        "cwd": "C:\\Users\\jasam\\Desktop\\BD\u0026IA\\Observatorio-de-actividad-s-smica\\frontend",
+        "env": {},
+        "prependPath": [],
+        "platform": "win32"
+      },
+      {
+        "source": "netlify-runtime-api-config",
+        "resolvedExecutable": "C:\\Program Files\\nodejs\\npm.CMD",
+        "args": [
+          "run",
+          "configure:netlify"
+        ],
+        "cwd": "C:\\Users\\jasam\\Desktop\\BD\u0026IA\\Observatorio-de-actividad-s-smica\\frontend",
+        "env": {
+          "NGROK_API_URL": "https://runtime-validation.ngrok.app"
+        },
+        "prependPath": [],
+        "platform": "win32"
+      },
+      {
+        "source": "tests-pass",
+        "resolvedExecutable": "C:\\Program Files\\nodejs\\npm.CMD",
+        "args": [
+          "test"
+        ],
+        "cwd": "C:\\Users\\jasam\\Desktop\\BD\u0026IA\\Observatorio-de-actividad-s-smica\\frontend",
+        "env": {},
+        "prependPath": [],
+        "platform": "win32"
+      },
+      {
+        "source": "angular-home-serves",
+        "resolvedExecutable": "C:\\Program Files\\nodejs\\npm.CMD",
+        "args": [
+          "run",
+          "start",
+          "--",
+          "--host",
+          "127.0.0.1"
+        ],
+        "cwd": "C:\\Users\\jasam\\Desktop\\BD\u0026IA\\Observatorio-de-actividad-s-smica\\frontend",
+        "env": {},
+        "prependPath": [],
+        "platform": "win32"
+      }
+    ]
+  }
+}
