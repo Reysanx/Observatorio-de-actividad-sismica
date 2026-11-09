@@ -91,3 +91,7 @@ Observatorio-de-actividad-s-smica/
 
 1. **Revisar y validar las especificaciones:** Confirmar que todos los requerimientos y decisiones técnicas descritas en `specs/001-observatorio-sismico/` se ajustan a las directrices esperadas.
 2. **Iniciar la Fase 1 de Implementación:** Comenzar la ejecución secuencial del backlog de tareas según [`tasks.md`](specs/001-observatorio-sismico/tasks.md).
+
+## Despliegue Netlify/ngrok
+
+La configuración del build de Netlify, la URL de API en tiempo de despliegue y el túnel ngrok están descritos en la [guía de despliegue](docs/deployment-netlify-ngrok.md).

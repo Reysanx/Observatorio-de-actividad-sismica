@@ -166,7 +166,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env (copy .env.example)}
       API_HOST: 0.0.0.0
       API_PORT: "8000"
-      CORS_ORIGINS: http://localhost:4200
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:4200}
       USGS_CACHE_DIR: /var/lib/observatorio/cache
       LOG_LEVEL: ${LOG_LEVEL:-INFO}
     ports:

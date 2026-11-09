@@ -5,6 +5,7 @@
   "scripts": {
     "start": "node ./node_modules/@angular/cli/bin/ng.js serve --prebundle false",
     "build": "node ./node_modules/@angular/cli/bin/ng.js build",
+    "configure:netlify": "node scripts/configure-netlify.mjs",
     "test": "node --test"
   },
   "dependencies": {

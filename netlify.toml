@@ -1,0 +1,13 @@
+[build]
+base = "frontend"
+command = "npm run build && npm run configure:netlify"
+publish = "dist/observatorio-sismico-frontend/browser"
+
+[build.environment]
+NODE_VERSION = "22.12.0"
+
+[[headers]]
+for = "/config.json"
+
+[headers.values]
+Cache-Control = "no-store"
