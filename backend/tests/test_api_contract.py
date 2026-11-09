@@ -34,10 +34,9 @@ class FakeConnection:
         if "FROM replay_runs" in query:
             return self.owner.replay_state
         if "magnitude_null_count" in query:
-            return {"magnitude_null_count": 0, "depth_null_count": 0}
+            return self.owner.depth_summary
         if "recent_event_count" in query:
-            return {"calculated_at": datetime(2026, 11, 2, tzinfo=timezone.utc),
-                    "recent_event_count": 2, "historical_2025_event_count": 730}
+            return self.owner.comparison_summary
         return {
             "api_time": datetime(2026, 11, 2, 12, tzinfo=timezone.utc),
             "last_successful_poll_at": None,
@@ -50,6 +49,22 @@ class FakePool:
     def __init__(self) -> None:
         self.queries: list[tuple[str, tuple[object, ...]]] = []
         self.replay_state: dict[str, Any] | None = None
+        self.depth_summary: dict[str, Any] = {
+            "magnitude_null_count": 0,
+            "depth_null_count": 0,
+            "depth_population_count": 2,
+            "depth_p90_km": 20.0,
+        }
+        self.comparison_summary: dict[str, Any] = {
+            "calculated_at": datetime(2026, 11, 2, tzinfo=timezone.utc),
+            "recent_event_count": 2,
+            "historical_2025_event_count": 730,
+            "historical_days": 365,
+            "historical_daily_average": 2.0,
+            "historical_daily_population_stddev": 1.0,
+            "stored_event_count": 1000,
+            "imported_event_count": 1000,
+        }
 
     def acquire(self) -> FakeConnection:
         return FakeConnection(self)
@@ -123,19 +138,74 @@ class APIRouteContractTests(unittest.TestCase):
         distribution = self.client.get("/api/v1/stats/distributions")
         self.assertEqual(distribution.json()["magnitude_null_count"], 0)
         self.assertEqual(distribution.json()["depth_null_count"], 0)
+        self.assertEqual(distribution.json()["depth_p90_km"], 20.0)
+        self.assertEqual(distribution.json()["depth_population_count"], 2)
+        self.assertEqual(
+            distribution.json()["depth_percentile_method"],
+            "hyndman_fan_type_7",
+        )
+        self.assertIn("depth_period_start_utc", distribution.json())
+        self.assertIn("depth_period_end_utc", distribution.json())
 
-    def test_comparison_uses_365_day_denominator_and_bound_filter_parameters(self) -> None:
+    def test_comparison_uses_symmetric_45_threshold_and_bound_filters(self) -> None:
         response = self.client.get(
             "/api/v1/stats/historical-comparison?adm0_a3=CHL"
         )
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json()["historical_days"], 365)
-        self.assertEqual(response.json()["historical_daily_average"], 2.0)
+        result = response.json()
+        self.assertEqual(result["magnitude_threshold"], 4.5)
+        self.assertEqual(result["historical_days"], 365)
+        self.assertEqual(result["historical_daily_average"], 2.0)
+        self.assertEqual(result["historical_daily_population_stddev"], 1.0)
+        self.assertEqual(result["recent_standard_deviations_from_mean"], 0.0)
+        self.assertEqual(result["deviation_band"], "within_1_sd")
         self.assertEqual(response.json()["ratio_to_historical_daily_average"], 1.0)
-        query, parameters = self.pool.queries[-1]
-        self.assertIn("live.adm0_a3 = $3", query)
-        self.assertIn("baseline.adm0_a3 = $4", query)
-        self.assertEqual(parameters[2:], ("CHL", "CHL"))
+        queries = [query for query, _ in self.pool.queries]
+        comparison_query = next(query for query in queries if "recent_event_count" in query)
+        daily_query = next(query for query in queries if "generate_series" in query)
+        self.assertIn("live.mag >= 4.5", comparison_query)
+        self.assertIn("baseline.mag >= 4.5", daily_query)
+        self.assertIn("generate_series", daily_query)
+        self.assertIn("live.adm0_a3 = $3", comparison_query)
+        self.assertIn("baseline.adm0_a3 = $1", daily_query)
+        self.assertEqual(self.pool.queries[0][1][2:], ("CHL",))
+        self.assertEqual(self.pool.queries[1][1], ("CHL",))
+
+    def test_comparison_marks_zero_variance_and_invalid_baseline_unavailable(self) -> None:
+        self.pool.comparison_summary["historical_daily_population_stddev"] = 0.0
+        response = self.client.get("/api/v1/stats/historical-comparison")
+        self.assertEqual(response.status_code, 200)
+        self.assertIsNone(response.json()["recent_standard_deviations_from_mean"])
+        self.assertEqual(response.json()["deviation_band"], "unavailable")
+
+        self.pool.comparison_summary["stored_event_count"] = 999
+        invalid = self.client.get("/api/v1/stats/historical-comparison")
+        self.assertEqual(invalid.status_code, 503)
+
+    def test_depth_percentile_excludes_invalid_values_and_isolated_by_scope(self) -> None:
+        live = self.client.get(
+            "/api/v1/stats/distributions?start_utc=2026-11-02T00:00:00Z"
+            "&end_utc=2026-11-03T00:00:00Z"
+        )
+        self.assertEqual(live.status_code, 200)
+        query = self.pool.queries[0][0]
+        self.assertIn("percentile_cont(0.9)", query)
+        self.assertIn("depth_km::TEXT NOT IN", query)
+        self.assertIn("current_earthquakes", query)
+        self.assertEqual(live.json()["depth_period_start_utc"], "2026-11-02T00:00:00Z")
+        self.assertEqual(live.json()["depth_period_end_utc"], "2026-11-03T00:00:00Z")
+
+        self.pool.depth_summary["depth_population_count"] = 0
+        self.pool.depth_summary["depth_p90_km"] = None
+        replay = self.client.get(
+            "/api/v1/stats/distributions?scope=replay&run_id=run-123"
+        )
+        self.assertEqual(replay.status_code, 200)
+        self.assertIsNone(replay.json()["depth_p90_km"])
+        self.assertEqual(replay.json()["depth_population_count"], 0)
+        self.assertEqual(replay.json()["scope"], "replay")
+        self.assertEqual(replay.json()["run_id"], "run-123")
+        self.assertIn("replay_earthquakes", self.pool.queries[-1][0])
 
     def test_replay_state_returns_explicit_idle_state_without_a_run(self) -> None:
         response = self.client.get("/api/v1/replay/state")
