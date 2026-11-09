@@ -137,7 +137,7 @@ gantt
 - [x] **TASK-5.4: Endpoint de Comparación Histórica 2025**
   - **Objetivo:** Implementar `GET /api/v1/stats/historical-comparison`.
   - **Archivos creados/modificados:** `backend/api/routes/comparison.py`.
-  - **Evidencia de Aceptación:** Comparativa de últimas 24h ($\text{mag} \ge 4.0$) contra media diaria anual de 2025 con denominador fijo de 365 días.
+  - **Evidencia de Aceptación original:** Comparativa de últimas 24h ($\text{mag} \ge 4.0$) contra media diaria anual de 2025 con denominador fijo de 365 días. Este registro describe la implementación inicial; el contrato actualizado en `specs/001-observatorio-sismico/spec.md` exige M≥4.5 y queda pendiente de la feature 002.
 
 - [x] **TASK-5.5: Middleware de CORS y Soporte para Cabeceras ngrok**
   - **Objetivo:** Permitir peticiones desde Netlify y atender preflight OPTIONS y `ngrok-skip-browser-warning`.

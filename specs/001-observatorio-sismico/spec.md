@@ -97,7 +97,7 @@ El producto final consta de un pipeline continuo de datos que alimenta una inter
   - `GET /api/v1/stats/geo`: Recuento y agregados de magnitud agrupados por país y subregión (incluyendo «Sin país asignado»).
   - `GET /api/v1/stats/hourly`: Agregaciones en ventanas fijas de 1 hora UTC basadas en el tiempo del evento (`time`).
   - `GET /api/v1/stats/distributions`: Distribución de magnitudes (bins de 0.5) y profundidades (bins de 20 km).
-  - `GET /api/v1/stats/historical-comparison`: Comparación del periodo reciente (últimas 24h, mag $\ge 4$) frente a la media diaria del histórico 2025 bajo los mismos filtros.
+  - `GET /api/v1/stats/historical-comparison`: Comparación del periodo reciente (últimas 24h, mag $\ge 4.5$) frente a la media diaria del histórico 2025 con el mismo umbral y filtros geográficos en ambas poblaciones. El histórico almacenado puede contener eventos desde mag $\ge 4.0$; el endpoint filtra ambas poblaciones para la comparación. La implementación actual aún usa mag $\ge 4.0$ y debe actualizarse para cumplir este contrato.
   - Habilitación de CORS para el dominio Netlify y local, y soporte de la cabecera `ngrok-skip-browser-warning`.
 
 ### FR-08: Panel de Control e Interfaz Cartográfica (Angular + Leaflet)
@@ -146,7 +146,8 @@ El producto final consta de un pipeline continuo de datos que alimenta una inter
 
 1. **Definición de Terremoto:** Solo los registros con `properties.type == 'earthquake'` forman parte del modelo oficial. Explosiones mineras, erupciones volcánicas o ensayos militares se descartan o se etiquetan en cuarentena.
 2. **Normalización Temporal UTC:** Todo cálculo y almacenamiento de fechas debe realizarse en UTC. El tiempo de ocurrencia (`time`) y el de revisión (`updated`) de USGS (en milisegundos Unix epoch) deben convertirse a `TIMESTAMP WITH TIME ZONE`.
-3. **Cálculo de la Media Diaria Histórica:**
-   $$\text{Media Diaria 2025} = \frac{\text{Total de sismos válidos en 2025 con mag } \ge 4.0}{365}$$
+3. **Cálculo de la Media Diaria Histórica para la Comparación:**
+   $$\text{Media Diaria 2025} = \frac{\text{Total de sismos válidos en 2025 con mag } \ge 4.5}{365}$$
+   El catálogo histórico puede conservar eventos con magnitud $\ge 4.0$; la comparación aplica $\ge 4.5$ tanto al periodo reciente como al histórico.
    *Nota crítica:* No deben omitirse del denominador los días con 0 eventos.
 4. **Independencia del Backend:** El productor y el consumidor continúan ejecutándose y actualizando la base de datos de manera ininterrumpida, independientemente de si hay usuarios en el panel de Angular.

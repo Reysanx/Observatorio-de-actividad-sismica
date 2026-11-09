@@ -277,6 +277,15 @@
         }
         @if (distributions(); as distribution) {
           <p class="null-count">Profundidad ND: {{ distribution.depth_null_count }}</p>
+          <p class="metric-caption">
+            p90 {{ formatP90(distribution.depth_p90_km) }}
+            · población válida {{ distribution.depth_population_count }}
+            · Type 7
+          </p>
+          <p class="metric-caption">
+            Periodo: {{ distribution.depth_period_start_utc | date:'yyyy-MM-dd HH:mm:ss':'UTC' }}–{{ distribution.depth_period_end_utc | date:'yyyy-MM-dd HH:mm:ss':'UTC' }} UTC
+            · {{ geographicFilterSummary() }}
+          </p>
         }
       </section>
 
@@ -313,7 +322,7 @@
       </section>
 
       <section class="panel comparison-panel" aria-labelledby="comparison-heading">
-        <p class="eyebrow">Solo vista en vivo · ventana fija M≥4</p>
+        <p class="eyebrow">Solo vista en vivo · ventana fija M≥4,5</p>
         <h2 id="comparison-heading">Últimas 24 h frente a la media diaria de 2025</h2>
         @if (isReplayMode()) {
           <p class="empty-inline">La comparativa con la media anual 2025 está disponible únicamente en el feed en vivo para preservar el aislamiento de la simulación.</p>
@@ -322,10 +331,21 @@
           <div class="comparison-values">
             <span>Últimas 24 h <b>{{ comparisonResult.recent_event_count }}</b></span>
             <span>Media diaria 2025 <b>{{ comparisonResult.historical_daily_average | number:'1.0-2' }}</b></span>
+            <span>Desviación estándar 2025 <b>{{ comparisonResult.historical_daily_population_stddev | number:'1.0-2' }}</b></span>
           </div>
           <p class="metric-caption">
             {{ comparisonResult.historical_2025_event_count }} eventos históricos / {{ comparisonResult.historical_days }} días.
-            Se aplican los filtros geográficos; el intervalo y el umbral M≥4 son fijos en el contrato de comparación.
+            Umbral M≥4,5 · ventana UTC {{ comparisonResult.window_start_utc | date:'yyyy-MM-dd HH:mm:ss':'UTC' }}–{{ comparisonResult.window_end_utc | date:'yyyy-MM-dd HH:mm:ss':'UTC' }}.
+          </p>
+          <p class="metric-caption">
+            {{ deviationLabel(comparisonResult.deviation_band) }}
+            @if (comparisonResult.recent_standard_deviations_from_mean !== null) {
+              · z={{ comparisonResult.recent_standard_deviations_from_mean | number:'1.0-2' }}
+            }
+            · solo variabilidad descriptiva, no predicción de riesgo.
+          </p>
+          <p class="metric-caption">
+            {{ geographicFilterSummary() }}
           </p>
         } @else {
           <p class="empty-inline">{{ dashboardLoading() ? 'Calculando comparación…' : 'Comparación no disponible.' }}</p>

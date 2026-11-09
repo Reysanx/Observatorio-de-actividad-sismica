@@ -16,11 +16,21 @@ import os
 import unittest
 import uuid
 from datetime import datetime, timedelta, timezone
+from pathlib import Path
 from typing import Any
 
 import asyncpg
 import httpx
 from aiokafka import AIOKafkaProducer
+
+from api.analysis import HISTORICAL_DATASET_KEY
+from consumer.historical_import import historical_cache_directory
+from scripts.download_historical_2025 import load_complete_cache
+from scripts.generate_seismic_analysis import (
+    _load_baseline_metadata,
+    generate_report,
+    validate_baseline,
+)
 
 
 LIVE_TOPIC = "earthquakes.live"
@@ -32,6 +42,11 @@ def _utc_iso(value: datetime) -> str:
     return value.astimezone(timezone.utc).isoformat(timespec="milliseconds").replace(
         "+00:00", "Z"
     )
+
+
+class MissingImportConnection:
+    async def fetchrow(self, *_: object) -> asyncpg.Record | None:
+        return None
 
 
 class BackendAcceptanceTests(unittest.IsolatedAsyncioTestCase):
@@ -476,6 +491,72 @@ class BackendAcceptanceTests(unittest.IsolatedAsyncioTestCase):
         self.assertNotIn(
             replay_id, {item["event_id"] for item in live_response.json()["items"]}
         )
+
+    async def test_analysis_report_reconciles_database_and_manifest_provenance(self) -> None:
+        cache_dir = historical_cache_directory(
+            Path(os.getenv("USGS_CACHE_DIR", "/var/lib/observatorio/cache"))
+        )
+        cache = load_complete_cache(cache_dir)
+        report = await generate_report(
+            self.pool,
+            cache_dir,
+            {"adm0_a3": None, "continent": None, "subregion": None},
+        )
+
+        self.assertEqual(report["source"]["dataset_key"], HISTORICAL_DATASET_KEY)
+        self.assertEqual(report["report_schema_version"], 1)
+        self.assertEqual(report["analysis_method_version"], "1.0")
+        self.assertEqual(report["baseline_query_version"], HISTORICAL_DATASET_KEY)
+        self.assertEqual(
+            report["source"]["stored_event_count"],
+            report["source"]["imported_event_count"],
+        )
+        self.assertEqual(
+            report["source"]["source_manifest"]["unique_event_count"],
+            report["source"]["imported_event_count"],
+        )
+        self.assertEqual(len(report["source"]["source_manifest"]["months"]), 12)
+        self.assertEqual(report["comparison"]["magnitude_threshold"], 4.5)
+        self.assertEqual(len(report["annual_daily_counts"]), 365)
+        self.assertEqual(
+            sum(day["event_count"] for day in report["annual_daily_counts"]),
+            report["comparison"]["historical_2025_event_count"],
+        )
+        self.assertEqual(
+            report["geographic_assignment"]["historical_2025"]["eligible_event_count"],
+            report["comparison"]["historical_2025_event_count"],
+        )
+        self.assertTrue(
+            all(
+                item["method"] == "hyndman_fan_type_7"
+                for item in report["historical_depth_by_subregion"]
+            )
+        )
+        validate_baseline(
+            report["source"]["imported_event_count"],
+            report["source"]["stored_event_count"],
+            cache["manifest"],
+        )
+
+    async def test_analysis_rejects_missing_or_incomplete_baseline_metadata(self) -> None:
+        cache_dir = historical_cache_directory(
+            Path(os.getenv("USGS_CACHE_DIR", "/var/lib/observatorio/cache"))
+        )
+        manifest = load_complete_cache(cache_dir)["manifest"]
+
+        with self.assertRaisesRegex(ValueError, "not registered"):
+            await _load_baseline_metadata(
+                MissingImportConnection(),
+                manifest,
+            )
+        with self.assertRaises(ValueError):
+            validate_baseline(0, 0, manifest)
+        with self.assertRaises(ValueError):
+            validate_baseline(
+                1,
+                1,
+                {**manifest, "complete": False},
+            )
 
 
 if __name__ == "__main__":

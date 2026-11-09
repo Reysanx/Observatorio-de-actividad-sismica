@@ -9,6 +9,12 @@
 
 BEGIN;
 
+CREATE TABLE IF NOT EXISTS dataset_imports (
+    dataset_key   TEXT PRIMARY KEY,
+    event_count   BIGINT NOT NULL CHECK (event_count >= 0),
+    imported_at   TIMESTAMPTZ NOT NULL DEFAULT clock_timestamp()
+);
+
 CREATE TABLE IF NOT EXISTS dim_countries (
     adm0_a3       VARCHAR(8) PRIMARY KEY,
     name_es       TEXT,

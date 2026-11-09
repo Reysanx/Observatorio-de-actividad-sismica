@@ -12,6 +12,7 @@ from typing import Any
 
 import asyncpg
 
+from api.analysis import HISTORICAL_DATASET_KEY
 from consumer.db_writer import load_country_dimension, persist_historical_events
 from consumer.historical import HistoricalEvent, HistoricalImportError, normalize_historical_feature
 from consumer.spatial import SpatialIndex
@@ -68,17 +69,29 @@ async def import_historical_cache(
     pool: asyncpg.Pool,
     *,
     ingested_at: datetime | None = None,
+    dataset_key: str | None = HISTORICAL_DATASET_KEY,
 ) -> dict[str, int]:
     """Enrich and atomically import the immutable baseline into PostgreSQL."""
     imported_at = ingested_at or datetime.now(timezone.utc)
     events, cached_count = load_historical_events(cache_dir, ingested_at=imported_at)
     spatial_index = SpatialIndex.from_geojson(country_geojson)
     await load_country_dimension(pool, spatial_index.countries)
+    if dataset_key is not None:
+        async with pool.acquire() as connection:
+            await connection.execute(
+                """
+                CREATE TABLE IF NOT EXISTS dataset_imports (
+                    dataset_key TEXT PRIMARY KEY,
+                    event_count BIGINT NOT NULL CHECK (event_count >= 0),
+                    imported_at TIMESTAMPTZ NOT NULL DEFAULT clock_timestamp()
+                )
+                """
+            )
     enriched = [
         (event, spatial_index.find_country(event.geom_lon, event.geom_lat))
         for event in events
     ]
-    await persist_historical_events(pool, enriched)
+    await persist_historical_events(pool, enriched, dataset_key=dataset_key)
     return {
         "cached_feature_count": cached_count,
         "unique_event_count": len(events),

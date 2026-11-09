@@ -57,15 +57,27 @@ export interface DistributionResponse {
   depth_bins: HistogramBin[];
   magnitude_null_count: number;
   depth_null_count: number;
+  depth_p90_km: number | null;
+  depth_population_count: number;
+  depth_percentile_method: 'hyndman_fan_type_7';
+  depth_period_start_utc: string;
+  depth_period_end_utc: string;
   scope: 'live' | 'replay';
   run_id: string | null;
 }
 
 export interface HistoricalComparisonResponse {
+  calculated_at: string;
+  window_start_utc: string;
+  window_end_utc: string;
+  magnitude_threshold: number;
   recent_event_count: number;
   historical_2025_event_count: number;
   historical_days: number;
   historical_daily_average: number;
+  historical_daily_population_stddev: number;
+  recent_standard_deviations_from_mean: number | null;
+  deviation_band: 'within_1_sd' | 'between_1_and_2_sd' | 'beyond_2_sd' | 'unavailable';
   ratio_to_historical_daily_average: number | null;
   adm0_a3: string | null;
   continent: string | null;
@@ -186,7 +198,7 @@ export class EarthquakeApiService {
   }
 
   getHistoricalComparison(filters: DashboardFilters): Observable<HistoricalComparisonResponse> {
-    // The API contract fixes the comparison to a rolling 24-hour M4+ window
+    // The API contract fixes the comparison to a rolling 24-hour M4.5+ window
     // and accepts geographic filters only.
     return this.http.get<HistoricalComparisonResponse>(
       `${this.baseUrl}/api/v1/stats/historical-comparison`,

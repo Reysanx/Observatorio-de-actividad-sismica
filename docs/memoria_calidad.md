@@ -72,9 +72,11 @@ flowchart LR
 
 ---
 
-## 3. Evidencia Cuantitativa: Resultados ANTES y DESPUÉS de la Limpieza
+## 3. Evidencia cuantitativa de calidad de datos (cifras anteriores retiradas)
 
-A continuación se presenta el contraste cuantitativo de aplicar las reglas sobre un conjunto de prueba de **5.000 eventos** extraídos de fuentes heterogéneas:
+**Fe de erratas:** el balance de 5.000 eventos y las conclusiones de la sección 4 se conservan abajo únicamente como registro histórico; sus cifras y afirmaciones están retiradas y no deben citarse. La sección 5 contiene los resultados reproducibles que las sustituyen.
+
+El contraste anterior se atribuía a un conjunto de prueba de **5.000 eventos**, pero no se encontró un registro reproducible de ese lote, su consulta ni sus resultados. No debe interpretarse el análisis histórico de 2025 como una medición antes/después de calidad: son poblaciones y preguntas distintas.
 
 ```sql
 -- Consulta de auditoría en PostgreSQL:
@@ -101,7 +103,7 @@ GROUP BY failure_reason;
 
 ---
 
-## 4. Análisis Sismológico: 3 Conclusiones Formales con Cifras Cuantitativas
+## 4. Conclusiones anteriores retiradas
 
 Basándose en la agregación analítica de la base de datos de 2025 y el feed en vivo, se establecen las tres conclusiones científicas obligatorias:
 
@@ -136,3 +138,22 @@ Basándose en la agregación analítica de la base de datos de 2025 y el feed en
   * No obstante, tras un sismo principal (*mainshock*) de $M \ge 7.0$, el ratio en la región afectada se dispara temporalmente por encima de **$4,5\times$** debido a la activación de la secuencia de réplicas (*aftershocks*) modeladas por la Ley de Omori.
 * **Limitación Metodológica Documentada:** La comparación histórica requiere simetría de corte: **únicamente deben compararse sismos con $M \ge 4.0$**. El feed en vivo de 24h de USGS registra sismos de hasta $M 0.5$ para redes densas (EE.UU. y Puerto Rico), por lo que comparar el recuento crudo total sin el filtro de corte introduciría un sesgo de completitud artificial de más de un $400\%$.
 
+---
+
+## 5. Análisis sísmico reproducible: resultados observados
+
+Los valores siguientes proceden de [analysis-report.json](./evidence/seismic-analysis/analysis-report.json), esquema 1 / método 1.0, generado el **2026-11-09T20:31:05.570399Z** desde la consulta versionada `usgs_2025_magnitude_4_v1`. La importación contiene 18.302 eventos M≥4,0; las comparaciones de esta sección usan el corte simétrico M≥4,5 y 365 días UTC. La ejecución no aplicó filtros geográficos.
+
+### Conclusión 1: población histórica y variación diaria
+
+La población de comparación de 2025 contiene **8.559 eventos M≥4,5**. Sus 365 recuentos diarios suman ese total, con una media de **23,449 eventos/día** y desviación estándar poblacional de **24,540 eventos/día**. Los recuentos diarios observados en esta ejecución variaron entre 9 y 422; la dispersión elevada describe variación del catálogo y no es una predicción de riesgo.
+
+### Conclusión 2: asignación geográfica y profundidad
+
+De los 8.559 eventos históricos M≥4,5, **1.480 (17,29%)** se asignaron a un país y **7.079 (82,71%)** quedaron como «Sin país asignado» (`ADM0_A3 = 'N/A'`). La categoría expresa que el catálogo cartográfico no asignó un polígono; por sí sola no demuestra que un evento sea submarino. Entre las regiones con profundidades finitas, Sudamérica tuvo el mayor p90 observado: **209,4036 km** sobre una población válida de **337 profundidades**. Este resumen es descriptivo y no identifica por sí mismo mecanismos tectónicos.
+
+### Conclusión 3: comparación de la ventana móvil reciente
+
+Para la ventana **2026-11-08T20:31:05.570399Z–2026-11-09T20:31:05.570399Z**, se contaron **17 eventos M≥4,5**: 4 asignados y 13 sin país asignado. El recuento equivale a **0,725 veces** la media diaria histórica y se encuentra a **−0,263 desviaciones estándar**, dentro de una desviación estándar de la media. La ventana reciente es móvil, no coincide con un día natural y cambia al regenerar el informe.
+
+Las capturas del [panel de comparación](./evidence/seismic-analysis/dashboard-live-comparison.png) y del [panel de profundidad](./evidence/seismic-analysis/dashboard-depth-distribution.png) se tomaron alrededor de un minuto después del informe. La comparación muestra los mismos 17 eventos con su ventana UTC exacta (2026-11-08T20:32:06Z–2026-11-09T20:32:06Z); el panel de profundidad muestra el p90 en vivo de 93,5 km sobre 206 profundidades válidas y el periodo aplicado, redondeado al minuto por los filtros del dashboard. El informe registra los 365 pares fecha/recuento, filtros, procedencia de la importación, hashes del manifest mensual, población de profundidades, métodos y limitaciones para reproducir estas cifras. No se infiere causalidad tectónica ni riesgo a partir de estas comparaciones.

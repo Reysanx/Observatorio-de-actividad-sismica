@@ -1,0 +1,1713 @@
+{
+  "report_schema_version": 1,
+  "analysis_method_version": "1.0",
+  "baseline_query_version": "usgs_2025_magnitude_4_v1",
+  "calculation_methods": {
+    "daily_average": "arithmetic_mean_over_365_utc_days",
+    "daily_standard_deviation": "population_standard_deviation_ddof_0",
+    "depth_p90": "hyndman_fan_type_7",
+    "time_zone": "UTC"
+  },
+  "analysis_id": "0204fec6-598e-4506-ba2f-ca2fb41a654b",
+  "generated_at_utc": "2026-11-09T20:31:05.570399+00:00",
+  "source": {
+    "dataset_key": "usgs_2025_magnitude_4_v1",
+    "imported_event_count": 18302,
+    "stored_event_count": 18302,
+    "imported_at_utc": "2026-11-09T17:40:59.837956+00:00",
+    "first_event_utc": "2025-01-01T00:13:22.650000+00:00",
+    "last_event_utc": "2025-12-31T23:52:11.327000+00:00",
+    "source": "USGS FDSNWS event catalog",
+    "source_manifest": {
+      "generated_at": "2026-11-09T17:40:49.385505Z",
+      "schema_version": 1,
+      "query": {
+        "format": "geojson",
+        "minmagnitude": "4.0",
+        "eventtype": "earthquake",
+        "orderby": "time-asc"
+      },
+      "unique_event_count": 18302,
+      "months": {
+        "2025-01": {
+          "file": "2025_m01.geojson",
+          "sha256": "9df2aff444a4cf0d8a949d80b1af7b2ffdda315ed58308d960b284a4e3576612",
+          "feature_count": 1413
+        },
+        "2025-02": {
+          "file": "2025_m02.geojson",
+          "sha256": "0dab0937ce3d1f416efaf2f46a8262fa74091b50e54738458f0a6a6b9309556c",
+          "feature_count": 1394
+        },
+        "2025-03": {
+          "file": "2025_m03.geojson",
+          "sha256": "154aa4e908290971a36034a9f0d4963e41ebbe610b0fb5c80d4c8ccc4eae4069",
+          "feature_count": 1178
+        },
+        "2025-04": {
+          "file": "2025_m04.geojson",
+          "sha256": "f15f1ea7c94184e8878ab2e651f3975d0da26dd8384a501410ce095f779c2bb7",
+          "feature_count": 1316
+        },
+        "2025-05": {
+          "file": "2025_m05.geojson",
+          "sha256": "a273735e39637400f08f34b0d724745a03c248a163d77639c84ccfe2b7e34fd3",
+          "feature_count": 1228
+        },
+        "2025-06": {
+          "file": "2025_m06.geojson",
+          "sha256": "39aa0345f66f2eedc99f3a209ec7af9adff0a18a2a4ffaf749a484f833c7070f",
+          "feature_count": 1156
+        },
+        "2025-07": {
+          "file": "2025_m07.geojson",
+          "sha256": "4ea8d1cdf273543e16533c36ac41761a7e4ba4b7ce93359e6c42ef26b49be63e",
+          "feature_count": 2684
+        },
+        "2025-08": {
+          "file": "2025_m08.geojson",
+          "sha256": "4feef5ca166445412711b900074e2794eedfd3b25302bc6bc4ccbb04edf9213c",
+          "feature_count": 2222
+        },
+        "2025-09": {
+          "file": "2025_m09.geojson",
+          "sha256": "c92ebfc8644a111cb91b0bf713809a9d56a1198a165715baf6b13f1c3c48f31b",
+          "feature_count": 1604
+        },
+        "2025-10": {
+          "file": "2025_m10.geojson",
+          "sha256": "924cba16fa346a5e175325da5040aad9d31e18b973f266657eeea6442b8efbf1",
+          "feature_count": 1509
+        },
+        "2025-11": {
+          "file": "2025_m11.geojson",
+          "sha256": "ddd39c0824539c00f5561ee183ed3ac93b6ba032a2d9e19384e64c596612b555",
+          "feature_count": 1321
+        },
+        "2025-12": {
+          "file": "2025_m12.geojson",
+          "sha256": "18860c2c5d69b3f823c664f5577779eb4190835ef5181ffa98d675908e7669cc",
+          "feature_count": 1277
+        }
+      }
+    }
+  },
+  "comparison": {
+    "historical_days": 365,
+    "historical_2025_event_count": 8559,
+    "historical_daily_average": 23.44931506849315,
+    "historical_daily_population_stddev": 24.540283478996304,
+    "recent_standard_deviations_from_mean": -0.2628052391494593,
+    "deviation_band": "within_1_sd",
+    "ratio_to_historical_daily_average": 0.7249678700782802,
+    "recent_event_count": 17,
+    "magnitude_threshold": 4.5,
+    "recent_window_start_utc": "2026-11-08T20:31:05.570399+00:00",
+    "recent_window_end_utc": "2026-11-09T20:31:05.570399+00:00",
+    "geographic_filters": {
+      "adm0_a3": null,
+      "continent": null,
+      "subregion": null
+    }
+  },
+  "annual_daily_counts": [
+    {
+      "date_utc": "2025-01-01",
+      "event_count": 31
+    },
+    {
+      "date_utc": "2025-01-02",
+      "event_count": 27
+    },
+    {
+      "date_utc": "2025-01-03",
+      "event_count": 29
+    },
+    {
+      "date_utc": "2025-01-04",
+      "event_count": 23
+    },
+    {
+      "date_utc": "2025-01-05",
+      "event_count": 16
+    },
+    {
+      "date_utc": "2025-01-06",
+      "event_count": 26
+    },
+    {
+      "date_utc": "2025-01-07",
+      "event_count": 40
+    },
+    {
+      "date_utc": "2025-01-08",
+      "event_count": 25
+    },
+    {
+      "date_utc": "2025-01-09",
+      "event_count": 15
+    },
+    {
+      "date_utc": "2025-01-10",
+      "event_count": 20
+    },
+    {
+      "date_utc": "2025-01-11",
+      "event_count": 14
+    },
+    {
+      "date_utc": "2025-01-12",
+      "event_count": 18
+    },
+    {
+      "date_utc": "2025-01-13",
+      "event_count": 31
+    },
+    {
+      "date_utc": "2025-01-14",
+      "event_count": 15
+    },
+    {
+      "date_utc": "2025-01-15",
+      "event_count": 14
+    },
+    {
+      "date_utc": "2025-01-16",
+      "event_count": 14
+    },
+    {
+      "date_utc": "2025-01-17",
+      "event_count": 24
+    },
+    {
+      "date_utc": "2025-01-18",
+      "event_count": 27
+    },
+    {
+      "date_utc": "2025-01-19",
+      "event_count": 12
+    },
+    {
+      "date_utc": "2025-01-20",
+      "event_count": 23
+    },
+    {
+      "date_utc": "2025-01-21",
+      "event_count": 32
+    },
+    {
+      "date_utc": "2025-01-22",
+      "event_count": 20
+    },
+    {
+      "date_utc": "2025-01-23",
+      "event_count": 18
+    },
+    {
+      "date_utc": "2025-01-24",
+      "event_count": 18
+    },
+    {
+      "date_utc": "2025-01-25",
+      "event_count": 15
+    },
+    {
+      "date_utc": "2025-01-26",
+      "event_count": 17
+    },
+    {
+      "date_utc": "2025-01-27",
+      "event_count": 25
+    },
+    {
+      "date_utc": "2025-01-28",
+      "event_count": 23
+    },
+    {
+      "date_utc": "2025-01-29",
+      "event_count": 11
+    },
+    {
+      "date_utc": "2025-01-30",
+      "event_count": 14
+    },
+    {
+      "date_utc": "2025-01-31",
+      "event_count": 18
+    },
+    {
+      "date_utc": "2025-02-01",
+      "event_count": 19
+    },
+    {
+      "date_utc": "2025-02-02",
+      "event_count": 18
+    },
+    {
+      "date_utc": "2025-02-03",
+      "event_count": 28
+    },
+    {
+      "date_utc": "2025-02-04",
+      "event_count": 33
+    },
+    {
+      "date_utc": "2025-02-05",
+      "event_count": 28
+    },
+    {
+      "date_utc": "2025-02-06",
+      "event_count": 16
+    },
+    {
+      "date_utc": "2025-02-07",
+      "event_count": 27
+    },
+    {
+      "date_utc": "2025-02-08",
+      "event_count": 17
+    },
+    {
+      "date_utc": "2025-02-09",
+      "event_count": 15
+    },
+    {
+      "date_utc": "2025-02-10",
+      "event_count": 26
+    },
+    {
+      "date_utc": "2025-02-11",
+      "event_count": 24
+    },
+    {
+      "date_utc": "2025-02-12",
+      "event_count": 22
+    },
+    {
+      "date_utc": "2025-02-13",
+      "event_count": 17
+    },
+    {
+      "date_utc": "2025-02-14",
+      "event_count": 24
+    },
+    {
+      "date_utc": "2025-02-15",
+      "event_count": 17
+    },
+    {
+      "date_utc": "2025-02-16",
+      "event_count": 20
+    },
+    {
+      "date_utc": "2025-02-17",
+      "event_count": 17
+    },
+    {
+      "date_utc": "2025-02-18",
+      "event_count": 17
+    },
+    {
+      "date_utc": "2025-02-19",
+      "event_count": 10
+    },
+    {
+      "date_utc": "2025-02-20",
+      "event_count": 34
+    },
+    {
+      "date_utc": "2025-02-21",
+      "event_count": 14
+    },
+    {
+      "date_utc": "2025-02-22",
+      "event_count": 15
+    },
+    {
+      "date_utc": "2025-02-23",
+      "event_count": 21
+    },
+    {
+      "date_utc": "2025-02-24",
+      "event_count": 15
+    },
+    {
+      "date_utc": "2025-02-25",
+      "event_count": 21
+    },
+    {
+      "date_utc": "2025-02-26",
+      "event_count": 21
+    },
+    {
+      "date_utc": "2025-02-27",
+      "event_count": 19
+    },
+    {
+      "date_utc": "2025-02-28",
+      "event_count": 16
+    },
+    {
+      "date_utc": "2025-03-01",
+      "event_count": 19
+    },
+    {
+      "date_utc": "2025-03-02",
+      "event_count": 17
+    },
+    {
+      "date_utc": "2025-03-03",
+      "event_count": 25
+    },
+    {
+      "date_utc": "2025-03-04",
+      "event_count": 19
+    },
+    {
+      "date_utc": "2025-03-05",
+      "event_count": 12
+    },
+    {
+      "date_utc": "2025-03-06",
+      "event_count": 11
+    },
+    {
+      "date_utc": "2025-03-07",
+      "event_count": 10
+    },
+    {
+      "date_utc": "2025-03-08",
+      "event_count": 15
+    },
+    {
+      "date_utc": "2025-03-09",
+      "event_count": 21
+    },
+    {
+      "date_utc": "2025-03-10",
+      "event_count": 25
+    },
+    {
+      "date_utc": "2025-03-11",
+      "event_count": 14
+    },
+    {
+      "date_utc": "2025-03-12",
+      "event_count": 15
+    },
+    {
+      "date_utc": "2025-03-13",
+      "event_count": 9
+    },
+    {
+      "date_utc": "2025-03-14",
+      "event_count": 17
+    },
+    {
+      "date_utc": "2025-03-15",
+      "event_count": 17
+    },
+    {
+      "date_utc": "2025-03-16",
+      "event_count": 16
+    },
+    {
+      "date_utc": "2025-03-17",
+      "event_count": 28
+    },
+    {
+      "date_utc": "2025-03-18",
+      "event_count": 23
+    },
+    {
+      "date_utc": "2025-03-19",
+      "event_count": 19
+    },
+    {
+      "date_utc": "2025-03-20",
+      "event_count": 27
+    },
+    {
+      "date_utc": "2025-03-21",
+      "event_count": 25
+    },
+    {
+      "date_utc": "2025-03-22",
+      "event_count": 12
+    },
+    {
+      "date_utc": "2025-03-23",
+      "event_count": 9
+    },
+    {
+      "date_utc": "2025-03-24",
+      "event_count": 16
+    },
+    {
+      "date_utc": "2025-03-25",
+      "event_count": 17
+    },
+    {
+      "date_utc": "2025-03-26",
+      "event_count": 12
+    },
+    {
+      "date_utc": "2025-03-27",
+      "event_count": 11
+    },
+    {
+      "date_utc": "2025-03-28",
+      "event_count": 28
+    },
+    {
+      "date_utc": "2025-03-29",
+      "event_count": 9
+    },
+    {
+      "date_utc": "2025-03-30",
+      "event_count": 22
+    },
+    {
+      "date_utc": "2025-03-31",
+      "event_count": 19
+    },
+    {
+      "date_utc": "2025-04-01",
+      "event_count": 23
+    },
+    {
+      "date_utc": "2025-04-02",
+      "event_count": 16
+    },
+    {
+      "date_utc": "2025-04-03",
+      "event_count": 19
+    },
+    {
+      "date_utc": "2025-04-04",
+      "event_count": 51
+    },
+    {
+      "date_utc": "2025-04-05",
+      "event_count": 58
+    },
+    {
+      "date_utc": "2025-04-06",
+      "event_count": 24
+    },
+    {
+      "date_utc": "2025-04-07",
+      "event_count": 18
+    },
+    {
+      "date_utc": "2025-04-08",
+      "event_count": 19
+    },
+    {
+      "date_utc": "2025-04-09",
+      "event_count": 19
+    },
+    {
+      "date_utc": "2025-04-10",
+      "event_count": 18
+    },
+    {
+      "date_utc": "2025-04-11",
+      "event_count": 11
+    },
+    {
+      "date_utc": "2025-04-12",
+      "event_count": 16
+    },
+    {
+      "date_utc": "2025-04-13",
+      "event_count": 28
+    },
+    {
+      "date_utc": "2025-04-14",
+      "event_count": 14
+    },
+    {
+      "date_utc": "2025-04-15",
+      "event_count": 19
+    },
+    {
+      "date_utc": "2025-04-16",
+      "event_count": 23
+    },
+    {
+      "date_utc": "2025-04-17",
+      "event_count": 17
+    },
+    {
+      "date_utc": "2025-04-18",
+      "event_count": 23
+    },
+    {
+      "date_utc": "2025-04-19",
+      "event_count": 21
+    },
+    {
+      "date_utc": "2025-04-20",
+      "event_count": 10
+    },
+    {
+      "date_utc": "2025-04-21",
+      "event_count": 13
+    },
+    {
+      "date_utc": "2025-04-22",
+      "event_count": 16
+    },
+    {
+      "date_utc": "2025-04-23",
+      "event_count": 18
+    },
+    {
+      "date_utc": "2025-04-24",
+      "event_count": 10
+    },
+    {
+      "date_utc": "2025-04-25",
+      "event_count": 18
+    },
+    {
+      "date_utc": "2025-04-26",
+      "event_count": 10
+    },
+    {
+      "date_utc": "2025-04-27",
+      "event_count": 17
+    },
+    {
+      "date_utc": "2025-04-28",
+      "event_count": 14
+    },
+    {
+      "date_utc": "2025-04-29",
+      "event_count": 21
+    },
+    {
+      "date_utc": "2025-04-30",
+      "event_count": 16
+    },
+    {
+      "date_utc": "2025-05-01",
+      "event_count": 18
+    },
+    {
+      "date_utc": "2025-05-02",
+      "event_count": 56
+    },
+    {
+      "date_utc": "2025-05-03",
+      "event_count": 32
+    },
+    {
+      "date_utc": "2025-05-04",
+      "event_count": 33
+    },
+    {
+      "date_utc": "2025-05-05",
+      "event_count": 23
+    },
+    {
+      "date_utc": "2025-05-06",
+      "event_count": 11
+    },
+    {
+      "date_utc": "2025-05-07",
+      "event_count": 23
+    },
+    {
+      "date_utc": "2025-05-08",
+      "event_count": 22
+    },
+    {
+      "date_utc": "2025-05-09",
+      "event_count": 16
+    },
+    {
+      "date_utc": "2025-05-10",
+      "event_count": 11
+    },
+    {
+      "date_utc": "2025-05-11",
+      "event_count": 25
+    },
+    {
+      "date_utc": "2025-05-12",
+      "event_count": 23
+    },
+    {
+      "date_utc": "2025-05-13",
+      "event_count": 13
+    },
+    {
+      "date_utc": "2025-05-14",
+      "event_count": 13
+    },
+    {
+      "date_utc": "2025-05-15",
+      "event_count": 12
+    },
+    {
+      "date_utc": "2025-05-16",
+      "event_count": 12
+    },
+    {
+      "date_utc": "2025-05-17",
+      "event_count": 12
+    },
+    {
+      "date_utc": "2025-05-18",
+      "event_count": 16
+    },
+    {
+      "date_utc": "2025-05-19",
+      "event_count": 23
+    },
+    {
+      "date_utc": "2025-05-20",
+      "event_count": 11
+    },
+    {
+      "date_utc": "2025-05-21",
+      "event_count": 16
+    },
+    {
+      "date_utc": "2025-05-22",
+      "event_count": 23
+    },
+    {
+      "date_utc": "2025-05-23",
+      "event_count": 15
+    },
+    {
+      "date_utc": "2025-05-24",
+      "event_count": 11
+    },
+    {
+      "date_utc": "2025-05-25",
+      "event_count": 10
+    },
+    {
+      "date_utc": "2025-05-26",
+      "event_count": 14
+    },
+    {
+      "date_utc": "2025-05-27",
+      "event_count": 25
+    },
+    {
+      "date_utc": "2025-05-28",
+      "event_count": 18
+    },
+    {
+      "date_utc": "2025-05-29",
+      "event_count": 17
+    },
+    {
+      "date_utc": "2025-05-30",
+      "event_count": 14
+    },
+    {
+      "date_utc": "2025-05-31",
+      "event_count": 27
+    },
+    {
+      "date_utc": "2025-06-01",
+      "event_count": 14
+    },
+    {
+      "date_utc": "2025-06-02",
+      "event_count": 13
+    },
+    {
+      "date_utc": "2025-06-03",
+      "event_count": 14
+    },
+    {
+      "date_utc": "2025-06-04",
+      "event_count": 12
+    },
+    {
+      "date_utc": "2025-06-05",
+      "event_count": 13
+    },
+    {
+      "date_utc": "2025-06-06",
+      "event_count": 13
+    },
+    {
+      "date_utc": "2025-06-07",
+      "event_count": 22
+    },
+    {
+      "date_utc": "2025-06-08",
+      "event_count": 21
+    },
+    {
+      "date_utc": "2025-06-09",
+      "event_count": 9
+    },
+    {
+      "date_utc": "2025-06-10",
+      "event_count": 19
+    },
+    {
+      "date_utc": "2025-06-11",
+      "event_count": 10
+    },
+    {
+      "date_utc": "2025-06-12",
+      "event_count": 17
+    },
+    {
+      "date_utc": "2025-06-13",
+      "event_count": 23
+    },
+    {
+      "date_utc": "2025-06-14",
+      "event_count": 18
+    },
+    {
+      "date_utc": "2025-06-15",
+      "event_count": 17
+    },
+    {
+      "date_utc": "2025-06-16",
+      "event_count": 20
+    },
+    {
+      "date_utc": "2025-06-17",
+      "event_count": 27
+    },
+    {
+      "date_utc": "2025-06-18",
+      "event_count": 12
+    },
+    {
+      "date_utc": "2025-06-19",
+      "event_count": 35
+    },
+    {
+      "date_utc": "2025-06-20",
+      "event_count": 17
+    },
+    {
+      "date_utc": "2025-06-21",
+      "event_count": 22
+    },
+    {
+      "date_utc": "2025-06-22",
+      "event_count": 20
+    },
+    {
+      "date_utc": "2025-06-23",
+      "event_count": 21
+    },
+    {
+      "date_utc": "2025-06-24",
+      "event_count": 31
+    },
+    {
+      "date_utc": "2025-06-25",
+      "event_count": 21
+    },
+    {
+      "date_utc": "2025-06-26",
+      "event_count": 17
+    },
+    {
+      "date_utc": "2025-06-27",
+      "event_count": 12
+    },
+    {
+      "date_utc": "2025-06-28",
+      "event_count": 20
+    },
+    {
+      "date_utc": "2025-06-29",
+      "event_count": 24
+    },
+    {
+      "date_utc": "2025-06-30",
+      "event_count": 19
+    },
+    {
+      "date_utc": "2025-07-01",
+      "event_count": 20
+    },
+    {
+      "date_utc": "2025-07-02",
+      "event_count": 39
+    },
+    {
+      "date_utc": "2025-07-03",
+      "event_count": 24
+    },
+    {
+      "date_utc": "2025-07-04",
+      "event_count": 24
+    },
+    {
+      "date_utc": "2025-07-05",
+      "event_count": 16
+    },
+    {
+      "date_utc": "2025-07-06",
+      "event_count": 23
+    },
+    {
+      "date_utc": "2025-07-07",
+      "event_count": 19
+    },
+    {
+      "date_utc": "2025-07-08",
+      "event_count": 22
+    },
+    {
+      "date_utc": "2025-07-09",
+      "event_count": 17
+    },
+    {
+      "date_utc": "2025-07-10",
+      "event_count": 20
+    },
+    {
+      "date_utc": "2025-07-11",
+      "event_count": 18
+    },
+    {
+      "date_utc": "2025-07-12",
+      "event_count": 18
+    },
+    {
+      "date_utc": "2025-07-13",
+      "event_count": 20
+    },
+    {
+      "date_utc": "2025-07-14",
+      "event_count": 25
+    },
+    {
+      "date_utc": "2025-07-15",
+      "event_count": 21
+    },
+    {
+      "date_utc": "2025-07-16",
+      "event_count": 17
+    },
+    {
+      "date_utc": "2025-07-17",
+      "event_count": 23
+    },
+    {
+      "date_utc": "2025-07-18",
+      "event_count": 25
+    },
+    {
+      "date_utc": "2025-07-19",
+      "event_count": 17
+    },
+    {
+      "date_utc": "2025-07-20",
+      "event_count": 87
+    },
+    {
+      "date_utc": "2025-07-21",
+      "event_count": 47
+    },
+    {
+      "date_utc": "2025-07-22",
+      "event_count": 41
+    },
+    {
+      "date_utc": "2025-07-23",
+      "event_count": 22
+    },
+    {
+      "date_utc": "2025-07-24",
+      "event_count": 26
+    },
+    {
+      "date_utc": "2025-07-25",
+      "event_count": 21
+    },
+    {
+      "date_utc": "2025-07-26",
+      "event_count": 17
+    },
+    {
+      "date_utc": "2025-07-27",
+      "event_count": 13
+    },
+    {
+      "date_utc": "2025-07-28",
+      "event_count": 28
+    },
+    {
+      "date_utc": "2025-07-29",
+      "event_count": 68
+    },
+    {
+      "date_utc": "2025-07-30",
+      "event_count": 422
+    },
+    {
+      "date_utc": "2025-07-31",
+      "event_count": 121
+    },
+    {
+      "date_utc": "2025-08-01",
+      "event_count": 111
+    },
+    {
+      "date_utc": "2025-08-02",
+      "event_count": 63
+    },
+    {
+      "date_utc": "2025-08-03",
+      "event_count": 65
+    },
+    {
+      "date_utc": "2025-08-04",
+      "event_count": 33
+    },
+    {
+      "date_utc": "2025-08-05",
+      "event_count": 39
+    },
+    {
+      "date_utc": "2025-08-06",
+      "event_count": 40
+    },
+    {
+      "date_utc": "2025-08-07",
+      "event_count": 32
+    },
+    {
+      "date_utc": "2025-08-08",
+      "event_count": 31
+    },
+    {
+      "date_utc": "2025-08-09",
+      "event_count": 30
+    },
+    {
+      "date_utc": "2025-08-10",
+      "event_count": 45
+    },
+    {
+      "date_utc": "2025-08-11",
+      "event_count": 37
+    },
+    {
+      "date_utc": "2025-08-12",
+      "event_count": 38
+    },
+    {
+      "date_utc": "2025-08-13",
+      "event_count": 24
+    },
+    {
+      "date_utc": "2025-08-14",
+      "event_count": 20
+    },
+    {
+      "date_utc": "2025-08-15",
+      "event_count": 18
+    },
+    {
+      "date_utc": "2025-08-16",
+      "event_count": 27
+    },
+    {
+      "date_utc": "2025-08-17",
+      "event_count": 20
+    },
+    {
+      "date_utc": "2025-08-18",
+      "event_count": 26
+    },
+    {
+      "date_utc": "2025-08-19",
+      "event_count": 23
+    },
+    {
+      "date_utc": "2025-08-20",
+      "event_count": 19
+    },
+    {
+      "date_utc": "2025-08-21",
+      "event_count": 30
+    },
+    {
+      "date_utc": "2025-08-22",
+      "event_count": 29
+    },
+    {
+      "date_utc": "2025-08-23",
+      "event_count": 26
+    },
+    {
+      "date_utc": "2025-08-24",
+      "event_count": 26
+    },
+    {
+      "date_utc": "2025-08-25",
+      "event_count": 14
+    },
+    {
+      "date_utc": "2025-08-26",
+      "event_count": 20
+    },
+    {
+      "date_utc": "2025-08-27",
+      "event_count": 13
+    },
+    {
+      "date_utc": "2025-08-28",
+      "event_count": 22
+    },
+    {
+      "date_utc": "2025-08-29",
+      "event_count": 21
+    },
+    {
+      "date_utc": "2025-08-30",
+      "event_count": 15
+    },
+    {
+      "date_utc": "2025-08-31",
+      "event_count": 26
+    },
+    {
+      "date_utc": "2025-09-01",
+      "event_count": 23
+    },
+    {
+      "date_utc": "2025-09-02",
+      "event_count": 25
+    },
+    {
+      "date_utc": "2025-09-03",
+      "event_count": 28
+    },
+    {
+      "date_utc": "2025-09-04",
+      "event_count": 31
+    },
+    {
+      "date_utc": "2025-09-05",
+      "event_count": 24
+    },
+    {
+      "date_utc": "2025-09-06",
+      "event_count": 15
+    },
+    {
+      "date_utc": "2025-09-07",
+      "event_count": 21
+    },
+    {
+      "date_utc": "2025-09-08",
+      "event_count": 20
+    },
+    {
+      "date_utc": "2025-09-09",
+      "event_count": 25
+    },
+    {
+      "date_utc": "2025-09-10",
+      "event_count": 13
+    },
+    {
+      "date_utc": "2025-09-11",
+      "event_count": 23
+    },
+    {
+      "date_utc": "2025-09-12",
+      "event_count": 27
+    },
+    {
+      "date_utc": "2025-09-13",
+      "event_count": 27
+    },
+    {
+      "date_utc": "2025-09-14",
+      "event_count": 15
+    },
+    {
+      "date_utc": "2025-09-15",
+      "event_count": 19
+    },
+    {
+      "date_utc": "2025-09-16",
+      "event_count": 11
+    },
+    {
+      "date_utc": "2025-09-17",
+      "event_count": 13
+    },
+    {
+      "date_utc": "2025-09-18",
+      "event_count": 74
+    },
+    {
+      "date_utc": "2025-09-19",
+      "event_count": 78
+    },
+    {
+      "date_utc": "2025-09-20",
+      "event_count": 34
+    },
+    {
+      "date_utc": "2025-09-21",
+      "event_count": 25
+    },
+    {
+      "date_utc": "2025-09-22",
+      "event_count": 41
+    },
+    {
+      "date_utc": "2025-09-23",
+      "event_count": 24
+    },
+    {
+      "date_utc": "2025-09-24",
+      "event_count": 17
+    },
+    {
+      "date_utc": "2025-09-25",
+      "event_count": 36
+    },
+    {
+      "date_utc": "2025-09-26",
+      "event_count": 24
+    },
+    {
+      "date_utc": "2025-09-27",
+      "event_count": 24
+    },
+    {
+      "date_utc": "2025-09-28",
+      "event_count": 12
+    },
+    {
+      "date_utc": "2025-09-29",
+      "event_count": 15
+    },
+    {
+      "date_utc": "2025-09-30",
+      "event_count": 38
+    },
+    {
+      "date_utc": "2025-10-01",
+      "event_count": 18
+    },
+    {
+      "date_utc": "2025-10-02",
+      "event_count": 24
+    },
+    {
+      "date_utc": "2025-10-03",
+      "event_count": 47
+    },
+    {
+      "date_utc": "2025-10-04",
+      "event_count": 24
+    },
+    {
+      "date_utc": "2025-10-05",
+      "event_count": 30
+    },
+    {
+      "date_utc": "2025-10-06",
+      "event_count": 21
+    },
+    {
+      "date_utc": "2025-10-07",
+      "event_count": 20
+    },
+    {
+      "date_utc": "2025-10-08",
+      "event_count": 16
+    },
+    {
+      "date_utc": "2025-10-09",
+      "event_count": 16
+    },
+    {
+      "date_utc": "2025-10-10",
+      "event_count": 84
+    },
+    {
+      "date_utc": "2025-10-11",
+      "event_count": 41
+    },
+    {
+      "date_utc": "2025-10-12",
+      "event_count": 23
+    },
+    {
+      "date_utc": "2025-10-13",
+      "event_count": 20
+    },
+    {
+      "date_utc": "2025-10-14",
+      "event_count": 29
+    },
+    {
+      "date_utc": "2025-10-15",
+      "event_count": 18
+    },
+    {
+      "date_utc": "2025-10-16",
+      "event_count": 32
+    },
+    {
+      "date_utc": "2025-10-17",
+      "event_count": 21
+    },
+    {
+      "date_utc": "2025-10-18",
+      "event_count": 19
+    },
+    {
+      "date_utc": "2025-10-19",
+      "event_count": 24
+    },
+    {
+      "date_utc": "2025-10-20",
+      "event_count": 23
+    },
+    {
+      "date_utc": "2025-10-21",
+      "event_count": 18
+    },
+    {
+      "date_utc": "2025-10-22",
+      "event_count": 11
+    },
+    {
+      "date_utc": "2025-10-23",
+      "event_count": 16
+    },
+    {
+      "date_utc": "2025-10-24",
+      "event_count": 25
+    },
+    {
+      "date_utc": "2025-10-25",
+      "event_count": 20
+    },
+    {
+      "date_utc": "2025-10-26",
+      "event_count": 19
+    },
+    {
+      "date_utc": "2025-10-27",
+      "event_count": 21
+    },
+    {
+      "date_utc": "2025-10-28",
+      "event_count": 22
+    },
+    {
+      "date_utc": "2025-10-29",
+      "event_count": 20
+    },
+    {
+      "date_utc": "2025-10-30",
+      "event_count": 13
+    },
+    {
+      "date_utc": "2025-10-31",
+      "event_count": 21
+    },
+    {
+      "date_utc": "2025-11-01",
+      "event_count": 13
+    },
+    {
+      "date_utc": "2025-11-02",
+      "event_count": 21
+    },
+    {
+      "date_utc": "2025-11-03",
+      "event_count": 50
+    },
+    {
+      "date_utc": "2025-11-04",
+      "event_count": 40
+    },
+    {
+      "date_utc": "2025-11-05",
+      "event_count": 17
+    },
+    {
+      "date_utc": "2025-11-06",
+      "event_count": 16
+    },
+    {
+      "date_utc": "2025-11-07",
+      "event_count": 22
+    },
+    {
+      "date_utc": "2025-11-08",
+      "event_count": 30
+    },
+    {
+      "date_utc": "2025-11-09",
+      "event_count": 49
+    },
+    {
+      "date_utc": "2025-11-10",
+      "event_count": 29
+    },
+    {
+      "date_utc": "2025-11-11",
+      "event_count": 17
+    },
+    {
+      "date_utc": "2025-11-12",
+      "event_count": 18
+    },
+    {
+      "date_utc": "2025-11-13",
+      "event_count": 19
+    },
+    {
+      "date_utc": "2025-11-14",
+      "event_count": 14
+    },
+    {
+      "date_utc": "2025-11-15",
+      "event_count": 16
+    },
+    {
+      "date_utc": "2025-11-16",
+      "event_count": 16
+    },
+    {
+      "date_utc": "2025-11-17",
+      "event_count": 12
+    },
+    {
+      "date_utc": "2025-11-18",
+      "event_count": 12
+    },
+    {
+      "date_utc": "2025-11-19",
+      "event_count": 20
+    },
+    {
+      "date_utc": "2025-11-20",
+      "event_count": 24
+    },
+    {
+      "date_utc": "2025-11-21",
+      "event_count": 12
+    },
+    {
+      "date_utc": "2025-11-22",
+      "event_count": 19
+    },
+    {
+      "date_utc": "2025-11-23",
+      "event_count": 19
+    },
+    {
+      "date_utc": "2025-11-24",
+      "event_count": 17
+    },
+    {
+      "date_utc": "2025-11-25",
+      "event_count": 19
+    },
+    {
+      "date_utc": "2025-11-26",
+      "event_count": 18
+    },
+    {
+      "date_utc": "2025-11-27",
+      "event_count": 17
+    },
+    {
+      "date_utc": "2025-11-28",
+      "event_count": 17
+    },
+    {
+      "date_utc": "2025-11-29",
+      "event_count": 18
+    },
+    {
+      "date_utc": "2025-11-30",
+      "event_count": 11
+    },
+    {
+      "date_utc": "2025-12-01",
+      "event_count": 18
+    },
+    {
+      "date_utc": "2025-12-02",
+      "event_count": 22
+    },
+    {
+      "date_utc": "2025-12-03",
+      "event_count": 9
+    },
+    {
+      "date_utc": "2025-12-04",
+      "event_count": 17
+    },
+    {
+      "date_utc": "2025-12-05",
+      "event_count": 17
+    },
+    {
+      "date_utc": "2025-12-06",
+      "event_count": 22
+    },
+    {
+      "date_utc": "2025-12-07",
+      "event_count": 32
+    },
+    {
+      "date_utc": "2025-12-08",
+      "event_count": 28
+    },
+    {
+      "date_utc": "2025-12-09",
+      "event_count": 27
+    },
+    {
+      "date_utc": "2025-12-10",
+      "event_count": 15
+    },
+    {
+      "date_utc": "2025-12-11",
+      "event_count": 14
+    },
+    {
+      "date_utc": "2025-12-12",
+      "event_count": 22
+    },
+    {
+      "date_utc": "2025-12-13",
+      "event_count": 12
+    },
+    {
+      "date_utc": "2025-12-14",
+      "event_count": 18
+    },
+    {
+      "date_utc": "2025-12-15",
+      "event_count": 17
+    },
+    {
+      "date_utc": "2025-12-16",
+      "event_count": 17
+    },
+    {
+      "date_utc": "2025-12-17",
+      "event_count": 17
+    },
+    {
+      "date_utc": "2025-12-18",
+      "event_count": 19
+    },
+    {
+      "date_utc": "2025-12-19",
+      "event_count": 18
+    },
+    {
+      "date_utc": "2025-12-20",
+      "event_count": 15
+    },
+    {
+      "date_utc": "2025-12-21",
+      "event_count": 31
+    },
+    {
+      "date_utc": "2025-12-22",
+      "event_count": 17
+    },
+    {
+      "date_utc": "2025-12-23",
+      "event_count": 13
+    },
+    {
+      "date_utc": "2025-12-24",
+      "event_count": 19
+    },
+    {
+      "date_utc": "2025-12-25",
+      "event_count": 19
+    },
+    {
+      "date_utc": "2025-12-26",
+      "event_count": 21
+    },
+    {
+      "date_utc": "2025-12-27",
+      "event_count": 14
+    },
+    {
+      "date_utc": "2025-12-28",
+      "event_count": 11
+    },
+    {
+      "date_utc": "2025-12-29",
+      "event_count": 12
+    },
+    {
+      "date_utc": "2025-12-30",
+      "event_count": 17
+    },
+    {
+      "date_utc": "2025-12-31",
+      "event_count": 12
+    }
+  ],
+  "geographic_assignment": {
+    "recent_24h": {
+      "eligible_event_count": 17,
+      "assigned_event_count": 4,
+      "unassigned_event_count": 13,
+      "assigned_share": 0.23529411764705882,
+      "unassigned_share": 0.7647058823529411
+    },
+    "historical_2025": {
+      "eligible_event_count": 8559,
+      "assigned_event_count": 1480,
+      "unassigned_event_count": 7079,
+      "assigned_share": 0.1729173968921603,
+      "unassigned_share": 0.8270826031078397
+    },
+    "unassigned_caveat": "Sin país asignado indica falta de coincidencia con el catálogo de polígonos y no demuestra por sí solo una ubicación submarina."
+  },
+  "historical_depth_by_subregion": [
+    {
+      "geographic_region": "Australia and New Zealand",
+      "depth_population_count": 15,
+      "depth_p90_km": 136.142,
+      "method": "hyndman_fan_type_7"
+    },
+    {
+      "geographic_region": "Caribbean",
+      "depth_population_count": 1,
+      "depth_p90_km": 10.0,
+      "method": "hyndman_fan_type_7"
+    },
+    {
+      "geographic_region": "Central America",
+      "depth_population_count": 56,
+      "depth_p90_km": 188.404,
+      "method": "hyndman_fan_type_7"
+    },
+    {
+      "geographic_region": "Central Asia",
+      "depth_population_count": 23,
+      "depth_p90_km": 10.620800000000001,
+      "method": "hyndman_fan_type_7"
+    },
+    {
+      "geographic_region": "Eastern Africa",
+      "depth_population_count": 124,
+      "depth_p90_km": 10.0,
+      "method": "hyndman_fan_type_7"
+    },
+    {
+      "geographic_region": "Eastern Asia",
+      "depth_population_count": 222,
+      "depth_p90_km": 77.886,
+      "method": "hyndman_fan_type_7"
+    },
+    {
+      "geographic_region": "Eastern Europe",
+      "depth_population_count": 50,
+      "depth_p90_km": 98.1038,
+      "method": "hyndman_fan_type_7"
+    },
+    {
+      "geographic_region": "Melanesia",
+      "depth_population_count": 108,
+      "depth_p90_km": 125.56479999999999,
+      "method": "hyndman_fan_type_7"
+    },
+    {
+      "geographic_region": "Middle Africa",
+      "depth_population_count": 5,
+      "depth_p90_km": 10.0,
+      "method": "hyndman_fan_type_7"
+    },
+    {
+      "geographic_region": "Northern Africa",
+      "depth_population_count": 7,
+      "depth_p90_km": 17.808400000000006,
+      "method": "hyndman_fan_type_7"
+    },
+    {
+      "geographic_region": "Northern America",
+      "depth_population_count": 48,
+      "depth_p90_km": 67.38001861572266,
+      "method": "hyndman_fan_type_7"
+    },
+    {
+      "geographic_region": "Northern Europe",
+      "depth_population_count": 8,
+      "depth_p90_km": 10.0,
+      "method": "hyndman_fan_type_7"
+    },
+    {
+      "geographic_region": "Sin subregión",
+      "depth_population_count": 7079,
+      "depth_p90_km": 110.72719999999994,
+      "method": "hyndman_fan_type_7"
+    },
+    {
+      "geographic_region": "South America",
+      "depth_population_count": 337,
+      "depth_p90_km": 209.40360000000004,
+      "method": "hyndman_fan_type_7"
+    },
+    {
+      "geographic_region": "South-Eastern Asia",
+      "depth_population_count": 284,
+      "depth_p90_km": 129.72670000000002,
+      "method": "hyndman_fan_type_7"
+    },
+    {
+      "geographic_region": "Southern Africa",
+      "depth_population_count": 2,
+      "depth_p90_km": 5.0,
+      "method": "hyndman_fan_type_7"
+    },
+    {
+      "geographic_region": "Southern Asia",
+      "depth_population_count": 135,
+      "depth_p90_km": 103.62060000000007,
+      "method": "hyndman_fan_type_7"
+    },
+    {
+      "geographic_region": "Southern Europe",
+      "depth_population_count": 12,
+      "depth_p90_km": 23.214299999999998,
+      "method": "hyndman_fan_type_7"
+    },
+    {
+      "geographic_region": "Western Asia",
+      "depth_population_count": 43,
+      "depth_p90_km": 18.72120000000002,
+      "method": "hyndman_fan_type_7"
+    }
+  ],
+  "limitations": [
+    "La ventana reciente móvil de 24 horas no es un día natural y no equivale a una muestra aleatoria del año 2025.",
+    "La desviación observada describe variabilidad histórica y no predice riesgo sísmico.",
+    "Las interpretaciones tectónicas requieren fuentes externas; estas métricas no demuestran causalidad."
+  ]
+}

@@ -81,7 +81,7 @@ Observatorio-de-actividad-s-smica/
         [ API FastAPI ] <========== [ Túnel ngrok (HTTPS) ] <========== [ SPA Netlify (Angular + Leaflet) ]
 ```
 
-- **5 Servicios Docker obligatorios en local:** `productor`, `broker` (Kafka), `consumidor`, `almacenamiento` (Postgres) y `api` (FastAPI).
+- **5 Servicios Docker permanentes en local:** `productor`, `broker` (Kafka), `consumidor`, `almacenamiento` (Postgres) y `api` (FastAPI), más un inicializador puntual que descarga e importa el histórico 2025 al arrancar.
 - **Frontend SPA desacoplado:** Compilado y publicado en Netlify.
 - **Conectividad segura:** Túnel HTTPS gestionado por ngrok hacia la API; Kafka y PostgreSQL jamás se exponen públicamente.
 
@@ -91,3 +91,7 @@ Observatorio-de-actividad-s-smica/
 
 1. **Revisar y validar las especificaciones:** Confirmar que todos los requerimientos y decisiones técnicas descritas en `specs/001-observatorio-sismico/` se ajustan a las directrices esperadas.
 2. **Iniciar la Fase 1 de Implementación:** Comenzar la ejecución secuencial del backlog de tareas según [`tasks.md`](specs/001-observatorio-sismico/tasks.md).
+
+## Despliegue Netlify/ngrok
+
+La configuración del build de Netlify, la URL de API en tiempo de despliegue y el túnel ngrok están descritos en la [guía de despliegue](docs/deployment-netlify-ngrok.md).
