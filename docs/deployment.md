@@ -1,7 +1,7 @@
 # GUÍA DE DESPLIEGUE Y OPERACIÓN LOCAL
 ## Observatorio de Actividad Sísmica
 
-Este documento contiene las instrucciones precisas paso a paso para levantar, verificar y operar el sistema completo en local (los 5 servicios Docker y la interfaz Angular).
+Este documento contiene las instrucciones precisas paso a paso para levantar, verificar y operar el sistema en local: cinco servicios Docker permanentes, un inicializador histórico de una sola ejecución y la interfaz Angular.
 
 ---
 
@@ -35,7 +35,7 @@ Parámetros clave de `.env`:
 
 ---
 
-## 3. Levantar los 5 Servicios de Backend con Docker Compose
+## 3. Levantar el Backend con Docker Compose
 
 Abre una terminal PowerShell en la raíz del repositorio y ejecuta:
 
@@ -43,11 +43,14 @@ Abre una terminal PowerShell en la raíz del repositorio y ejecuta:
 # 1. Validar la configuración del compose
 docker compose config
 
-# 2. Construir y levantar los 5 contenedores en segundo plano
+# 2. Construir y levantar los servicios en segundo plano
 docker compose up --build -d
 
-# 3. Comprobar que los 5 servicios están en estado 'healthy'
+# 3. Comprobar el estado de los servicios permanentes
 docker compose ps
+
+# 4. Consultar el inicializador (debe terminar con código 0)
+docker compose ps -a historical-bootstrap
 ```
 
 ### Servicios levantados:
@@ -55,12 +58,24 @@ docker compose ps
 | :--- | :--- | :--- |
 | `broker` | Apache Kafka 3.7 (KRaft) | Interno (`broker:9092`) |
 | `almacenamiento` | PostgreSQL 16.4 Alpine | Interno (`almacenamiento:5432`) |
+| `historical-bootstrap` | Descarga e importa el catálogo USGS 2025 una vez | Red interna `sismos-network` |
 | `productor` | Ingesta asíncrona de USGS cada 60s | Red interna `sismos-network` |
 | `consumidor` | Calidad 6D, STRtree (Shapely) e idempotencia | Red interna `sismos-network` |
 | `api` | FastAPI REST + asyncpg | Expuesto en `http://127.0.0.1:8000` |
 
 > [!NOTE]
 > Por seguridad y cumplimiento de la arquitectura, ni PostgreSQL ni Kafka exponen puertos al host exterior. Solo la API está publicada en el puerto 8000 del loopback local.
+> El inicializador histórico se ejecuta en segundo plano, sin bloquear la API ni el feed en vivo. Guarda el catálogo descargado en el volumen `usgs_cache` y registra en PostgreSQL que la importación terminó, así que los siguientes arranques no repiten la descarga ni la importación. Si USGS no está disponible, Docker reintenta el servicio hasta 5 veces; consulta `docker compose logs -f historical-bootstrap` para ver el estado.
+
+La carga empieza automáticamente al ejecutar `docker compose up --build -d`. Puedes comprobar su estado y los datos importados con:
+
+```powershell
+docker compose ps -a historical-bootstrap
+docker compose logs historical-bootstrap
+docker compose exec almacenamiento psql -U observatorio -d observatorio -c "SELECT dataset_key, event_count, imported_at FROM dataset_imports;"
+```
+
+Si ejecutas `docker compose down --volumes`, se eliminan tanto la base de datos como la caché; el siguiente arranque descargará de nuevo el histórico. Si solo borras la base de datos pero conservas `usgs_cache`, la importación se repetirá usando la caché local.
 
 ---
 

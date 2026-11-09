@@ -285,6 +285,8 @@ async def persist_replay_event(
 async def persist_historical_events(
     pool: asyncpg.Pool,
     events: list[tuple[HistoricalEvent, Country]],
+    *,
+    dataset_key: str | None = None,
 ) -> None:
     """Insert a complete baseline in one transaction without mutating prior rows.
 
@@ -320,6 +322,16 @@ async def persist_historical_events(
         async with connection.transaction():
             await connection.executemany(_INSERT_HISTORICAL_KEY, key_records)
             await connection.executemany(_INSERT_HISTORICAL_EVENT, fact_records)
+            if dataset_key is not None:
+                await connection.execute(
+                    """
+                    INSERT INTO dataset_imports (dataset_key, event_count)
+                    VALUES ($1, $2)
+                    ON CONFLICT (dataset_key) DO NOTHING
+                    """,
+                    dataset_key,
+                    len(events),
+                )
 
 
 async def persist_poll_audit(pool: asyncpg.Pool, audit: PollAudit) -> None:

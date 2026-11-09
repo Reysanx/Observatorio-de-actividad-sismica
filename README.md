@@ -81,7 +81,7 @@ Observatorio-de-actividad-s-smica/
         [ API FastAPI ] <========== [ Túnel ngrok (HTTPS) ] <========== [ SPA Netlify (Angular + Leaflet) ]
 ```
 
-- **5 Servicios Docker obligatorios en local:** `productor`, `broker` (Kafka), `consumidor`, `almacenamiento` (Postgres) y `api` (FastAPI).
+- **5 Servicios Docker permanentes en local:** `productor`, `broker` (Kafka), `consumidor`, `almacenamiento` (Postgres) y `api` (FastAPI), más un inicializador puntual que descarga e importa el histórico 2025 al arrancar.
 - **Frontend SPA desacoplado:** Compilado y publicado en Netlify.
 - **Conectividad segura:** Túnel HTTPS gestionado por ngrok hacia la API; Kafka y PostgreSQL jamás se exponen públicamente.
 

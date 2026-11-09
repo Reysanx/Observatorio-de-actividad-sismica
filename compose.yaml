@@ -67,6 +67,35 @@ services:
     networks:
       - sismos-network
 
+  historical-bootstrap:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.consumer
+    command: ["python", "-m", "consumer.historical_bootstrap"]
+    environment:
+      POSTGRES_HOST: almacenamiento
+      POSTGRES_PORT: "5432"
+      POSTGRES_DB: ${POSTGRES_DB:-observatorio}
+      POSTGRES_USER: ${POSTGRES_USER:-observatorio}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env (copy .env.example)}
+      NATURAL_EARTH_GEOJSON: /app/data/paises.geojson
+      USGS_CACHE_DIR: /var/lib/observatorio/cache
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+    volumes:
+      - usgs_cache:/var/lib/observatorio/cache
+      - type: bind
+        source: ./frontend/public/datos/paises.geojson
+        target: /app/data/paises.geojson
+        read_only: true
+        bind:
+          create_host_path: false
+    depends_on:
+      almacenamiento:
+        condition: service_healthy
+    restart: on-failure:5
+    networks:
+      - sismos-network
+
   consumidor:
     build:
       context: ./backend
