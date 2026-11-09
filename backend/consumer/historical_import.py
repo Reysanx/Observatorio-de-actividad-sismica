@@ -12,6 +12,7 @@ from typing import Any
 
 import asyncpg
 
+from api.analysis import HISTORICAL_DATASET_KEY
 from consumer.db_writer import load_country_dimension, persist_historical_events
 from consumer.historical import HistoricalEvent, HistoricalImportError, normalize_historical_feature
 from consumer.spatial import SpatialIndex
@@ -23,7 +24,6 @@ from scripts.download_historical_2025 import (
 )
 
 LOGGER = logging.getLogger(__name__)
-HISTORICAL_DATASET_KEY = "usgs_2025_magnitude_4_v1"
 
 
 def historical_cache_directory(cache_root: str | Path) -> Path:

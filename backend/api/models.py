@@ -96,6 +96,11 @@ class DistributionResponse(APIModel):
     depth_bins: list[HistogramBinDTO]
     magnitude_null_count: int
     depth_null_count: int
+    depth_p90_km: float | None
+    depth_population_count: int
+    depth_percentile_method: Literal["hyndman_fan_type_7"] = "hyndman_fan_type_7"
+    depth_period_start_utc: datetime
+    depth_period_end_utc: datetime
     scope: Literal["live", "replay"]
     run_id: str | None
 
@@ -104,10 +109,16 @@ class HistoricalComparisonResponse(APIModel):
     calculated_at: datetime
     window_start_utc: datetime
     window_end_utc: datetime
+    magnitude_threshold: float
     recent_event_count: int
     historical_2025_event_count: int
     historical_days: int
     historical_daily_average: float
+    historical_daily_population_stddev: float
+    recent_standard_deviations_from_mean: float | None
+    deviation_band: Literal[
+        "within_1_sd", "between_1_and_2_sd", "beyond_2_sd", "unavailable"
+    ]
     ratio_to_historical_daily_average: float | None
     adm0_a3: str | None
     continent: str | None

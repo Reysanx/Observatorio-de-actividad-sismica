@@ -3,12 +3,14 @@
 from __future__ import annotations
 
 import unittest
-from datetime import datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 from typing import Any
 
 from fastapi.testclient import TestClient
 
+from api.analysis import summarize_comparison, type_7_percentile
 from api.main import create_app
+from scripts.generate_seismic_analysis import validate_baseline
 
 
 class FakeConnection:
@@ -27,6 +29,8 @@ class FakeConnection:
 
     async def fetch(self, query: str, *args: object) -> list[dict[str, Any]]:
         self.owner.queries.append((query, args))
+        if "generate_series" in query:
+            return self.owner.daily_counts
         return []
 
     async def fetchrow(self, query: str, *args: object) -> dict[str, Any]:
@@ -58,13 +62,14 @@ class FakePool:
         self.comparison_summary: dict[str, Any] = {
             "calculated_at": datetime(2026, 11, 2, tzinfo=timezone.utc),
             "recent_event_count": 2,
-            "historical_2025_event_count": 730,
-            "historical_days": 365,
-            "historical_daily_average": 2.0,
-            "historical_daily_population_stddev": 1.0,
             "stored_event_count": 1000,
             "imported_event_count": 1000,
         }
+        counts = [0] + [1] * 182 + [3] * 181 + [5]
+        self.daily_counts = [
+            {"day_utc": date(2025, 1, 1) + timedelta(days=index), "event_count": count}
+            for index, count in enumerate(counts)
+        ]
 
     def acquire(self) -> FakeConnection:
         return FakeConnection(self)
@@ -82,6 +87,43 @@ class APIRouteContractTests(unittest.TestCase):
 
     def tearDown(self) -> None:
         self.client.close()
+
+    def test_comparison_summary_requires_365_days_and_handles_zero_variance(self) -> None:
+        with self.assertRaises(ValueError):
+            summarize_comparison([0], 0)
+        metrics = summarize_comparison([0] * 365, 3)
+        self.assertEqual(metrics["historical_2025_event_count"], 0)
+        self.assertEqual(metrics["historical_daily_population_stddev"], 0.0)
+        self.assertIsNone(metrics["recent_standard_deviations_from_mean"])
+        self.assertEqual(metrics["deviation_band"], "unavailable")
+        self.assertIsNone(metrics["ratio_to_historical_daily_average"])
+
+    def test_type_7_percentile_interpolates_and_handles_empty_or_single_values(self) -> None:
+        self.assertEqual(type_7_percentile([], 0.9), None)
+        self.assertEqual(type_7_percentile([12.5], 0.9), 12.5)
+        self.assertAlmostEqual(type_7_percentile([0.0, 10.0], 0.9) or 0.0, 9.0)
+        with self.assertRaises(ValueError):
+            type_7_percentile([float("nan")], 0.9)
+        with self.assertRaises(ValueError):
+            type_7_percentile([1.0], 1.1)
+
+    def test_analysis_baseline_validation_rejects_missing_or_incomplete_import(self) -> None:
+        manifest = {
+            "year": 2025,
+            "complete": True,
+            "query": {"minmagnitude": "4.0"},
+            "unique_event_count": 10,
+            "months": {f"2025-{month:02d}": {} for month in range(1, 13)},
+        }
+        validate_baseline(10, 10, manifest)
+        with self.assertRaises(ValueError):
+            validate_baseline(10, 9, manifest)
+        with self.assertRaises(ValueError):
+            validate_baseline(10, 10, {**manifest, "complete": False})
+        with self.assertRaises(ValueError):
+            validate_baseline(10, 10, {**manifest, "query": None})
+        with self.assertRaises(ValueError):
+            validate_baseline(10, 10, {**manifest, "months": {"2025-01": {}}})
 
     def test_health_reports_database_and_serializes_utc_with_z(self) -> None:
         response = self.client.get("/api/v1/health")
@@ -156,7 +198,10 @@ class APIRouteContractTests(unittest.TestCase):
         self.assertEqual(result["magnitude_threshold"], 4.5)
         self.assertEqual(result["historical_days"], 365)
         self.assertEqual(result["historical_daily_average"], 2.0)
-        self.assertEqual(result["historical_daily_population_stddev"], 1.0)
+        self.assertAlmostEqual(
+            result["historical_daily_population_stddev"],
+            (376 / 365) ** 0.5,
+        )
         self.assertEqual(result["recent_standard_deviations_from_mean"], 0.0)
         self.assertEqual(result["deviation_band"], "within_1_sd")
         self.assertEqual(response.json()["ratio_to_historical_daily_average"], 1.0)
@@ -166,13 +211,23 @@ class APIRouteContractTests(unittest.TestCase):
         self.assertIn("live.mag >= 4.5", comparison_query)
         self.assertIn("baseline.mag >= 4.5", daily_query)
         self.assertIn("generate_series", daily_query)
+        self.assertIn("LEFT JOIN", daily_query)
+        self.assertIn("count(baseline.event_id)", daily_query)
         self.assertIn("live.adm0_a3 = $3", comparison_query)
         self.assertIn("baseline.adm0_a3 = $1", daily_query)
         self.assertEqual(self.pool.queries[0][1][2:], ("CHL",))
         self.assertEqual(self.pool.queries[1][1], ("CHL",))
+        self.assertEqual(sum(row["event_count"] for row in self.pool.daily_counts), 730)
+        self.assertTrue(any(row["event_count"] == 0 for row in self.pool.daily_counts))
 
     def test_comparison_marks_zero_variance_and_invalid_baseline_unavailable(self) -> None:
-        self.pool.comparison_summary["historical_daily_population_stddev"] = 0.0
+        self.pool.daily_counts = [
+            {
+                "day_utc": date(2025, 1, 1) + timedelta(days=index),
+                "event_count": 2,
+            }
+            for index in range(365)
+        ]
         response = self.client.get("/api/v1/stats/historical-comparison")
         self.assertEqual(response.status_code, 200)
         self.assertIsNone(response.json()["recent_standard_deviations_from_mean"])
@@ -189,7 +244,7 @@ class APIRouteContractTests(unittest.TestCase):
         )
         self.assertEqual(live.status_code, 200)
         query = self.pool.queries[0][0]
-        self.assertIn("percentile_cont(0.9)", query)
+        self.assertIn("percentile_cont(0.90)", query)
         self.assertIn("depth_km::TEXT NOT IN", query)
         self.assertIn("current_earthquakes", query)
         self.assertEqual(live.json()["depth_period_start_utc"], "2026-11-02T00:00:00Z")

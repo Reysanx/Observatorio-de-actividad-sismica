@@ -115,7 +115,16 @@ async def distributions(
                 SELECT count(*) FILTER (WHERE e.mag IS NULL)::BIGINT
                            AS magnitude_null_count,
                        count(*) FILTER (WHERE e.depth_km IS NULL)::BIGINT
-                           AS depth_null_count
+                           AS depth_null_count,
+                       count(e.depth_km) FILTER (
+                           WHERE e.depth_km IS NOT NULL
+                             AND e.depth_km::TEXT NOT IN ('NaN', 'Infinity', '-Infinity')
+                       )::BIGINT AS depth_population_count,
+                       percentile_cont(0.90) WITHIN GROUP (ORDER BY e.depth_km)
+                           FILTER (
+                               WHERE e.depth_km IS NOT NULL
+                                 AND e.depth_km::TEXT NOT IN ('NaN', 'Infinity', '-Infinity')
+                           ) AS depth_p90_km
                 FROM {relation} e
                 {COUNTRY_JOIN}
                 WHERE {predicate}
@@ -155,6 +164,10 @@ async def distributions(
         depth_bins=[dict(row) for row in depth_rows],
         magnitude_null_count=counts["magnitude_null_count"] or 0,
         depth_null_count=counts["depth_null_count"] or 0,
+        depth_p90_km=counts["depth_p90_km"],
+        depth_population_count=counts["depth_population_count"] or 0,
+        depth_period_start_utc=filters.start_utc,
+        depth_period_end_utc=filters.end_utc,
         scope=filters.scope,
         run_id=filters.run_id,
     )

@@ -329,6 +329,33 @@ export class App implements OnInit, OnDestroy {
     return value === null ? 'No disponible' : `${value.toFixed(2)}×`;
   }
 
+  deviationLabel(value: HistoricalComparisonResponse['deviation_band']): string {
+    switch (value) {
+      case 'within_1_sd':
+        return 'Dentro de 1 desviación estándar';
+      case 'between_1_and_2_sd':
+        return 'Entre 1 y 2 desviaciones estándar';
+      case 'beyond_2_sd':
+        return 'Más de 2 desviaciones estándar';
+      case 'unavailable':
+        return 'No disponible';
+    }
+  }
+
+  formatP90(value: number | null): string {
+    return value === null ? 'No disponible' : `${value.toFixed(1)} km`;
+  }
+
+  geographicFilterSummary(): string {
+    const filters = this.appliedFilters();
+    const selected = [
+      filters.adm0_a3 ? `País: ${filters.adm0_a3}` : null,
+      filters.continent ? `Continente: ${filters.continent}` : null,
+      filters.subregion ? `Subregión: ${filters.subregion}` : null,
+    ].filter((value): value is string => value !== null);
+    return selected.length > 0 ? selected.join(' · ') : 'Sin filtros geográficos';
+  }
+
   private defaultAppliedFilters(): DashboardFilters {
     const validated = validateFilterDraft(createDefaultDraft());
     return validated.filters ?? {

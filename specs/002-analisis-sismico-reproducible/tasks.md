@@ -32,18 +32,18 @@ No new shared infrastructure is needed. The feature reuses the existing PostgreS
 
 ### Tests for User Story 1
 
-- [ ] T001 [P] [US1] Add API contract tests for the M≥4.5 threshold, matching geographic predicates, 365 zero-filled UTC daily counts, population standard deviation, undefined zero-variance handling, and deviation bands in `backend/tests/test_api_contract.py`.
-- [ ] T002 [P] [US1] Add acceptance coverage in `backend/tests/test_acceptance.py` proving analysis refuses an absent or invalid 2025 import and that generated totals and provenance reconcile with a valid import.
+- [X] T001 [P] [US1] Add API contract tests for the M≥4.5 threshold, matching geographic predicates, 365 zero-filled UTC daily counts, population standard deviation, undefined zero-variance handling, and deviation bands in `backend/tests/test_api_contract.py`.
+- [X] T002 [P] [US1] Add acceptance coverage in `backend/tests/test_acceptance.py` proving analysis refuses an absent or invalid 2025 import and that generated totals and provenance reconcile with a valid import.
 
 ### Implementation for User Story 1
 
-- [ ] T003 [US1] Extend the historical comparison query and response DTO in `backend/api/routes/comparison.py` and `backend/api/models.py` to return the fixed M≥4.5 comparison, exact UTC window, 365-day zero-filled baseline, population standard deviation, standardized deviation, descriptive band, and explicit unavailable values as specified in `contracts/historical-comparison.md`.
-- [ ] T004 [US1] Extend filtered depth aggregation and its response DTO in `backend/api/routes/stats.py` and `backend/api/models.py` to return finite non-null population count, Hyndman–Fan Type 7 p90, exact applied period, and existing live/replay scope without mixing data, as specified in `contracts/depth-distribution.md`.
-- [ ] T005 [US1] Update the frontend API types and response mapping in `frontend/src/app/api/earthquake-api.service.ts` for the comparison and depth response fields, preserving existing live/replay semantics.
-- [ ] T006 [US1] Update the comparison and depth panels in `frontend/src/app/app.ts` and `frontend/src/app/app.html` to show the M≥4.5 threshold, comparison statistics, p90, valid-depth population, units, and unavailable states without presenting descriptive deviation as a risk forecast.
-- [ ] T007 [P] [US1] Implement `backend/scripts/generate_seismic_analysis.py` to verify the successful 2025 import, record available provenance without inventing checksums, and generate reproducible report evidence including all 365 date/count pairs, recent and historical assigned/unassigned counts and shares, regional 2025 depth populations and p90, filters, calculation methods, and limitations.
-- [ ] T008 [P] [US1] Reconcile the three quantitative conclusions and any unsupported prior figures in `docs/memoria_calidad.md` against the generated evidence; include the periods, populations, thresholds, denominators, and limitations, and do not publish unverified illustrative contract values.
-- [ ] T009 [P] [US1] Update `specs/002-analisis-sismico-reproducible/quickstart.md` with the exact existing-container command and output locations for `backend/scripts/generate_seismic_analysis.py`, plus expected provenance and calculation checks.
+- [X] T003 [US1] Extend the historical comparison query and response DTO in `backend/api/routes/comparison.py` and `backend/api/models.py` to return the fixed M≥4.5 comparison, exact UTC window, 365-day zero-filled baseline, population standard deviation, standardized deviation, descriptive band, and explicit unavailable values as specified in `contracts/historical-comparison.md`.
+- [X] T004 [US1] Extend filtered depth aggregation and its response DTO in `backend/api/routes/stats.py` and `backend/api/models.py` to return finite non-null population count, Hyndman–Fan Type 7 p90, exact applied period, and existing live/replay scope without mixing data, as specified in `contracts/depth-distribution.md`.
+- [X] T005 [US1] Update the frontend API types and response mapping in `frontend/src/app/api/earthquake-api.service.ts` for the comparison and depth response fields, preserving existing live/replay semantics.
+- [X] T006 [US1] Update the comparison and depth panels in `frontend/src/app/app.ts` and `frontend/src/app/app.html` to show the M≥4.5 threshold, comparison statistics, p90, valid-depth population, units, and unavailable states without presenting descriptive deviation as a risk forecast.
+- [X] T007 [P] [US1] Implement `backend/scripts/generate_seismic_analysis.py` to verify the successful 2025 import, record available provenance without inventing checksums, and generate reproducible report evidence including all 365 date/count pairs, recent and historical assigned/unassigned counts and shares, regional 2025 depth populations and p90, filters, calculation methods, and limitations.
+- [X] T008 [P] [US1] Reconcile the three quantitative conclusions and any unsupported prior figures in `docs/memoria_calidad.md` against the generated evidence; include the periods, populations, thresholds, denominators, and limitations, and do not publish unverified illustrative contract values.
+- [X] T009 [P] [US1] Update `specs/002-analisis-sismico-reproducible/quickstart.md` with the exact existing-container command and output locations for `backend/scripts/generate_seismic_analysis.py`, plus expected provenance and calculation checks.
 
 **Checkpoint**: User Story 1 is complete when the comparison and p90 contracts are implemented, the report can be regenerated from a valid identified import, all three conclusions reconcile to the report output, focused backend/frontend checks pass, and the 11 acceptance scenarios pass and are recorded.
 
@@ -61,11 +61,13 @@ No new shared infrastructure is needed. The feature reuses the existing PostgreS
 
 ### Implementation for User Story 2
 
-- [ ] T011 [US2] Make the selected period and geographic-filter context visible beside the analytical panels in `frontend/src/app/app.ts` and `frontend/src/app/app.html`, retaining clear live/replay labeling and ensuring screenshots do not imply filters or periods that were not applied.
-- [ ] T012 [US2] Capture the completed dashboard comparison and depth panels with the documented M≥4.5 threshold, period, and geographic filters visible, saving the evidence as `docs/evidence/seismic-analysis/dashboard-live-comparison.png` and `docs/evidence/seismic-analysis/dashboard-depth-distribution.png`.
-- [ ] T013 [US2] Link the screenshots from `docs/memoria_calidad.md` and document any conclusion indicator that is not visible in the dashboard as an explicit evidence limitation.
+- [X] T011 [US2] Make the selected period and geographic-filter context visible beside the analytical panels in `frontend/src/app/app.ts` and `frontend/src/app/app.html`, retaining clear live/replay labeling and ensuring screenshots do not imply filters or periods that were not applied.
+- [X] T012 [US2] Capture the completed dashboard comparison and depth panels with the documented M≥4.5 threshold, period, and geographic filters visible, saving the evidence as `docs/evidence/seismic-analysis/dashboard-live-comparison.png` and `docs/evidence/seismic-analysis/dashboard-depth-distribution.png`.
+- [X] T013 [US2] Link the screenshots from `docs/memoria_calidad.md` and document any conclusion indicator that is not visible in the dashboard as an explicit evidence limitation.
 
 **Checkpoint**: User Story 2 is complete when the images show the actual applied context and values, the report distinguishes visible evidence from unavailable indicators, and the 11 acceptance scenarios pass and are recorded.
+
+**Pending manual validation**: TC-09 and TC-10 require a configured ngrok tunnel. No ngrok executable or process was available during this implementation, so T010, T014, and final sign-off T015 remain open until tunnel loss and recovery are observed and recorded.
 
 - [ ] T014 [US2] After completing User Story 2, rerun all 11 acceptance scenarios with `docker compose exec api pytest tests/test_acceptance.py -v`; append the TC-01–TC-11 results to `docs/evidence/seismic-analysis/acceptance-tc-01-to-11.md` to validate this delivery increment.
 

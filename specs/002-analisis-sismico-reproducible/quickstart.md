@@ -24,7 +24,20 @@ Confirm all five long-running services are healthy and the historical bootstrap 
 
 ## 2. Reproduce the annual daily baseline
 
-Run the analysis report-generation procedure produced by implementation from the API container (the implementation task will define the exact command). It must:
+Create the evidence directory and run the report generator from the API container. The API mounts the verified USGS cache read-only:
+
+```powershell
+New-Item -ItemType Directory -Force docs/evidence/seismic-analysis | Out-Null
+$report = docker compose exec -T api python -m scripts.generate_seismic_analysis | Out-String
+if ($LASTEXITCODE -ne 0) { throw "Analysis report generation failed" }
+[System.IO.File]::WriteAllText(
+    "docs/evidence/seismic-analysis/analysis-report.json",
+    $report,
+    [System.Text.UTF8Encoding]::new($false)
+)
+```
+
+The command fails rather than producing a report when the import registry, stored baseline, or cache manifest disagree. It records:
 
 1. Select the historical 2025 population with `mag >= 4.5` and the declared geographic filters.
 2. Produce one count for every UTC date from `2025-01-01` through `2025-12-31`.
@@ -35,7 +48,7 @@ Run the analysis report-generation procedure produced by implementation from the
 7. Produce 2025 depth distribution summaries by the declared geographic area, including p90 and the valid-depth population count. The dashboard's live p90 must separately follow the visible event and geographic filters.
 8. Classify the recent M≥4.5 count as within one SD, between one and two SD, beyond two SD, or unavailable, using the published comparison contract.
 
-Record the query/method version, dataset import identity/count, exact filters, run time, all 365 counts, and the regional summaries. Do not copy illustrative contract values into evidence.
+Record the query/method version, dataset import identity/count, exact filters, run time, all 365 counts, and the regional summaries in `docs/evidence/seismic-analysis/analysis-report.json`. The report includes the available source manifest checksums; do not copy illustrative contract values into evidence.
 
 ## 3. Validate the depth p90
 
@@ -48,13 +61,7 @@ Validate both the historical conclusion and the live dashboard response:
 ## 4. Run focused automated checks
 
 ```powershell
-$env:PYTHONDONTWRITEBYTECODE = '1'
-Push-Location backend
-..\.venv\Scripts\python.exe -m pytest -q -p no:cacheprovider tests/test_api_contract.py tests/test_acceptance.py
-$testExit = $LASTEXITCODE
-Pop-Location
-if ($testExit -ne 0) { exit $testExit }
-
+docker compose exec -T api python -m pytest -q -p no:cacheprovider tests/test_api_contract.py tests/test_acceptance.py
 npm test --prefix frontend
 npm run build --prefix frontend
 ```
@@ -67,7 +74,7 @@ At each delivered increment (after User Story 1 and again after User Story 2), r
 docker compose exec api pytest tests/test_acceptance.py -v
 ```
 
-Record the result of each TC-01 through TC-11, including failures and their disposition, in `docs/evidence/seismic-analysis/acceptance-tc-01-to-11.md`. Do not declare an increment complete until the suite result has been recorded. The suite covers idempotency, chronological revisions, null magnitude, invalid coordinates/quarantine, unassigned maritime events, ngrok recovery, and replay identification; retain the focused feature tests above as additional checks.
+Record the result of each TC-01 through TC-11, including failures and their disposition, in `docs/evidence/seismic-analysis/acceptance-tc-01-to-11.md`. The automated suite covers TC-01–TC-08 and TC-11; TC-09/TC-10 require manual browser validation against an available ngrok tunnel. Do not mark those cases passed without observing both loss and recovery. Retain the focused feature tests above as additional checks.
 
 ## 5. Capture and reconcile evidence
 

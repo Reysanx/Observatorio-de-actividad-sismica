@@ -167,9 +167,12 @@ services:
       API_HOST: 0.0.0.0
       API_PORT: "8000"
       CORS_ORIGINS: http://localhost:4200
+      USGS_CACHE_DIR: /var/lib/observatorio/cache
       LOG_LEVEL: ${LOG_LEVEL:-INFO}
     ports:
       - "127.0.0.1:${API_PORT:-8000}:8000"
+    volumes:
+      - usgs_cache:/var/lib/observatorio/cache:ro
     depends_on:
       almacenamiento:
         condition: service_healthy
