@@ -3,6 +3,8 @@
 
 Este documento contiene las instrucciones precisas paso a paso para levantar, verificar y operar el sistema en local: cinco servicios Docker permanentes, un inicializador histórico de una sola ejecución y la interfaz Angular.
 
+Para preparar la publicación del frontend en Netlify y conectar desde otro equipo mediante ngrok, sigue la [guía reproducible Netlify/ngrok](deployment-netlify-ngrok.md).
+
 ---
 
 ## 1. Requisitos Previos
@@ -19,17 +21,18 @@ Este documento contiene las instrucciones precisas paso a paso para levantar, ve
 
 ## 2. Preparación de la Configuración (.env)
 
-El archivo `.env` ya se encuentra configurado en la raíz del proyecto. Si necesitas recrearlo, se basa en `.env.example`:
+El archivo `.env` es local y no se versiona. En una instalación nueva, créalo desde `.env.example`:
 
 ```powershell
 Copy-Item .env.example .env
 ```
 
-Parámetros clave de `.env`:
+Edita `.env` y sustituye la contraseña de ejemplo por una contraseña local propia. No copies credenciales de otro equipo ni compartas el archivo. Parámetros clave:
 * `POSTGRES_DB=observatorio`
 * `POSTGRES_USER=observatorio`
-* `POSTGRES_PASSWORD=observatorio_local_dev_secret_2026`
+* `POSTGRES_PASSWORD=<contraseña-local>`
 * `API_PORT=8000`
+* `CORS_ORIGINS=http://localhost:4200` (añade el origen exacto de Netlify para acceso remoto)
 * `USGS_POLL_INTERVAL_SECONDS=60`
 * `LOG_LEVEL=INFO`
 
