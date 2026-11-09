@@ -1,0 +1,82 @@
+{
+  "generatedAt": "2026-11-09T22:53:00+01:00",
+  "generatedOnPlatform": "win32",
+  "projectType": "webapp",
+  "devServer": {
+    "command": "npm",
+    "args": [
+      "run",
+      "start",
+      "--",
+      "--host",
+      "127.0.0.1"
+    ],
+    "url": "http://127.0.0.1:4200/",
+    "readyTimeoutSeconds": 120
+  },
+  "setup": [
+    {
+      "command": "npm",
+      "args": [
+        "ci"
+      ],
+      "timeoutSeconds": 600
+    }
+  ],
+  "assertions": [
+    {
+      "name": "production-build",
+      "kind": "process",
+      "command": "npm",
+      "args": [
+        "run",
+        "build"
+      ],
+      "verificationMethod": "exit-code",
+      "expected": "0",
+      "timeoutSeconds": 300
+    },
+    {
+      "name": "netlify-runtime-api-config",
+      "kind": "process",
+      "command": "npm",
+      "args": [
+        "run",
+        "configure:netlify"
+      ],
+      "env": {
+        "NGROK_API_URL": "https://runtime-validation.ngrok.app"
+      },
+      "verificationMethod": "exit-code",
+      "expected": "0",
+      "timeoutSeconds": 60
+    },
+    {
+      "name": "tests-pass",
+      "kind": "process",
+      "command": "npm",
+      "args": [
+        "test"
+      ],
+      "verificationMethod": "test-results",
+      "expected": "0",
+      "timeoutSeconds": 300
+    },
+    {
+      "name": "angular-home-serves",
+      "kind": "http-probe",
+      "startCommand": "npm",
+      "startArgs": [
+        "run",
+        "start",
+        "--",
+        "--host",
+        "127.0.0.1"
+      ],
+      "url": "http://127.0.0.1:4200/",
+      "verificationMethod": "http-status",
+      "expected": "200",
+      "timeoutSeconds": 120
+    }
+  ]
+}
