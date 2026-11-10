@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a" />
+      <stop offset="100%" stop-color="#1e293b" />
+    </linearGradient>
+    <linearGradient id="waveGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#38bdf8" />
+      <stop offset="50%" stop-color="#f59e0b" />
+      <stop offset="100%" stop-color="#ef4444" />
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="1.5" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Fondo circular con borde sutil -->
+  <circle cx="32" cy="32" r="30" fill="url(#bg)" stroke="#334155" stroke-width="2" />
+
+  <!-- Círculos concéntricos de ondas sísmicas / epicentro -->
+  <circle cx="32" cy="32" r="22" fill="none" stroke="#38bdf8" stroke-width="0.75" stroke-opacity="0.3" stroke-dasharray="3,3" />
+  <circle cx="32" cy="32" r="14" fill="none" stroke="#38bdf8" stroke-width="0.75" stroke-opacity="0.4" />
+
+  <!-- Trazo de sismograma / pulso sísmico -->
+  <path d="M 8 32 L 20 32 L 24 24 L 28 42 L 32 12 L 36 50 L 40 26 L 44 36 L 48 32 L 56 32"
+        fill="none"
+        stroke="url(#waveGrad)"
+        stroke-width="3"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        filter="url(#glow)" />
+
+  <!-- Punto de epicentro central -->
+  <circle cx="32" cy="32" r="2.5" fill="#f8fafc" />
+</svg>
+
