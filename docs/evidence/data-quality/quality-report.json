@@ -1,0 +1,1128 @@
+{
+  "schema_version": "1.0",
+  "evaluation_id": "6afb2e2d3c2675d94c1e51a5af5c6fc7ddff23a81a4fc5eeb9b501498ca1a4a3",
+  "generated_at_utc": "2026-11-11T10:52:39.432558Z",
+  "method_version": "1.0",
+  "rule_set_version": "historical.py:1.0;quality.py:1.0",
+  "populations": [
+    {
+      "population_id": "historical_2025_cache",
+      "source": "Caché mensual GeoJSON USGS 2025 verificada y tabla historical_2025",
+      "period_start_utc": "2025-01-01T00:00:00Z",
+      "period_end_utc": "2026-01-01T00:00:00Z",
+      "filters": {
+        "eventtype": "earthquake",
+        "minmagnitude": "4.0",
+        "period": "[2025-01-01T00:00:00Z, 2026-01-01T00:00:00Z)",
+        "monthly_feature_count": 18302,
+        "unique_event_count": 18302,
+        "cache_manifest": "2025_manifest.json",
+        "manifest_generated_at": "2026-11-09T17:40:49.385505Z",
+        "query": {
+          "format": "geojson",
+          "minmagnitude": "4.0",
+          "eventtype": "earthquake",
+          "orderby": "time-asc"
+        },
+        "monthly_files_sha256": {
+          "2025-01": "9df2aff444a4cf0d8a949d80b1af7b2ffdda315ed58308d960b284a4e3576612",
+          "2025-02": "0dab0937ce3d1f416efaf2f46a8262fa74091b50e54738458f0a6a6b9309556c",
+          "2025-03": "154aa4e908290971a36034a9f0d4963e41ebbe610b0fb5c80d4c8ccc4eae4069",
+          "2025-04": "f15f1ea7c94184e8878ab2e651f3975d0da26dd8384a501410ce095f779c2bb7",
+          "2025-05": "a273735e39637400f08f34b0d724745a03c248a163d77639c84ccfe2b7e34fd3",
+          "2025-06": "39aa0345f66f2eedc99f3a209ec7af9adff0a18a2a4ffaf749a484f833c7070f",
+          "2025-07": "4ea8d1cdf273543e16533c36ac41761a7e4ba4b7ce93359e6c42ef26b49be63e",
+          "2025-08": "4feef5ca166445412711b900074e2794eedfd3b25302bc6bc4ccbb04edf9213c",
+          "2025-09": "c92ebfc8644a111cb91b0bf713809a9d56a1198a165715baf6b13f1c3c48f31b",
+          "2025-10": "924cba16fa346a5e175325da5040aad9d31e18b973f266657eeea6442b8efbf1",
+          "2025-11": "ddd39c0824539c00f5561ee183ed3ac93b6ba032a2d9e19384e64c596612b555",
+          "2025-12": "18860c2c5d69b3f823c664f5577779eb4190835ef5181ffa98d675908e7669cc"
+        },
+        "persisted_snapshot_sha256": "b2ff83624cd5166c9b044b74dd929ed1f526b31374582b638db47dee35d4e1a7",
+        "dataset_import_event_count": 18302,
+        "dataset_imported_at_utc": "2026-11-09T17:40:59.837956Z"
+      },
+      "input_count": 18302,
+      "after_count": 18302,
+      "input_identity": {
+        "kind": "sha256",
+        "value": "2025_manifest.json",
+        "sha256": "55d0e7719f18d7dcbc11b0da937915e529572e2e9e8c924acfe1962e4435dc73"
+      },
+      "dispositions": [
+        {
+          "category": "matched",
+          "count": 18302,
+          "definition": "event_id presente en la caché única y en historical_2025."
+        },
+        {
+          "category": "missing_after",
+          "count": 0,
+          "definition": "event_id de caché sin fila correspondiente en historical_2025."
+        },
+        {
+          "category": "unmatched_source",
+          "count": 0,
+          "definition": "event_id de historical_2025 sin Feature correspondiente en esta caché."
+        }
+      ],
+      "transformations": [
+        {
+          "transformation_id": "cache_partition_deduplication",
+          "stage": "agregación de particiones cacheadas antes de la importación",
+          "status": "measured",
+          "affected_count": 0,
+          "denominator": 18302,
+          "overlap_policy": "not_applicable",
+          "definition": "Features repetidas por event_id entre particiones mensuales idénticas que el importador colapsa.",
+          "evidence": [
+            "Conteo de IDs y hashes canónicos de los 12 archivos verificados."
+          ],
+          "limitations": [
+            "No mide duplicados eliminados por el descargador dentro de cada respuesta antes de guardar."
+          ]
+        },
+        {
+          "transformation_id": "source_to_persisted_columns",
+          "stage": "Feature cacheada a columnas canónicas de historical_2025",
+          "status": "measured",
+          "affected_count": 0,
+          "denominator": 18302,
+          "overlap_policy": "may_overlap",
+          "definition": "Filas emparejadas con al menos un campo canónico distinto del valor derivado del Feature fuente.",
+          "evidence": [
+            "Comparación de event_id, mag, mag_type, profundidad, tiempos, place y coordenadas."
+          ],
+          "limitations": [
+            "Solo se evalúan IDs presentes tanto en caché como en la tabla."
+          ]
+        },
+        {
+          "transformation_id": "pre_cache_magnitude_filter",
+          "stage": "consulta USGS anterior a la escritura de caché",
+          "status": "not_verifiable",
+          "affected_count": null,
+          "denominator": null,
+          "overlap_policy": "not_applicable",
+          "definition": "Features excluidos por el filtro de magnitud mínima M≥4 antes de persistir la caché.",
+          "evidence": [
+            "El contrato de descarga fija minmagnitude=4.0; no conserva el feed previo al filtro."
+          ],
+          "limitations": [
+            "No existe la población bruta necesaria para cuantificar excluidos."
+          ]
+        },
+        {
+          "transformation_id": "pre_cache_deduplication",
+          "stage": "respuesta USGS anterior a la escritura de caché",
+          "status": "not_verifiable",
+          "affected_count": null,
+          "denominator": null,
+          "overlap_policy": "not_applicable",
+          "definition": "Duplicados descartados por el descargador dentro de respuestas mensuales.",
+          "evidence": [
+            "El descargador deduplica por id antes de guardar el GeoJSON."
+          ],
+          "limitations": [
+            "No se conserva una captura de entrada previa a la deduplicación."
+          ]
+        },
+        {
+          "transformation_id": "historical_quarantine",
+          "stage": "validación de importación histórica",
+          "status": "not_verifiable",
+          "affected_count": null,
+          "denominator": null,
+          "overlap_policy": "not_applicable",
+          "definition": "Destino de Features históricos rechazados durante la importación.",
+          "evidence": [
+            "El importador histórico valida y detiene la importación; no persiste un ledger completo de cuarentena."
+          ],
+          "limitations": [
+            "La tabla de cuarentena live no permite inferir disposiciones del histórico."
+          ]
+        }
+      ],
+      "results": [
+        {
+          "dimension": "completeness",
+          "metrics": [
+            {
+              "metric_id": "source_event_id_present",
+              "stage": "before",
+              "numerator": 18302,
+              "denominator": 18302,
+              "value": 100.0,
+              "unit": "percent",
+              "formula": "presencias no nulas de identificador / Features únicos de la caché * 100",
+              "evidence": [
+                "Features de los 12 archivos mensuales verificados por el manifest."
+              ],
+              "limitations": []
+            },
+            {
+              "metric_id": "persisted_event_id_present",
+              "stage": "after",
+              "numerator": 18302,
+              "denominator": 18302,
+              "value": 100.0,
+              "unit": "percent",
+              "formula": "valores no nulos de identificador / filas históricas emparejadas * 100",
+              "evidence": [
+                "Columnas de historical_2025 para event_id emparejados."
+              ],
+              "limitations": []
+            },
+            {
+              "metric_id": "source_mag_present",
+              "stage": "before",
+              "numerator": 18302,
+              "denominator": 18302,
+              "value": 100.0,
+              "unit": "percent",
+              "formula": "presencias no nulas de magnitud / Features únicos de la caché * 100",
+              "evidence": [
+                "Features de los 12 archivos mensuales verificados por el manifest."
+              ],
+              "limitations": []
+            },
+            {
+              "metric_id": "persisted_mag_present",
+              "stage": "after",
+              "numerator": 18302,
+              "denominator": 18302,
+              "value": 100.0,
+              "unit": "percent",
+              "formula": "valores no nulos de magnitud / filas históricas emparejadas * 100",
+              "evidence": [
+                "Columnas de historical_2025 para event_id emparejados."
+              ],
+              "limitations": []
+            },
+            {
+              "metric_id": "source_mag_type_present",
+              "stage": "before",
+              "numerator": 18302,
+              "denominator": 18302,
+              "value": 100.0,
+              "unit": "percent",
+              "formula": "presencias no nulas de tipo de magnitud (opcional) / Features únicos de la caché * 100",
+              "evidence": [
+                "Features de los 12 archivos mensuales verificados por el manifest."
+              ],
+              "limitations": [
+                "El campo es opcional; su ausencia no equivale por sí sola a incumplimiento."
+              ]
+            },
+            {
+              "metric_id": "persisted_mag_type_present",
+              "stage": "after",
+              "numerator": 18302,
+              "denominator": 18302,
+              "value": 100.0,
+              "unit": "percent",
+              "formula": "valores no nulos de tipo de magnitud (opcional) / filas históricas emparejadas * 100",
+              "evidence": [
+                "Columnas de historical_2025 para event_id emparejados."
+              ],
+              "limitations": [
+                "El campo es opcional; su ausencia no equivale por sí sola a incumplimiento."
+              ]
+            },
+            {
+              "metric_id": "source_place_present",
+              "stage": "before",
+              "numerator": 18302,
+              "denominator": 18302,
+              "value": 100.0,
+              "unit": "percent",
+              "formula": "presencias no nulas de descripción del lugar (opcional) / Features únicos de la caché * 100",
+              "evidence": [
+                "Features de los 12 archivos mensuales verificados por el manifest."
+              ],
+              "limitations": [
+                "El campo es opcional; su ausencia no equivale por sí sola a incumplimiento."
+              ]
+            },
+            {
+              "metric_id": "persisted_place_present",
+              "stage": "after",
+              "numerator": 18302,
+              "denominator": 18302,
+              "value": 100.0,
+              "unit": "percent",
+              "formula": "valores no nulos de descripción del lugar (opcional) / filas históricas emparejadas * 100",
+              "evidence": [
+                "Columnas de historical_2025 para event_id emparejados."
+              ],
+              "limitations": [
+                "El campo es opcional; su ausencia no equivale por sí sola a incumplimiento."
+              ]
+            },
+            {
+              "metric_id": "source_time_present",
+              "stage": "before",
+              "numerator": 18302,
+              "denominator": 18302,
+              "value": 100.0,
+              "unit": "percent",
+              "formula": "presencias no nulas de tiempo de ocurrencia / Features únicos de la caché * 100",
+              "evidence": [
+                "Features de los 12 archivos mensuales verificados por el manifest."
+              ],
+              "limitations": []
+            },
+            {
+              "metric_id": "persisted_time_present",
+              "stage": "after",
+              "numerator": 18302,
+              "denominator": 18302,
+              "value": 100.0,
+              "unit": "percent",
+              "formula": "valores no nulos de tiempo de ocurrencia / filas históricas emparejadas * 100",
+              "evidence": [
+                "Columnas de historical_2025 para event_id emparejados."
+              ],
+              "limitations": []
+            },
+            {
+              "metric_id": "source_updated_present",
+              "stage": "before",
+              "numerator": 18302,
+              "denominator": 18302,
+              "value": 100.0,
+              "unit": "percent",
+              "formula": "presencias no nulas de tiempo de actualización / Features únicos de la caché * 100",
+              "evidence": [
+                "Features de los 12 archivos mensuales verificados por el manifest."
+              ],
+              "limitations": []
+            },
+            {
+              "metric_id": "persisted_updated_present",
+              "stage": "after",
+              "numerator": 18302,
+              "denominator": 18302,
+              "value": 100.0,
+              "unit": "percent",
+              "formula": "valores no nulos de tiempo de actualización / filas históricas emparejadas * 100",
+              "evidence": [
+                "Columnas de historical_2025 para event_id emparejados."
+              ],
+              "limitations": []
+            },
+            {
+              "metric_id": "source_geometry_present",
+              "stage": "before",
+              "numerator": 18302,
+              "denominator": 18302,
+              "value": 100.0,
+              "unit": "percent",
+              "formula": "presencias no nulas de coordenadas GeoJSON / Features únicos de la caché * 100",
+              "evidence": [
+                "Features de los 12 archivos mensuales verificados por el manifest."
+              ],
+              "limitations": []
+            },
+            {
+              "metric_id": "persisted_geometry_present",
+              "stage": "after",
+              "numerator": 18302,
+              "denominator": 18302,
+              "value": 100.0,
+              "unit": "percent",
+              "formula": "valores no nulos de coordenadas GeoJSON / filas históricas emparejadas * 100",
+              "evidence": [
+                "Columnas de historical_2025 para event_id emparejados."
+              ],
+              "limitations": []
+            }
+          ]
+        },
+        {
+          "dimension": "uniqueness",
+          "metrics": [
+            {
+              "metric_id": "unique_source_ids",
+              "stage": "before",
+              "numerator": 18302,
+              "denominator": 18302,
+              "value": 100.0,
+              "unit": "percent",
+              "formula": "IDs de evento únicos / Features de las particiones mensuales * 100",
+              "evidence": [
+                "IDs de Features deduplicados entre los 12 archivos de caché."
+              ],
+              "limitations": []
+            },
+            {
+              "metric_id": "unique_persisted_ids",
+              "stage": "after",
+              "numerator": 18302,
+              "denominator": 18302,
+              "value": 100.0,
+              "unit": "percent",
+              "formula": "event_id distintos / filas de historical_2025 * 100",
+              "evidence": [
+                "Lectura de solo lectura de historical_2025."
+              ],
+              "limitations": []
+            }
+          ]
+        },
+        {
+          "dimension": "validity",
+          "metrics": [
+            {
+              "metric_id": "source_features_satisfying_historical_rules",
+              "stage": "before",
+              "numerator": 18302,
+              "denominator": 18302,
+              "value": 100.0,
+              "unit": "percent",
+              "formula": "Features válidas según normalize_historical_feature / Features únicos * 100",
+              "evidence": [
+                "Reglas de importación histórica backend/consumer/historical.py."
+              ],
+              "limitations": []
+            },
+            {
+              "metric_id": "persisted_rows_satisfying_historical_rules",
+              "stage": "after",
+              "numerator": 18302,
+              "denominator": 18302,
+              "value": 100.0,
+              "unit": "percent",
+              "formula": "Filas que cumplen restricciones históricas aplicables / filas leídas * 100",
+              "evidence": [
+                "Columnas y reglas de historical_2025 definidas en backend/db/init.sql."
+              ],
+              "limitations": []
+            }
+          ]
+        },
+        {
+          "dimension": "consistency",
+          "metrics": [
+            {
+              "metric_id": "stored_payload_id_and_timestamps_consistent",
+              "stage": "comparison",
+              "numerator": 18302,
+              "denominator": 18302,
+              "value": 100.0,
+              "unit": "percent",
+              "formula": "Filas con ID y tiempos de raw_payload consistentes con columnas / filas emparejadas * 100",
+              "evidence": [
+                "Comparación por event_id entre Feature cacheada, raw_payload y columnas temporales."
+              ],
+              "limitations": []
+            }
+          ]
+        },
+        {
+          "dimension": "currency",
+          "metrics": [
+            {
+              "metric_id": "source_update_delay_min",
+              "stage": "before",
+              "numerator": 18302,
+              "denominator": 18302,
+              "value": 5164538646.0,
+              "unit": "milliseconds",
+              "formula": "mínimo(source_update_delay)",
+              "evidence": [
+                "Diferencia entre properties.updated y properties.time del Feature USGS, en milisegundos."
+              ],
+              "limitations": [
+                "Mide demora entre ocurrencia y última actualización fuente, no el tiempo de respuesta del pipeline."
+              ]
+            },
+            {
+              "metric_id": "source_update_delay_median",
+              "stage": "before",
+              "numerator": 18302,
+              "denominator": 18302,
+              "value": 6649297031.5,
+              "unit": "milliseconds",
+              "formula": "mediana(source_update_delay)",
+              "evidence": [
+                "Diferencia entre properties.updated y properties.time del Feature USGS, en milisegundos."
+              ],
+              "limitations": [
+                "Mide demora entre ocurrencia y última actualización fuente, no el tiempo de respuesta del pipeline."
+              ]
+            },
+            {
+              "metric_id": "source_update_delay_p90",
+              "stage": "before",
+              "numerator": 18302,
+              "denominator": 18302,
+              "value": 7597780858.7,
+              "unit": "milliseconds",
+              "formula": "percentil 90 Hyndman-Fan tipo 7(source_update_delay)",
+              "evidence": [
+                "Diferencia entre properties.updated y properties.time del Feature USGS, en milisegundos."
+              ],
+              "limitations": [
+                "Mide demora entre ocurrencia y última actualización fuente, no el tiempo de respuesta del pipeline."
+              ]
+            },
+            {
+              "metric_id": "source_update_delay_max",
+              "stage": "before",
+              "numerator": 18302,
+              "denominator": 18302,
+              "value": 53162893575.0,
+              "unit": "milliseconds",
+              "formula": "máximo(source_update_delay)",
+              "evidence": [
+                "Diferencia entre properties.updated y properties.time del Feature USGS, en milisegundos."
+              ],
+              "limitations": [
+                "Mide demora entre ocurrencia y última actualización fuente, no el tiempo de respuesta del pipeline."
+              ]
+            }
+          ]
+        },
+        {
+          "dimension": "accuracy",
+          "metrics": [
+            {
+              "metric_id": "payload_retention_proxy",
+              "stage": "comparison",
+              "numerator": 18302,
+              "denominator": 18302,
+              "value": 100.0,
+              "unit": "percent",
+              "formula": "raw_payload idéntico al Feature cacheado / filas emparejadas * 100",
+              "evidence": [
+                "Comparación JSON del Feature de caché con historical_2025.raw_payload."
+              ],
+              "limitations": [
+                "Mide preservación del payload, no la veracidad científica de sus valores."
+              ],
+              "reference_independent": false,
+              "proxy": true
+            },
+            {
+              "metric_id": "canonical_column_fidelity_proxy",
+              "stage": "comparison",
+              "numerator": 18302,
+              "denominator": 18302,
+              "value": 100.0,
+              "unit": "percent",
+              "formula": "Filas cuyas columnas canónicas coinciden con el Feature / filas emparejadas * 100",
+              "evidence": [
+                "Comparación de campos Feature→columnas de historical_2025 por event_id."
+              ],
+              "limitations": [
+                "Mide fidelidad de transformación, no la exactitud instrumental de la ubicación o magnitud."
+              ],
+              "reference_independent": false,
+              "proxy": true
+            },
+            {
+              "metric_id": "absolute_seismic_accuracy",
+              "stage": "not_verifiable",
+              "numerator": null,
+              "denominator": null,
+              "value": null,
+              "unit": null,
+              "formula": "No se calcula: faltan datos o una referencia adecuada.",
+              "evidence": [],
+              "limitations": [
+                "No existe una referencia independiente de verdad sísmica para esta población."
+              ],
+              "reference_independent": false,
+              "proxy": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "population_id": "live_ingestion_audit",
+      "source": "Tabla PostgreSQL ingestion_audit limitada a source=usgs_live",
+      "filters": {
+        "source": "usgs_live",
+        "poll_count": 555,
+        "records_received": 113942,
+        "snapshot_scope": "todas las filas usgs_live presentes durante la transacción de lectura"
+      },
+      "input_count": 555,
+      "after_count": 555,
+      "input_identity": {
+        "kind": "sha256",
+        "value": "filas de auditoría usgs_live de la instantánea de lectura",
+        "sha256": "96fd0675dbb4eb40ef8422c8a6e7427d4274ebe663ec006bdcc08a7be4fdbdbd"
+      },
+      "dispositions": [
+        {
+          "category": "accepted",
+          "count": 112110,
+          "definition": "Registros que pasaron el filtro de tipo en los polls USGS; denominador records_received."
+        },
+        {
+          "category": "excluded",
+          "count": 1832,
+          "definition": "Registros excluidos por el productor durante esos polls; denominador records_received."
+        }
+      ],
+      "transformations": [
+        {
+          "transformation_id": "live_poll_acceptance",
+          "stage": "filtrado del poll USGS live",
+          "status": "measured",
+          "affected_count": 112110,
+          "denominator": 113942,
+          "overlap_policy": "mutually_exclusive",
+          "definition": "Suma de records_accepted en polls auditados.",
+          "evidence": [
+            "Filas usgs_live de ingestion_audit; no contiene el payload bruto completo."
+          ],
+          "limitations": [
+            "No incluye pérdidas ni cuarentena posteriores al poll."
+          ]
+        },
+        {
+          "transformation_id": "live_poll_exclusion",
+          "stage": "filtrado del poll USGS live",
+          "status": "measured",
+          "affected_count": 1832,
+          "denominator": 113942,
+          "overlap_policy": "mutually_exclusive",
+          "definition": "Suma de records_excluded en polls auditados.",
+          "evidence": [
+            "Filas usgs_live de ingestion_audit; no contiene el payload bruto completo."
+          ],
+          "limitations": [
+            "No incluye pérdidas ni cuarentena posteriores al poll."
+          ]
+        }
+      ],
+      "results": [
+        {
+          "dimension": "completeness",
+          "metrics": [
+            {
+              "metric_id": "audit_poll_id_present",
+              "stage": "after",
+              "numerator": 555,
+              "denominator": 555,
+              "value": 100.0,
+              "unit": "percent",
+              "formula": "poll_id no nulo / filas de auditoría * 100",
+              "evidence": [
+                "Filas usgs_live de ingestion_audit; no contiene el payload bruto completo."
+              ],
+              "limitations": []
+            }
+          ]
+        },
+        {
+          "dimension": "uniqueness",
+          "metrics": [
+            {
+              "metric_id": "unique_audit_poll_ids",
+              "stage": "after",
+              "numerator": 555,
+              "denominator": 555,
+              "value": 100.0,
+              "unit": "percent",
+              "formula": "poll_id distintos / filas de auditoría * 100",
+              "evidence": [
+                "Filas usgs_live de ingestion_audit; no contiene el payload bruto completo."
+              ],
+              "limitations": []
+            }
+          ]
+        },
+        {
+          "dimension": "validity",
+          "metrics": [
+            {
+              "metric_id": "audit_received_balance",
+              "stage": "after",
+              "numerator": 555,
+              "denominator": 555,
+              "value": 100.0,
+              "unit": "percent",
+              "formula": "polls con records_received = records_accepted + records_excluded / polls * 100",
+              "evidence": [
+                "Filas usgs_live de ingestion_audit; no contiene el payload bruto completo."
+              ],
+              "limitations": [
+                "El balance es del poll de origen; no reconcilia descartes ni cuarentena posteriores."
+              ]
+            }
+          ]
+        },
+        {
+          "dimension": "consistency",
+          "metrics": [
+            {
+              "metric_id": "audit_counts_consistent",
+              "stage": "comparison",
+              "numerator": 555,
+              "denominator": 555,
+              "value": 100.0,
+              "unit": "percent",
+              "formula": "polls con conteos internamente consistentes / polls * 100",
+              "evidence": [
+                "Filas usgs_live de ingestion_audit; no contiene el payload bruto completo."
+              ],
+              "limitations": []
+            }
+          ]
+        },
+        {
+          "dimension": "currency",
+          "metrics": [
+            {
+              "metric_id": "poll_completion_delay_min",
+              "stage": "comparison",
+              "numerator": 555,
+              "denominator": 555,
+              "value": 0.0,
+              "unit": "milliseconds",
+              "formula": "mínimo(poll_completion_delay)",
+              "evidence": [
+                "completed_at - requested_at de ingestion_audit, en milisegundos."
+              ],
+              "limitations": [
+                "Latencia de consulta USGS registrada; no representa latencia extremo a extremo Kafka/BD."
+              ]
+            },
+            {
+              "metric_id": "poll_completion_delay_median",
+              "stage": "comparison",
+              "numerator": 555,
+              "denominator": 555,
+              "value": 0.0,
+              "unit": "milliseconds",
+              "formula": "mediana(poll_completion_delay)",
+              "evidence": [
+                "completed_at - requested_at de ingestion_audit, en milisegundos."
+              ],
+              "limitations": [
+                "Latencia de consulta USGS registrada; no representa latencia extremo a extremo Kafka/BD."
+              ]
+            },
+            {
+              "metric_id": "poll_completion_delay_p90",
+              "stage": "comparison",
+              "numerator": 555,
+              "denominator": 555,
+              "value": 1000.0,
+              "unit": "milliseconds",
+              "formula": "percentil 90 Hyndman-Fan tipo 7(poll_completion_delay)",
+              "evidence": [
+                "completed_at - requested_at de ingestion_audit, en milisegundos."
+              ],
+              "limitations": [
+                "Latencia de consulta USGS registrada; no representa latencia extremo a extremo Kafka/BD."
+              ]
+            },
+            {
+              "metric_id": "poll_completion_delay_max",
+              "stage": "comparison",
+              "numerator": 555,
+              "denominator": 555,
+              "value": 1000.0,
+              "unit": "milliseconds",
+              "formula": "máximo(poll_completion_delay)",
+              "evidence": [
+                "completed_at - requested_at de ingestion_audit, en milisegundos."
+              ],
+              "limitations": [
+                "Latencia de consulta USGS registrada; no representa latencia extremo a extremo Kafka/BD."
+              ]
+            }
+          ]
+        },
+        {
+          "dimension": "accuracy",
+          "metrics": [
+            {
+              "metric_id": "live_absolute_accuracy",
+              "stage": "not_verifiable",
+              "numerator": null,
+              "denominator": null,
+              "value": null,
+              "unit": null,
+              "formula": "No se calcula: faltan datos o una referencia adecuada.",
+              "evidence": [],
+              "limitations": [
+                "La auditoría no conserva una referencia independiente ni el feed bruto para comprobar exactitud."
+              ],
+              "reference_independent": false,
+              "proxy": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "population_id": "live_current_state",
+      "source": "Tabla PostgreSQL current_earthquakes (source=usgs_live)",
+      "filters": {
+        "source": "usgs_live",
+        "record_count": 693,
+        "snapshot_scope": "estado actual durante la transacción de lectura"
+      },
+      "input_count": 693,
+      "after_count": 693,
+      "input_identity": {
+        "kind": "sha256",
+        "value": "event_id, updated_utc e ingested_at de current_earthquakes",
+        "sha256": "20ab342ee055c00bc704620a372c7f92ee420ed9195f00b34ff0cac74000db4e"
+      },
+      "dispositions": [
+        {
+          "category": "accepted",
+          "count": 693,
+          "definition": "Filas presentes en el estado actual live; no es un recuento de entregas."
+        }
+      ],
+      "transformations": [
+        {
+          "transformation_id": "live_current_state_observation",
+          "stage": "estado actual de PostgreSQL",
+          "status": "measured",
+          "affected_count": 693,
+          "denominator": 693,
+          "overlap_policy": "not_applicable",
+          "definition": "Número de eventos live retenidos actualmente en current_earthquakes.",
+          "evidence": [
+            "Columnas updated_utc e ingested_at de current_earthquakes."
+          ],
+          "limitations": [
+            "El estado UPSERT no conserva versiones anteriores ni todas las entregas."
+          ]
+        }
+      ],
+      "results": [
+        {
+          "dimension": "completeness",
+          "metrics": [
+            {
+              "metric_id": "live_event_id_present",
+              "stage": "after",
+              "numerator": 693,
+              "denominator": 693,
+              "value": 100.0,
+              "unit": "percent",
+              "formula": "event_id no nulos / filas current_earthquakes * 100",
+              "evidence": [
+                "Columnas updated_utc e ingested_at de current_earthquakes."
+              ],
+              "limitations": []
+            }
+          ]
+        },
+        {
+          "dimension": "uniqueness",
+          "metrics": [
+            {
+              "metric_id": "live_event_id_unique",
+              "stage": "after",
+              "numerator": 693,
+              "denominator": 693,
+              "value": 100.0,
+              "unit": "percent",
+              "formula": "event_id distintos / filas current_earthquakes * 100",
+              "evidence": [
+                "Columnas updated_utc e ingested_at de current_earthquakes."
+              ],
+              "limitations": []
+            }
+          ]
+        },
+        {
+          "dimension": "validity",
+          "metrics": [
+            {
+              "metric_id": "live_update_ingestion_timestamps_present",
+              "stage": "after",
+              "numerator": 693,
+              "denominator": 693,
+              "value": 100.0,
+              "unit": "percent",
+              "formula": "filas con updated_utc e ingested_at válidos / filas current_earthquakes * 100",
+              "evidence": [
+                "Columnas updated_utc e ingested_at de current_earthquakes."
+              ],
+              "limitations": []
+            }
+          ]
+        },
+        {
+          "dimension": "consistency",
+          "metrics": [
+            {
+              "metric_id": "live_cross_source_consistency",
+              "stage": "not_verifiable",
+              "numerator": null,
+              "denominator": null,
+              "value": null,
+              "unit": null,
+              "formula": "No se calcula: faltan datos o una referencia adecuada.",
+              "evidence": [],
+              "limitations": [
+                "La tabla de estado no conserva el Feature original de cada evento para una comparación independiente."
+              ]
+            }
+          ]
+        },
+        {
+          "dimension": "currency",
+          "metrics": [
+            {
+              "metric_id": "live_update_to_ingestion_delay_min",
+              "stage": "comparison",
+              "numerator": 693,
+              "denominator": 693,
+              "value": 4530.0,
+              "unit": "milliseconds",
+              "formula": "mínimo(live_update_to_ingestion_delay)",
+              "evidence": [
+                "Diferencia entre current_earthquakes.ingested_at y updated_utc, en milisegundos."
+              ],
+              "limitations": [
+                "La tabla contiene únicamente el estado live actual; no conserva cada entrega ni mide latencia Kafka extremo a extremo.",
+                "Los valores negativos se conservan y no se recortan."
+              ]
+            },
+            {
+              "metric_id": "live_update_to_ingestion_delay_median",
+              "stage": "comparison",
+              "numerator": 693,
+              "denominator": 693,
+              "value": 30882260.0,
+              "unit": "milliseconds",
+              "formula": "mediana(live_update_to_ingestion_delay)",
+              "evidence": [
+                "Diferencia entre current_earthquakes.ingested_at y updated_utc, en milisegundos."
+              ],
+              "limitations": [
+                "La tabla contiene únicamente el estado live actual; no conserva cada entrega ni mide latencia Kafka extremo a extremo.",
+                "Los valores negativos se conservan y no se recortan."
+              ]
+            },
+            {
+              "metric_id": "live_update_to_ingestion_delay_p90",
+              "stage": "comparison",
+              "numerator": 693,
+              "denominator": 693,
+              "value": 72771079.6,
+              "unit": "milliseconds",
+              "formula": "percentil 90 Hyndman-Fan tipo 7(live_update_to_ingestion_delay)",
+              "evidence": [
+                "Diferencia entre current_earthquakes.ingested_at y updated_utc, en milisegundos."
+              ],
+              "limitations": [
+                "La tabla contiene únicamente el estado live actual; no conserva cada entrega ni mide latencia Kafka extremo a extremo.",
+                "Los valores negativos se conservan y no se recortan."
+              ]
+            },
+            {
+              "metric_id": "live_update_to_ingestion_delay_max",
+              "stage": "comparison",
+              "numerator": 693,
+              "denominator": 693,
+              "value": 85959750.0,
+              "unit": "milliseconds",
+              "formula": "máximo(live_update_to_ingestion_delay)",
+              "evidence": [
+                "Diferencia entre current_earthquakes.ingested_at y updated_utc, en milisegundos."
+              ],
+              "limitations": [
+                "La tabla contiene únicamente el estado live actual; no conserva cada entrega ni mide latencia Kafka extremo a extremo.",
+                "Los valores negativos se conservan y no se recortan."
+              ]
+            }
+          ]
+        },
+        {
+          "dimension": "accuracy",
+          "metrics": [
+            {
+              "metric_id": "live_absolute_accuracy",
+              "stage": "not_verifiable",
+              "numerator": null,
+              "denominator": null,
+              "value": null,
+              "unit": null,
+              "formula": "No se calcula: faltan datos o una referencia adecuada.",
+              "evidence": [],
+              "limitations": [
+                "No existe una referencia independiente de verdad sísmica para el estado live."
+              ],
+              "reference_independent": false,
+              "proxy": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "population_id": "live_quarantine",
+      "source": "Tabla PostgreSQL quarantine_events (topic earthquakes.live)",
+      "period_start_utc": null,
+      "period_end_utc": null,
+      "filters": {
+        "source_topic": "earthquakes.live",
+        "count_scope": "filas presentes en la tabla durante la transacción de lectura"
+      },
+      "input_count": 0,
+      "after_count": 0,
+      "input_identity": {
+        "kind": "sha256",
+        "value": "recuento e intervalo de quarantine_events",
+        "sha256": "db33600c844772e2f66a5061c9afea4589e98bb9a0f62711f51a4685088bdeed"
+      },
+      "dispositions": [
+        {
+          "category": "quarantined",
+          "count": 0,
+          "definition": "Filas observadas en quarantine_events; no se atribuyen a una cohorte de entrada live concreta."
+        }
+      ],
+      "transformations": [
+        {
+          "transformation_id": "observed_live_quarantine_rows",
+          "stage": "cuarentena del consumidor live",
+          "status": "measured",
+          "affected_count": 0,
+          "denominator": 0,
+          "overlap_policy": "not_applicable",
+          "definition": "Recuento de filas directamente observables en quarantine_events.",
+          "evidence": [
+            "SELECT count(*), min(quarantined_at), max(quarantined_at) FROM quarantine_events."
+          ],
+          "limitations": [
+            "Solo se consultó el recuento y el intervalo temporal; no se leyeron los payloads ni los motivos."
+          ]
+        }
+      ],
+      "results": [
+        {
+          "dimension": "completeness",
+          "metrics": [
+            {
+              "metric_id": "quarantine_completeness",
+              "stage": "not_verifiable",
+              "numerator": null,
+              "denominator": null,
+              "value": null,
+              "unit": null,
+              "formula": "No se calcula: faltan datos o una referencia adecuada.",
+              "evidence": [],
+              "limitations": [
+                "Solo se consultó el recuento y el intervalo temporal; no se leyeron los payloads ni los motivos."
+              ]
+            }
+          ]
+        },
+        {
+          "dimension": "uniqueness",
+          "metrics": [
+            {
+              "metric_id": "quarantine_uniqueness",
+              "stage": "not_verifiable",
+              "numerator": null,
+              "denominator": null,
+              "value": null,
+              "unit": null,
+              "formula": "No se calcula: faltan datos o una referencia adecuada.",
+              "evidence": [],
+              "limitations": [
+                "Solo se consultó el recuento y el intervalo temporal; no se leyeron los payloads ni los motivos."
+              ]
+            }
+          ]
+        },
+        {
+          "dimension": "validity",
+          "metrics": [
+            {
+              "metric_id": "quarantine_validity",
+              "stage": "not_verifiable",
+              "numerator": null,
+              "denominator": null,
+              "value": null,
+              "unit": null,
+              "formula": "No se calcula: faltan datos o una referencia adecuada.",
+              "evidence": [],
+              "limitations": [
+                "Solo se consultó el recuento y el intervalo temporal; no se leyeron los payloads ni los motivos."
+              ]
+            }
+          ]
+        },
+        {
+          "dimension": "consistency",
+          "metrics": [
+            {
+              "metric_id": "quarantine_consistency",
+              "stage": "not_verifiable",
+              "numerator": null,
+              "denominator": null,
+              "value": null,
+              "unit": null,
+              "formula": "No se calcula: faltan datos o una referencia adecuada.",
+              "evidence": [],
+              "limitations": [
+                "Solo se consultó el recuento y el intervalo temporal; no se leyeron los payloads ni los motivos."
+              ]
+            }
+          ]
+        },
+        {
+          "dimension": "currency",
+          "metrics": [
+            {
+              "metric_id": "quarantine_currency",
+              "stage": "not_verifiable",
+              "numerator": null,
+              "denominator": null,
+              "value": null,
+              "unit": null,
+              "formula": "No se calcula: faltan datos o una referencia adecuada.",
+              "evidence": [],
+              "limitations": [
+                "Solo se consultó el recuento y el intervalo temporal; no se leyeron los payloads ni los motivos."
+              ]
+            }
+          ]
+        },
+        {
+          "dimension": "accuracy",
+          "metrics": [
+            {
+              "metric_id": "quarantine_accuracy",
+              "stage": "not_verifiable",
+              "numerator": null,
+              "denominator": null,
+              "value": null,
+              "unit": null,
+              "formula": "No se calcula: faltan datos o una referencia adecuada.",
+              "evidence": [],
+              "limitations": [
+                "Solo se consultó el recuento y el intervalo temporal; no se leyeron los payloads ni los motivos."
+              ],
+              "reference_independent": false,
+              "proxy": false
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "La caché USGS ya aplica filtros y deduplicación; no representa el feed bruto.",
+    "Las métricas live y la cuarentena se publican en poblaciones separadas y no reconcilian el histórico.",
+    "La cuarentena histórica no puede cuantificarse con las tablas de observabilidad disponibles.",
+    "Sin referencia independiente, la exactitud sísmica absoluta no es verificable."
+  ]
+}

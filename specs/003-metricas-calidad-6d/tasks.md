@@ -18,14 +18,14 @@
 
 **Purpose**: Establish the report entry point without changing the existing services, schema, dependencies, or branch.
 
-- [ ] T001 Create the read-only quality-report CLI entry point in `backend/scripts/quality_report.py`; emit JSON to stdout by default so output can be captured on the host without adding a Compose service or mounting repository documentation into a container.
+- [X] T001 Create the read-only quality-report CLI entry point in `backend/scripts/quality_report.py`; emit JSON to stdout by default so output can be captured on the host without adding a Compose service or mounting repository documentation into a container.
 
 ## Phase 2: Foundational
 
 **Purpose**: Provide trusted, shared inputs for all report dimensions; user-story work depends on these tasks.
 
-- [ ] T002 Implement verified historical-cache and manifest loading in `backend/scripts/quality_report.py`; preserve monthly source counts separately from unique `event_id` counts, verify available SHA-256 identities, and fail explicitly on missing/incomplete source artifacts rather than silently substituting data.
-- [ ] T003 Implement read-only PostgreSQL access and source-to-persisted matching in `backend/scripts/quality_report.py`; match historical features and `historical_2025` rows by `event_id`, use `raw_payload` as the stored source evidence, and execute reads in a read-only transaction without changing business tables.
+- [X] T002 Implement verified historical-cache and manifest loading in `backend/scripts/quality_report.py`; preserve monthly source counts separately from unique `event_id` counts, verify available SHA-256 identities, and fail explicitly on missing/incomplete source artifacts rather than silently substituting data.
+- [X] T003 Implement read-only PostgreSQL access and source-to-persisted matching in `backend/scripts/quality_report.py`; match historical features and `historical_2025` rows by `event_id`, use `raw_payload` as the stored source evidence, and execute reads in a read-only transaction without changing business tables.
 
 **Checkpoint**: Report execution has a verifiable source identity and safe, read-only access to the persisted comparison population.
 
@@ -37,15 +37,15 @@
 
 ### Tests for User Story 1
 
-- [ ] T004 [US1] Add unit and report-contract tests in `backend/tests/test_quality_report.py` for eligible-field denominators, null handling, ID matching and collisions, historical cache-to-database reconciliation, deterministic output fields, exactly one entry for each of the six dimensions, and multiple submetrics in a dimension; assert rejection of missing/duplicate dimensions and measured submetrics without required fields, and cover transformation impact counts, possible overlap, unverified stages, missing timestamps, `N/A`, valid negative magnitude/depth values, and separate live/synthetic populations.
+- [X] T004 [US1] Add unit and report-contract tests in `backend/tests/test_quality_report.py` for eligible-field denominators, null handling, ID matching and collisions, historical cache-to-database reconciliation, deterministic output fields, exactly one entry for each of the six dimensions, and multiple submetrics in a dimension; assert rejection of missing/duplicate dimensions and measured submetrics without required fields, and cover transformation impact counts, possible overlap, unverified stages, missing timestamps, `N/A`, valid negative magnitude/depth values, and separate live/synthetic populations.
 
 ### Implementation for User Story 1
 
-- [ ] T005 [US1] Implement population-scoped completeness, uniqueness, validity, consistency, currency, and accuracy calculations as nested submetrics in `backend/scripts/quality_report.py`; support per-field completeness and separate latency statistics, include numerator/denominator/formula/unit/evidence/limitations for each measured submetric, and mark absolute accuracy `not_verifiable` when no independent reference exists.
-- [ ] T006 [US1] Add historical cache-to-database matching and report matched, missing, and unmatched rows in `backend/scripts/quality_report.py`; enumerate each observable transformation with stage, affected-record count, eligible denominator, evidence, and overlap policy. Mark pre-cache filtering, deduplication, and historical quarantine as not verifiable when their audit trail is absent; report accepted, excluded, and quarantined counts from live audit tables only as a separate population with independent denominators, and claim complete reconciliation only when audit coverage spans all stages.
-- [ ] T007 [US1] Emit report JSON conforming to `specs/003-metricas-calidad-6d/contracts/quality-report.schema.json` from `backend/scripts/quality_report.py`; include exactly one dimension entry for each of the six dimensions, its one-or-more nested submetrics, per-population transformation counts/limitations, evaluation/method/rule-set identity, population filters/period, cache/dataset identity, and stable deterministic values apart from generation timestamps.
-- [ ] T008 [US1] Generate the reproducible evidence package in `docs/evidence/data-quality/quality-report.json` and `docs/evidence/data-quality/README.md` from the real available cache and database; record the exact input identity, command, timestamp, rule version, historical match and per-transformation counts, their overlap policies, separately scoped live audit/quarantine counts when available, and non-verifiable stages, and do not fabricate results if required source artifacts are unavailable.
-- [ ] T009 [US1] Update `docs/memoria_calidad.md` to link the generated 6D evidence, explain its measured populations and before/after meaning, and remove or label unsupported historical quality figures as non-reproducible rather than current results.
+- [X] T005 [US1] Implement population-scoped completeness, uniqueness, validity, consistency, currency, and accuracy calculations as nested submetrics in `backend/scripts/quality_report.py`; support per-field completeness and separate latency statistics, include numerator/denominator/formula/unit/evidence/limitations for each measured submetric, and mark absolute accuracy `not_verifiable` when no independent reference exists.
+- [X] T006 [US1] Add historical cache-to-database matching and report matched, missing, and unmatched rows in `backend/scripts/quality_report.py`; enumerate each observable transformation with stage, affected-record count, eligible denominator, evidence, and overlap policy. Mark pre-cache filtering, deduplication, and historical quarantine as not verifiable when their audit trail is absent; report accepted/excluded counts from `ingestion_audit` and quarantine counts from `quarantine_events`, each as a separately identified live population with its own denominator. Do not claim end-to-end reconciliation unless audit coverage explicitly connects all stages.
+- [X] T007 [US1] Emit report JSON conforming to `specs/003-metricas-calidad-6d/contracts/quality-report.schema.json` from `backend/scripts/quality_report.py`; include exactly one dimension entry for each of the six dimensions, its one-or-more nested submetrics, per-population transformation counts/limitations, evaluation/method/rule-set identity, population filters/period, cache/dataset identity, and stable deterministic values apart from generation timestamps.
+- [X] T008 [US1] Generate the reproducible evidence package in `docs/evidence/data-quality/quality-report.json` and `docs/evidence/data-quality/README.md` from the real available cache and database; record the exact input identity, command, timestamp, rule version, historical match and per-transformation counts, their overlap policies, separately scoped live audit/quarantine counts when available, and non-verifiable stages, and do not fabricate results if required source artifacts are unavailable.
+- [X] T009 [US1] Update `docs/memoria_calidad.md` to link the generated 6D evidence, explain its measured populations and before/after meaning, and remove or label unsupported historical quality figures as non-reproducible rather than current results.
 
 **Checkpoint**: User Story 1 can be reviewed and reproduced without implementing User Story 2's expanded accuracy interpretation.
 
@@ -57,9 +57,9 @@
 
 ### Implementation for User Story 2
 
-- [ ] T010 [P] [US2] Document the accuracy-proxy definitions, interpretation, required evidence, and scientific limitations in `docs/evidence/data-quality/accuracy-limitations.md`; distinguish payload-to-canonical-field fidelity and Natural Earth spatial concordance from independently verified seismic truth, and state that absolute accuracy is not verifiable with current sources.
-- [ ] T011 [US2] Add a link from the accuracy discussion in `docs/memoria_calidad.md` to `docs/evidence/data-quality/accuracy-limitations.md`; ensure «Sin país asignado» is not interpreted as an accuracy failure and proxies are not presented as ground truth.
-- [ ] T012 [US2] Extend report tests in `backend/tests/test_quality_report.py` to assert that accuracy results identify `reference_independent` as false, label measurable comparisons as proxies, and provide limitations or an explicit not-verifiable reason.
+- [X] T010 [P] [US2] Document the accuracy-proxy definitions, interpretation, required evidence, and scientific limitations in `docs/evidence/data-quality/accuracy-limitations.md`; distinguish payload-to-canonical-field fidelity and Natural Earth spatial concordance from independently verified seismic truth, and state that absolute accuracy is not verifiable with current sources.
+- [X] T011 [US2] Add a link from the accuracy discussion in `docs/memoria_calidad.md` to `docs/evidence/data-quality/accuracy-limitations.md`; ensure «Sin país asignado» is not interpreted as an accuracy failure and proxies are not presented as ground truth.
+- [X] T012 [US2] Extend report tests in `backend/tests/test_quality_report.py` to assert that accuracy results identify `reference_independent` as false, label measurable comparisons as proxies, and provide limitations or an explicit not-verifiable reason.
 
 **Checkpoint**: The accuracy interpretation is independently auditable and consistent with the numeric report.
 
@@ -67,8 +67,8 @@
 
 **Purpose**: Validate the complete workflow and keep its reproduction instructions synchronized.
 
-- [ ] T013 [P] Update `specs/003-metricas-calidad-6d/quickstart.md` with the final CLI invocation, prerequisites, host-side output capture, expected report structure, and read-only validation procedure.
-- [ ] T014 Run the targeted report tests and the documented Compose-based reproduction from `specs/003-metricas-calidad-6d/quickstart.md`; verify `docs/evidence/data-quality/quality-report.json` against the contract, repeatability of deterministic metrics, unchanged database row counts, exact coverage of all six dimensions, and absence of live/replay/synthetic data in the historical population.
+- [X] T013 [P] Update `specs/003-metricas-calidad-6d/quickstart.md` with the final CLI invocation, prerequisites, host-side output capture, expected report structure, and read-only validation procedure.
+- [X] T014 Run the targeted report tests and the documented Compose-based reproduction from `specs/003-metricas-calidad-6d/quickstart.md`; verify `docs/evidence/data-quality/quality-report.json` against the contract, repeatability of deterministic metrics, unchanged database row counts, exact coverage of all six dimensions, and absence of live/replay/synthetic data in the historical population.
 
 ## Dependencies & Execution Order
 

@@ -24,33 +24,16 @@ flowchart LR
 
 ---
 
-### Evaluación Cuantitativa de las 6 Dimensiones
+### Reglas implementadas (no resultados cuantitativos)
 
-```
-+---------------------------------------------------------------------------------------------------------------+
-|                                EVALUACIÓN DE LAS 6 DIMENSIONES DE CALIDAD                                     |
-+-------------------+-----------------------------------+--------------------------------+----------------------+
-| Dimensión         | Regla Implementada                | Comportamiento ANTES           | Resultado DESPUÉS    |
-+-------------------+-----------------------------------+--------------------------------+----------------------+
-| 1. Completitud    | Magnitudes nulas como NULL        | Posible distorsión rellenando 0| Preservado como NULL |
-|                   |                                   | (falso sismo detectado).       | UI muestra «ND».     |
-+-------------------+-----------------------------------+--------------------------------+----------------------+
-| 2. Unicidad       | Deduplicación por (id, updated)   | Reenvíos duplican recuentos    | Idempotencia 100%.   |
-|                   | con clave de mensaje Kafka        | en tablas agregadas.           | Cero duplicados.     |
-+-------------------+-----------------------------------+--------------------------------+----------------------+
-| 3. Validez        | Rango WGS84: lat [-90, 90],       | Coordenadas corruptas rompen   | Aislamiento en       |
-|                   | lon [-180, 180], números finitos  | renderizado en Leaflet.        | quarantine_events.   |
-+-------------------+-----------------------------------+--------------------------------+----------------------+
-| 4. Consistencia   | Integración punto-en-polígono     | Sismos oceánicos asignados     | «Sin país asignado»  |
-|                   | determinista con STRtree          | erróneamente a costas cercanas.| (ADM0_A3 = 'N/A').   |
-+-------------------+-----------------------------------+--------------------------------+----------------------+
-| 5. Actualidad     | Timestamp UTC en milisegundos     | Fechas en hora local causan    | Estandarización UTC Z|
-|                   | auditando latencia de ingesta     | desorden en series temporales. | Latencia < 45 seg.   |
-+-------------------+-----------------------------------+--------------------------------+----------------------+
-| 6. Exactitud      | Validación cruzada de profundidad | Profundidades negativas        | Preservadas si son   |
-|                   | y magnitud física                 | descartadas erróneamente.      | sismos sobre el mar. |
-+-------------------+-----------------------------------+--------------------------------+----------------------+
-```
+Las reglas siguientes describen el comportamiento esperado del sistema, no una evaluación empírica antes/después ni tasas observadas. Los únicos resultados cuantitativos reproducibles son los vinculados en la sección 6.
+
+- **Completitud:** los nulos legítimos se conservan; la presencia se mide por campo y población.
+- **Unicidad:** la persistencia es idempotente; la tasa observada requiere una cohorte identificada.
+- **Validez:** se verifican estructura, tipos, finitud y límites geográficos definidos por el proyecto.
+- **Consistencia:** la asignación espacial no fuerza un país cuando no coincide ningún polígono.
+- **Actualidad:** las marcas temporales usan UTC; cualquier latencia publicada debe llevar intervalo y población.
+- **Exactitud:** la fidelidad del procesamiento no acredita verdad sísmica; no existe una referencia independiente disponible.
 
 ---
 
@@ -157,3 +140,22 @@ De los 8.559 eventos históricos M≥4,5, **1.480 (17,29%)** se asignaron a un p
 Para la ventana **2026-11-08T20:31:05.570399Z–2026-11-09T20:31:05.570399Z**, se contaron **17 eventos M≥4,5**: 4 asignados y 13 sin país asignado. El recuento equivale a **0,725 veces** la media diaria histórica y se encuentra a **−0,263 desviaciones estándar**, dentro de una desviación estándar de la media. La ventana reciente es móvil, no coincide con un día natural y cambia al regenerar el informe.
 
 Las capturas del [panel de comparación](./evidence/seismic-analysis/dashboard-live-comparison.png) y del [panel de profundidad](./evidence/seismic-analysis/dashboard-depth-distribution.png) se tomaron alrededor de un minuto después del informe. La comparación muestra los mismos 17 eventos con su ventana UTC exacta (2026-11-08T20:32:06Z–2026-11-09T20:32:06Z); el panel de profundidad muestra el p90 en vivo de 93,5 km sobre 206 profundidades válidas y el periodo aplicado, redondeado al minuto por los filtros del dashboard. El informe registra los 365 pares fecha/recuento, filtros, procedencia de la importación, hashes del manifest mensual, población de profundidades, métodos y limitaciones para reproducir estas cifras. No se infiere causalidad tectónica ni riesgo a partir de estas comparaciones.
+
+---
+
+## 6. Métricas 6D reproducibles (Spec-003)
+
+La ejecución completa, su código de reproducción, los hashes y el inventario de transformaciones están en [quality-report.json](./evidence/data-quality/quality-report.json) y [README.md](./evidence/data-quality/README.md). La limitación científica de los proxies está detallada en [accuracy-limitations.md](./evidence/data-quality/accuracy-limitations.md).
+
+La cohorte es el extracto USGS cacheado de 2025, tipo `earthquake`, M≥4.0: **18.302 Features únicos** frente a **18.302 filas persistidas** en `historical_2025`. Por `event_id`, se emparejaron **18.302**, faltan **0** en destino y hay **0** filas no emparejadas en la fuente.
+
+| Dimensión | Resultado observado | Interpretación |
+|---|---|---|
+| Completitud | Los siete campos analizados tienen 18.302/18.302 valores no nulos antes y después (100%). | `magType` y `place` son opcionales; su ausencia no es automáticamente un incumplimiento. |
+| Unicidad | Caché: 18.302/18.302 IDs únicos. PostgreSQL: 18.302/18.302 (100%). | El descargador ya deduplica dentro de las respuestas; eso no se mide como una transformación observada. |
+| Validez | Feature: 18.302/18.302 conforme a las reglas de importación histórica. Persistencia: 18.302/18.302 filas conformes a las reglas evaluadas. | No se imponen límites físicos no definidos; las profundidades negativas se conservan. |
+| Consistencia | 18.302/18.302 filas emparejadas mantienen ID y tiempos coherentes entre payload y columnas. | Es una comprobación interna, no una validación de la verdad científica. |
+| Actualidad | `updated - time` fuente: mínimo 5.164.538.646 ms; mediana 6.649.297.031,5 ms; p90 7.597.780.858,7 ms; máximo 53.162.893.575 ms. | Mide el intervalo entre ocurrencia y última actualización fuente, no el tiempo de respuesta del pipeline. |
+| Exactitud | Preservación Feature→`raw_payload`: 18.302/18.302 (100%). Fidelidad Feature→columnas: 18.302/18.302 (100%). | Son proxies del procesamiento. Sin referencia independiente, la exactitud absoluta no es verificable. |
+
+La instantánea live se informa aparte: 555 polls, 113.942 registros recibidos, 112.110 aceptados y 1.832 excluidos; el estado actual tenía 693 filas y la consulta de cuarentena observó 0. No se suman ni se atribuyen al histórico: los polls son observaciones repetidas, y la auditoría no reconcilia todas las etapas end-to-end.
