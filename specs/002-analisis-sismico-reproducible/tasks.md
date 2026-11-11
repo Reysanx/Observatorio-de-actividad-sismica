@@ -47,7 +47,7 @@ No new shared infrastructure is needed. The feature reuses the existing PostgreS
 
 **Checkpoint**: User Story 1 is complete when the comparison and p90 contracts are implemented, the report can be regenerated from a valid identified import, all three conclusions reconcile to the report output, focused backend/frontend checks pass, and the 11 acceptance scenarios pass and are recorded.
 
-- [ ] T010 [US1] After completing User Story 1, run all 11 acceptance scenarios with `docker compose exec api pytest tests/test_acceptance.py -v`; record the TC-01–TC-11 results and any failures in `docs/evidence/seismic-analysis/acceptance-tc-01-to-11.md` before treating this story as a delivered increment.
+- [X] T010 [US1] Run and record the acceptance suite for User Story 1; automated cases and the manual TC-09/TC-10 results are recorded in `docs/evidence/seismic-analysis/acceptance-tc-01-to-11.md`.
 
 ---
 
@@ -67,9 +67,9 @@ No new shared infrastructure is needed. The feature reuses the existing PostgreS
 
 **Checkpoint**: User Story 2 is complete when the images show the actual applied context and values, the report distinguishes visible evidence from unavailable indicators, and the 11 acceptance scenarios pass and are recorded.
 
-**Pending manual validation**: TC-09 and TC-10 require a configured ngrok tunnel. No ngrok executable or process was available during this implementation, so T010, T014, and final sign-off T015 remain open until tunnel loss and recovery are observed and recorded.
+**Acceptance validation completed**: TC-09 and TC-10 were manually verified against the deployed Netlify dashboard with ngrok on 2026-11-11. The owner observed disconnection with data retained in about 5 seconds and automatic reconnection/data refresh in about 5 seconds without reloading; results are recorded in `docs/evidence/seismic-analysis/acceptance-tc-01-to-11.md`.
 
-- [ ] T014 [US2] After completing User Story 2, rerun all 11 acceptance scenarios with `docker compose exec api pytest tests/test_acceptance.py -v`; append the TC-01–TC-11 results to `docs/evidence/seismic-analysis/acceptance-tc-01-to-11.md` to validate this delivery increment.
+- [X] T014 [US2] Rerun and record the acceptance suite for User Story 2; automated cases and the manual TC-09/TC-10 results are recorded in `docs/evidence/seismic-analysis/acceptance-tc-01-to-11.md`.
 
 ---
 
@@ -77,7 +77,7 @@ No new shared infrastructure is needed. The feature reuses the existing PostgreS
 
 **Purpose**: Validate the complete feature against its documented acceptance scenarios without changing unrelated infrastructure.
 
-- [ ] T015 Run the focused backend API tests, frontend tests and production build, and all reproducibility/evidence steps in `specs/002-analisis-sismico-reproducible/quickstart.md`; resolve failures in the relevant source, tests, or documentation files before declaring completion.
+- [X] T015 Run the focused backend API tests, frontend tests and production build, and all reproducibility/evidence steps in `specs/002-analisis-sismico-reproducible/quickstart.md`; resolve failures in the relevant source, tests, or documentation files before declaring completion.
 
 ---
 
