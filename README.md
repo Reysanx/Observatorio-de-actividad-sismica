@@ -59,6 +59,7 @@ Observatorio-de-actividad-s-smica/
 | **Rúbrica de Evaluación y Entregables** | Mapeo detallado para garantizar Sobresaliente (9–10) en los 5 criterios de la sesión 8. | [`specs/001-observatorio-sismico/evaluation-rubric.md`](specs/001-observatorio-sismico/evaluation-rubric.md) |
 | **Modelo y Evidencia de Índices** | Diagramas conceptual y lógico, grano de las 12 relaciones y planes reproducibles de PostgreSQL. | [`specs/004-modelado-y-evidencia-indices/`](specs/004-modelado-y-evidencia-indices/) |
 | **Benchmarks y TCO (Criterio 5 / E-07)** | Medición reproducible de tres lotes, auditoría de Big-O y supuestos/fuentes para costes. | [`specs/005-benchmarks-y-tco-reproducibles/`](specs/005-benchmarks-y-tco-reproducibles/) |
+| **Evidencias de ingesta (Criterio 1 / E-03)** | Conteos verificables de USGS live, histórico 2025 y catálogo Natural Earth; semántica de `ingestion_audit`. | [`specs/006-evidencias-de-ingesta-y-auditoria/`](specs/006-evidencias-de-ingesta-y-auditoria/) |
 | **Documento Fuente Original** | Texto original y requerimientos iniciales consolidados. | [`Fuente_inicial.md`](Fuente_inicial.md) |
 
 ---

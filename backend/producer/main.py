@@ -34,9 +34,7 @@ def utc_timestamp(value: datetime) -> str:
     """Serialize a timezone-aware instant as RFC 3339 UTC with ``Z``."""
     if value.tzinfo is None:
         raise ValueError("timestamp must be timezone-aware")
-    return value.astimezone(timezone.utc).isoformat(timespec="seconds").replace(
-        "+00:00", "Z"
-    )
+    return value.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
 
 
 def _canonical_json(value: Any) -> bytes:

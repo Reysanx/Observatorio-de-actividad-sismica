@@ -1,0 +1,91 @@
+{
+  "report": "three_source_ingestion_evidence",
+  "mode": "read_only",
+  "database_snapshot_at_utc": "2026-11-11T12:16:44.768287Z",
+  "environment": {
+    "python": "3.11.9",
+    "platform": "Linux-5.15.167.4-microsoft-standard-WSL2-x86_64-with-glibc2.36",
+    "shapely": "2.0.7"
+  },
+  "sources": [
+    {
+      "source_id": "usgs_live",
+      "kind": "live_feed_poll_audit",
+      "evidence": {
+        "poll_count": 639,
+        "status_counts": {
+          "succeeded": 639,
+          "partial": 0,
+          "failed": 0
+        },
+        "http_status_counts": {
+          "200": 639
+        },
+        "records_received": 130387,
+        "records_accepted": 128219,
+        "records_excluded": 2168,
+        "records_quarantined": 0,
+        "error_count": 0,
+        "errors_by_code": {},
+        "first_requested_at_utc": "2026-11-06T17:37:18Z",
+        "last_completed_at_utc": "2026-11-11T12:16:28.390790Z",
+        "poll_interval_median_seconds": 60.0,
+        "stored_duration_median_ms": 0.0,
+        "stored_duration_p95_ms": 1000.0,
+        "stored_duration_max_ms": 1000.0,
+        "subsecond_precision_poll_count": 2,
+        "subsecond_duration_median_ms": 195.56799999999998,
+        "subsecond_duration_p95_ms": 285.17199999999997,
+        "subsecond_duration_max_ms": 295.128,
+        "timestamps_have_whole_second_precision": false,
+        "duration_note": "Whole-second rows are quantized and are not request-latency measurements. Subsecond metrics include only rows with fractional timestamps."
+      }
+    },
+    {
+      "source_id": "usgs_2025",
+      "kind": "verified_historical_cache",
+      "cache_validation_seconds": 0.1541313440011436,
+      "manifest_sha256": "55d0e7719f18d7dcbc11b0da937915e529572e2e9e8c924acfe1962e4435dc73",
+      "cache_sha256": "f9b2a09876f440698104ce4ee94eff42845882c491fa1e6453e6aeb0795179f5",
+      "manifest_generated_at": "2026-11-09T17:40:49.385505Z",
+      "monthly_feature_counts": {
+        "2025_m01.geojson": 1413,
+        "2025_m02.geojson": 1394,
+        "2025_m03.geojson": 1178,
+        "2025_m04.geojson": 1316,
+        "2025_m05.geojson": 1228,
+        "2025_m06.geojson": 1156,
+        "2025_m07.geojson": 2684,
+        "2025_m08.geojson": 2222,
+        "2025_m09.geojson": 1604,
+        "2025_m10.geojson": 1509,
+        "2025_m11.geojson": 1321,
+        "2025_m12.geojson": 1277
+      },
+      "cached_feature_count": 18302,
+      "unique_event_ids": 18302,
+      "validation_errors": [],
+      "download_and_database_import_duration_recorded": false,
+      "duration_note": "This run measures local cache validation only. The existing import registry has no download or database-import duration.",
+      "database_import": {
+        "dataset_key": "usgs_2025_magnitude_4_v1",
+        "registered_event_count": 18302,
+        "imported_at_utc": "2026-11-09T17:40:59.837956Z",
+        "historical_rows": 18302,
+        "unique_event_ids": 18302,
+        "errors": []
+      }
+    },
+    {
+      "source_id": "natural_earth_countries",
+      "kind": "local_reference_catalog",
+      "file_name": "paises.geojson",
+      "sha256": "6866c877d39cba9c357620878839b336d569f8c662d3cfab4cb1dbe2d39c977f",
+      "features_indexed": 177,
+      "load_and_index_seconds": 0.03938763200130779,
+      "errors": [],
+      "duration_note": "Catalog validation and in-memory STRtree construction; this is not a remote download or database-import duration."
+    }
+  ],
+  "audit_semantics": "ingestion_audit records source poll attempts and their outcomes; it does not record user/API reads. User-query auditing would require a separate table and contract."
+}

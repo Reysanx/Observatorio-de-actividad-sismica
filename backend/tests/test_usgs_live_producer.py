@@ -6,7 +6,7 @@ from datetime import datetime, timezone
 
 import httpx
 
-from producer.main import LiveEventDeduplicator, poll_once
+from producer.main import LiveEventDeduplicator, poll_once, utc_timestamp
 from producer.usgs_client import USGSFeedError, fetch_live_feed
 
 
@@ -22,6 +22,18 @@ class FakeProducer:
         value: bytes,
     ) -> None:
         self.records.append((topic, key, json.loads(value)))
+
+
+class TimestampSerializationTests(unittest.TestCase):
+    def test_utc_timestamp_preserves_microseconds(self) -> None:
+        instant = datetime(2026, 11, 11, 12, 0, 0, 123456, tzinfo=timezone.utc)
+
+        self.assertEqual(utc_timestamp(instant), "2026-11-11T12:00:00.123456Z")
+
+    def test_utc_timestamp_keeps_whole_seconds_compact(self) -> None:
+        instant = datetime(2026, 11, 11, 12, 0, 0, tzinfo=timezone.utc)
+
+        self.assertEqual(utc_timestamp(instant), "2026-11-11T12:00:00Z")
 
 
 def _feature(event_id: str, updated: int, event_type: str = "earthquake") -> dict:
