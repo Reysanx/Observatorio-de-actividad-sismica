@@ -81,10 +81,11 @@ La entrega final debe contener de forma verificable los 9 entregables especifica
   - Código de comprobación, métricas cuantitativas antes y después de aplicar reglas.
   - Explicación fundamentada del no relleno de nulos con cero y de la tabla de cuarentena.
 
-- [ ] **E-05: Modelado Conceptual, Lógico y Físico de Base de Datos**
+- [x] **E-05: Modelado Conceptual, Lógico y Físico de Base de Datos**
   - Diagrama Entidad-Relación y justificación del grano.
   - Script SQL de creación (`init.sql`) con restricciones de clave primaria, unicidad y claves foráneas.
   - Justificación técnica y evidencia empírica de optimización de índices.
+  - Evidencias: [modelo, grano e índices](../004-modelado-y-evidencia-indices/data-model.md) y [salidas reproducibles de `EXPLAIN ANALYZE`](../004-modelado-y-evidencia-indices/evidence/database-indexes/explain-analyze.txt).
 
 - [ ] **E-06: Análisis Sísmico con Mínimo 3 Conclusiones Fundamentadas**
   - Apartado en la memoria con 3 conclusiones analíticas con cifras cuantitativas exactas.

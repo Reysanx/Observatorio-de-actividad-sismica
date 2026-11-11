@@ -57,6 +57,7 @@ Observatorio-de-actividad-s-smica/
 | **Desglose de Tareas** | Plan de ejecución en 8 fases lógicas con tareas atómicas, dependencias y criterios de verificación. | [`specs/001-observatorio-sismico/tasks.md`](specs/001-observatorio-sismico/tasks.md) |
 | **Pruebas de Aceptación** | Protocolo de validación de los 11 escenarios oficiales de la Sección 11 (idempotencia, túnel, replay). | [`specs/001-observatorio-sismico/acceptance-tests.md`](specs/001-observatorio-sismico/acceptance-tests.md) |
 | **Rúbrica de Evaluación y Entregables** | Mapeo detallado para garantizar Sobresaliente (9–10) en los 5 criterios de la sesión 8. | [`specs/001-observatorio-sismico/evaluation-rubric.md`](specs/001-observatorio-sismico/evaluation-rubric.md) |
+| **Modelo y Evidencia de Índices** | Diagramas conceptual y lógico, grano de las 12 relaciones y planes reproducibles de PostgreSQL. | [`specs/004-modelado-y-evidencia-indices/`](specs/004-modelado-y-evidencia-indices/) |
 | **Documento Fuente Original** | Texto original y requerimientos iniciales consolidados. | [`Fuente_inicial.md`](Fuente_inicial.md) |
 
 ---

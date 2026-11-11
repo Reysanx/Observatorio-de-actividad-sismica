@@ -138,83 +138,12 @@ flowchart TD
 
 ## 3. Modelo de Datos Relacional y Estrategia de Índices
 
-```mermaid
-erDiagram
-    DIM_COUNTRIES ||--o{ CURRENT_EARTHQUAKES : "se ubica en"
-    DIM_COUNTRIES ||--o{ HISTORICAL_2025 : "se ubica en"
-    CURRENT_EARTHQUAKES ||--o{ EARTHQUAKE_VERSIONS : "posee historial"
-    
-    CURRENT_EARTHQUAKES {
-        varchar(32) event_id PK
-        float mag
-        varchar(16) mag_type
-        float depth_km
-        timestamptz time_utc
-        timestamptz updated_utc
-        varchar(8) adm0_a3 FK
-        text place
-        float geom_lon
-        float geom_lat
-        jsonb raw_properties
-        timestamptz created_at
-    }
-
-    EARTHQUAKE_VERSIONS {
-        bigserial version_id PK
-        varchar(32) event_id
-        timestamptz updated_utc
-        float mag
-        float depth_km
-        timestamptz received_at
-        jsonb payload_diff
-    }
-
-    HISTORICAL_2025 {
-        varchar(32) event_id PK
-        float mag
-        float depth_km
-        timestamptz time_utc
-        varchar(8) adm0_a3 FK
-        text place
-        float geom_lon
-        float geom_lat
-    }
-
-    QUARANTINE_EVENTS {
-        bigserial quarantine_id PK
-        varchar(64) source_event_id
-        varchar(128) failure_reason
-        jsonb raw_payload
-        timestamptz quarantined_at
-    }
-
-    DIM_COUNTRIES {
-        varchar(8) adm0_a3 PK
-        varchar(100) name_es
-        varchar(100) admin_name
-        varchar(50) continent
-        varchar(50) subregion
-    }
-
-    INGESTION_AUDIT {
-        bigserial audit_id PK
-        timestamptz run_at
-        varchar(32) source
-        integer records_received
-        integer records_inserted
-        integer records_updated
-        integer records_quarantined
-        integer duration_ms
-        varchar(16) status
-    }
-```
-
-### 3.1 Estrategia de Indexación Fisiológica
-1. `idx_current_earthquakes_time`: Índice B-Tree sobre `(time_utc DESC)` $\rightarrow$ Acelera ventanas móviles de 24 horas y series temporales horarias.
-2. `idx_current_earthquakes_mag`: Índice B-Tree sobre `(mag)` $\rightarrow$ Filtro inmediato de magnitudes $\ge 4.0$.
-3. `idx_current_earthquakes_adm0`: Índice B-Tree sobre `(adm0_a3)` $\rightarrow$ Optimiza agrupaciones geoespaciales por país.
-4. `idx_historical_time_mag`: Índice compuesto sobre `HISTORICAL_2025(time_utc, mag)` $\rightarrow$ Resuelve el denominador y la media diaria histórica en menos de 10 ms.
-5. `idx_versions_lookup`: Índice compuesto sobre `EARTHQUAKE_VERSIONS(event_id, updated_utc DESC)` $\rightarrow$ Búsqueda ultrarrápida del historial de revisiones de un sismo.
+El modelo conceptual, lógico, el grano de todas las relaciones y la matriz
+física de índices basada en el DDL vigente se documentan en
+[`specs/004-modelado-y-evidencia-indices/data-model.md`](../004-modelado-y-evidencia-indices/data-model.md).
+La salida real y el script repetible de `EXPLAIN ANALYZE` están enlazados desde
+ese documento. Esa documentación es la fuente canónica para el esquema actual;
+el DDL instalable permanece en `backend/db/init.sql`.
 
 ---
 
