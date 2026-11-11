@@ -1,165 +1,73 @@
-# ANÁLISIS DE COMPLEJIDAD COMPUTACIONAL (BIG-O) Y BENCHMARKING EXPERIMENTAL
-## Observatorio de Actividad Sísmica · Resultado de Aprendizaje 1 (RA1)
+# Complejidad algorítmica y benchmarks
 
-> **Materia:** Sistemas de Big Data & Inteligencia Artificial  
-> **Criterio de Evaluación:** Criterio 5 — Reflexión Crítica y Propuestas de Escalabilidad (Sobresaliente 9–10)  
-> **Entregable:** E-07 (`docs/complexity_and_benchmarks.md`)
+> **Estado de evidencia (2026-11-11):** Las cifras heredadas de ingesta,
+> throughput, memoria de consumidor, latencia API, series horarias y
+> `EXPLAIN ANALYZE` que antes aparecían aquí no tenían salidas, entorno ni
+> procedimiento reproducible asociados. Se retiran como resultados
+> confirmados. La auditoría y el procedimiento vigente están en
+> [specs/005-benchmarks-y-tco-reproducibles/](../specs/005-benchmarks-y-tco-reproducibles/).
 
----
+## Complejidad teórica
 
-## 1. Análisis Teórico de Complejidad Algorítmica (Big-O)
+Sean `N` las filas indexadas, `M` las geometrías de países, `K` las filas
+elegibles de una ventana y `G` los grupos de agregación:
 
-El diseño del flujo de procesamiento en streaming se estructuró para minimizar la latencia por evento y garantizar que el rendimiento del pipeline sea estable frente a picos de actividad sísmica mundial. A continuación se analiza la complejidad temporal y espacial de las **tres operaciones críticas** del sistema.
+| Operación | Complejidad orientativa | Condiciones y límites |
+|---|---|---|
+| Búsqueda/deduplicación por hash del productor | O(1) esperada por acceso a `dict`; peor caso dependiente de colisiones | No es una garantía estricta de peor caso O(1). El productor es además una caché local, no el árbitro de unicidad durable. |
+| `INSERT ... ON CONFLICT` de PostgreSQL | O(log N) para la búsqueda en el B-Tree, además del coste de escribir filas/WAL cuando hay cambios | Las PK/índices reales y reglas de UPSERT están en `backend/db/init.sql`; contención, disco y escritura añaden costes no expresados por esa cota. |
+| `SpatialIndex.find_country` | En promedio, consulta del STRtree más pruebas exactas de los candidatos; peor caso O(M) candidatos, multiplicado por el coste geométrico correspondiente | El rendimiento depende de la distribución espacial, tamaño y solapamiento de los polígonos, y sus vértices. No se presupone que todo punto consulte solo uno o dos candidatos. |
+| Agregación por ventana | O(log N + K) para localizar y recorrer un rango indexado, más agregación y posible ordenamiento de grupos | El planificador puede elegir Seq Scan; no se garantiza que toda consulta use el B-Tree ni latencia sub-10 ms. |
 
-```
-+-------------------------------------------------------------------------------------------------------------+
-|                                  MATRIZ DE COMPLEJIDAD TEÓRICA (BIG-O)                                      |
-+------------------------------------+----------------+----------------+----------------+---------------------+
-| Operación Crítica                  | Mejor Caso     | Caso Medio     | Peor Caso      | Complejidad Espacial|
-+------------------------------------+----------------+----------------+----------------+---------------------+
-| 1. Inserción e Idempotencia por ID | O(1)           | O(log N)       | O(log N)       | O(N)                |
-| 2. Integración Espacial STRtree    | O(1)           | O(log M)       | O(M)           | O(M)                |
-| 3. Agregación en Ventanas Horarias | O(1)           | O(log N + K)   | O(log N + K)   | O(K)                |
-+------------------------------------+----------------+----------------+----------------+---------------------+
-* Donde N = Total de sismos en BD (~millones), M = Número de geometrías de países (~250), K = Eventos en la ventana (~decenas/cientos).
-```
+Estas son cotas/modelos de estructuras, no mediciones de velocidad ni
+promesas SLA. Para la indexación PostgreSQL con planes observados y
+reproducibles, véase la
+[evidencia de la spec 004](../specs/004-modelado-y-evidencia-indices/data-model.md).
 
----
+## Benchmarks
 
-### Operación 1: Búsqueda, deduplicación e inserción de versiones por ID
+No se confirman las cifras antiguas de `48/890/8.740 ms`, `10.416/11.235/
+11.441 eventos/s`, `42,3/43,8/49,1 MB`, latencias API/serie horaria ni las
+comparaciones de consultas `8,6 ms` frente a `184 ms`: no se conservó el lote
+ni su hash, código exacto, hardware, repeticiones, versión, consulta ejecutada
+o salida de memoria/`EXPLAIN ANALYZE`.
 
-* **Estructuras utilizadas:**
-  1. *Caché local en Productor:* `dict` de Python (tabla hash en memoria) indexada por `(event_id, updated)`.
-  2. *Base de Datos:* Índice B-Tree único sobre `current_earthquakes(event_id)` e índice compuesto sobre `earthquake_versions(event_id, updated_utc)`.
+El procedimiento que sí puede repetirse mide la operación real
+`SpatialIndex.find_country` con los datos cacheados identificados, tres
+tamaños, repeticiones y salida JSON:
 
-* **Desglose de Complejidad Temporal:**
-  * **En el Productor (Memoria):** La comprobación de novedad del sismo es un acceso por clave hash. En el caso medio es $O(1)$. En el peor caso teórico (colisiones hash extremas) degradaría a $O(B)$ donde $B$ es la longitud del bucket, mitigado por el algoritmo SipHash de Python.
-  * **En el Consumidor y PostgreSQL:** La sentencia `INSERT ... ON CONFLICT (event_id) DO UPDATE ... WHERE EXCLUDED.updated_utc > current_earthquakes.updated_utc` requiere una búsqueda en el árbol balanceado B-Tree de la clave primaria. Para una tabla con $N$ registros y un factor de ramificación (*fan-out*) $b \approx 100$, la altura del árbol es $h = \lceil \log_b N \rceil$. La búsqueda y comprobación de versión requiere exactamente:
-    $$\mathcal{O}(\log_b N)$$
-  * Si la versión entrante es idéntica o anterior, el motor de PostgreSQL descarta la actualización en tiempo de evaluación de la condición `WHERE`, evitando escrituras de página en disco. Si es estrictamente más reciente, ejecuta el `UPDATE` en $O(\log N)$ e inserta la versión previa en `earthquake_versions` en $O(\log V)$.
+- [Protocolo de medición](../specs/005-benchmarks-y-tco-reproducibles/benchmark-protocol.md)
+- [Comando y validación](../specs/005-benchmarks-y-tco-reproducibles/quickstart.md)
+- [JSON generado](../specs/005-benchmarks-y-tco-reproducibles/evidence/benchmarks/spatial-benchmark.json)
 
----
+| Cifra publicada anteriormente | Resultado de la verificación |
+|---|---|
+| Ingesta STRtree: 48 ms / 890 ms / 8.740 ms para 500 / 10k / 100k | Sin salida, lote o entorno identificables: no verificable. |
+| Throughput: 10.416 / 11.235 / 11.441 eventos/s | Cociente derivable aproximadamente de los tiempos anteriores; aritmética coherente, pero no verificación independiente ni conteo de IDs distintos. |
+| RAM del consumidor: 42,3 / 43,8 / 49,1 MB | Sin definición de memoria, proceso o perfil: no verificable. |
+| API Geo: 2,1 / 3,8 / 14,2 ms; serie horaria: 1,4 / 2,1 / 8,6 ms | Sin request/consulta, datos, cardinalidad o salida: no verificable. |
+| `EXPLAIN ANALYZE (cost)`: `8.42..12.30`, `14.15..45.20`, `28.50..112.40` | `cost` son unidades estimadas del planificador, no milisegundos. Sin SQL/plan completo/dataset, no prueban rendimiento por lote. |
+| Con índice 8,6 ms vs Seq Scan 184 ms (~21×) en 100k | El cociente `184 / 8,6 ≈ 21,4` es correcto; los tiempos/planes carecen de evidencia reproducible y se retiran como observación. |
+| ~250 geometrías Natural Earth | No coincide con el catálogo medido de esta ejecución: 177 entradas. Usar recuento y hash del catálogo de cada reporte. |
 
-### Operación 2: Integración geoespacial Punto-en-Polígono (STRtree)
+El lote de 100.000 es un número de llamadas; si el caché contiene menos
+coordenadas se recorren cíclicamente y el reporte cuantifica la reutilización.
+No se etiqueta como 100.000 eventos únicos. `tracemalloc` es pico de
+asignaciones Python durante la operación, no RSS total ni memoria nativa de
+GEOS. El microbenchmark no mide Kafka, PostgreSQL, API o el pipeline completo.
 
-* **Estructura utilizada:** `shapely.STRtree` (Sort-Tile-Recursive R-Tree) construido en memoria a partir del catálogo Natural Earth (`paises.geojson`, 250 geometrías poligonales y multipoligonales).
+## Proyección a 100 millones
 
-* **Desglose de Complejidad Temporal:**
-  * **Sin índice espacial (Naive Point-in-Polygon):** Un algoritmo ingenuo evaluaría el algoritmo de *Ray Casting* contra cada uno de los $M$ países:
-    $$\mathcal{O}(M \times V_p)$$
-    donde $V_p$ es el número medio de vértices por polígono ($V_p \approx 800$). Con $M = 250$, cada sismo requeriría cientos de miles de cálculos trigonométricos.
-  * **Con STRtree optimizado:**
-    1. *Fase 1 (Bounding Box Query):* El árbol R-Tree filtra las cajas envolventes (*AABB*) del punto en tiempo logarítmico:
-       $$\mathcal{O}(\log M)$$
-       Dado que $M = 250$, $\log_2(250) \approx 8$ comparaciones de cajas envolventes.
-    2. *Fase 2 (Exact Polygon Test):* El filtro devuelve un conjunto muy reducido de candidatos (típicamente 0 para sismos oceánicos, 1 para el 95% de sismos continentales, y máximo 2 o 3 en fronteras compartidas). Solo sobre estos candidatos se ejecuta `polygon.contains(point)`.
-    3. *Desempate determinista:* En caso de frontera compartida exacta, se aplica ordenación lexicográfica por `ADM0_A3` en $O(C \log C)$ con $C \le 3$.
-  * **Complejidad Global:**
-    $$\mathcal{O}(\log M + C \times V_c) \approx \mathcal{O}(1) \text{ respecto a } N$$
-    La operación es completamente independiente del volumen de sismos históricos $N$, procesándose en $< 0.15 \text{ ms}$ por evento.
+Los antiguos `212 bytes/fila`, `10,4 GB` de índices, `31,6 GB` totales y
+`~42 GB` con margen son **supuestos no medidos**, no un dimensionamiento
+confirmado. La aritmética es consistente bajo esos supuestos:
+`100M × 212 B = 21,2 GB` (decimal), `21,2 + 10,4 = 31,6 GB` y
+`31,6 × 1,30 = 41,08 GB`, redondeado a 42 GB. Para planificar capacidad se
+requieren tamaños de tabla/índice medidos con el esquema y datos representativos,
+más WAL, backups, bloat, retención y margen de crecimiento.
 
----
-
-### Operación 3: Agregación analítica por ventanas temporales de 1 hora UTC
-
-* **Estructura utilizada:** Índice B-Tree sobre `current_earthquakes(time_utc)` y función de truncamiento temporal `date_trunc('hour', time_utc)`.
-
-* **Desglose de Complejidad Temporal:**
-  * La consulta de agregación sobre un intervalo $[T_{inicio}, T_{fin})$ ejecuta un *Index Range Scan* o *Index-Only Scan* en PostgreSQL:
-    1. Localización del nodo inicial en el B-Tree: $\mathcal{O}(\log N)$.
-    2. Recorrido secuencial de las hojas enlazadas del B-Tree hasta $T_{fin}$: $\mathcal{O}(K)$, donde $K$ es el número de sismos contenidos en el intervalo.
-    3. Agrupación hash de las ventanas horarias: $\mathcal{O}(K)$ con $W$ grupos (donde $W = \frac{T_{fin} - T_{inicio}}{1\text{ hora}} \le 24$).
-  * **Complejidad Global:**
-    $$\mathcal{O}(\log N + K)$$
-  * Al contar con el índice B-Tree sobre `time_utc`, la base de datos jamás realiza un escaneo secuencial completo de la tabla (*Seq Scan*), garantizando tiempos de respuesta sub-10 ms en la API REST incluso con millones de filas.
-
----
-
-## 2. Protocolo de Medición Experimental (Benchmarking)
-
-Para validar empíricamente los cálculos teóricos, se diseñó un banco de pruebas midiendo el tiempo de CPU y el consumo de memoria RAM en tres tamaños de carga representativos:
-
-* **Lote Pequeño ($N_1 = 500$ registros):** Carga habitual del feed en tiempo real de 24 a 48 horas.
-* **Lote Medio ($N_2 = 10.000$ registros):** Simulación de un mes completo de sismicidad global con $M \ge 4.0$.
-* **Lote Grande ($N_3 = 100.000$ registros):** Prueba de estrés sintética para validar la estabilidad de la memoria y la degradación algorítmica.
-
-### Resultados Experimentales Obtenidos
-
-```
-+----------------------------------------------------------------------------------------------------+
-|                               TABLA DE MEDICIONES EXPERIMENTALES REALES                            |
-+--------------------------+---------------------+--------------------+------------------------------+
-| Métrica Evaluada         | Lote 1 (500 sismos) | Lote 2 (10k sismos)| Lote 3 (100k sismos)         |
-+--------------------------+---------------------+--------------------+------------------------------+
-| Tiempo Ingesta STRtree   | 48 ms               | 890 ms             | 8.740 ms (8,74 s)            |
-| Rendimiento (eventos/s)  | 10.416 ev/s         | 11.235 ev/s        | 11.441 ev/s                  |
-| Memoria RAM Consumidor   | 42,3 MB             | 43,8 MB            | 49,1 MB                      |
-| Tiempo Consulta API Geo  | 2,1 ms              | 3,8 ms             | 14,2 ms                      |
-| Tiempo Serie Horaria     | 1,4 ms              | 2,1 ms             | 8,6 ms                       |
-| EXPLAIN ANALYZE (cost)   | 8.42..12.30         | 14.15..45.20       | 28.50..112.40                |
-+--------------------------+---------------------+--------------------+------------------------------+
-```
-
-### Gráfico Conceptual de Escalabilidad (Tiempo vs Volumen)
-
-```text
-Tiempo (ms)
-  10.000 |                                              * (100k: 8.740 ms)
-   8.000 |
-   6.000 |
-   4.000 |
-   2.000 |
-       0 +----------------*-----------------------------+
-        500              10.000                       100.000 Registros
-          [ Comportamiento estrictamente lineal O(N) en pipeline completo ]
-```
-
-### Hallazgos de las Mediciones:
-1. **Memoria acotada $O(1)$ en el Consumidor:** El consumo de RAM del proceso consumidor apenas se incrementó en $\approx 6,8 \text{ MB}$ al pasar de 500 a 100.000 eventos. Esto demuestra que la geometría del STRtree reside en memoria fija ($250$ polígonos $\approx 35 \text{ MB}$) y los eventos transitan en streaming sin retención innecesaria de objetos en el heap.
-2. **Impacto de los Índices B-Tree en PostgreSQL:**
-   * Con índice en `time_utc`: La consulta horaria sobre 100.000 filas tardó **$8,6 \text{ ms}$** mediante *Bitmap Index Scan*.
-   * Sin índice (escaneo forzado): El plan degradó a *Sequential Scan*, tardando **$184 \text{ ms}$** (un factor de degradación de más de **$21\times$**).
-
----
-
-## 3. Proyección a Escala Masiva (100 Millones de Sismos)
-
-Si el observatorio escalara para albergar 100 millones de registros sísmicos (equivalente a décadas de sismicidad histórica global o a la inclusión de micro-sismos $M < 1.0$ de redes locales):
-
-### 3.1. Dimensionamiento de Almacenamiento
-* **Tamaño estimado por fila:**
-  * Registro físico en PostgreSQL: $\approx 180 \text{ bytes}$ (incluyendo campos numéricos, timestamps UTC, texto normalizado de lugar y hash SHA-256).
-  * Sobrecarga de tupla y alineación de página (*MVCC heap tuple header*): $\approx 32 \text{ bytes}$.
-  * Total por registro: $\approx 212 \text{ bytes}$.
-* **Volumen de Datos Brutos:**
-  $$100.000.000 \times 212 \text{ bytes} \approx 21,2 \text{ GB}$$
-* **Volumen de Índices:**
-  * B-Tree sobre `event_id` (VARCHAR 32): $\approx 4,8 \text{ GB}$.
-  * B-Tree sobre `time_utc` (TIMESTAMPTZ): $\approx 3,2 \text{ GB}$.
-  * B-Tree sobre `adm0_a3` (VARCHAR 8): $\approx 2,4 \text{ GB}$.
-  * Total Índices: $\approx 10,4 \text{ GB}$.
-* **Almacenamiento Total Requerido:** $\approx \mathbf{31,6 \text{ GB}}$ (más un 30% de margen de seguridad para *vacuum* y WAL $\rightarrow \mathbf{\approx 42 \text{ GB}}$).
-
-### 3.2. Cuellos de Botella Identificados y Estrategia de Escalado
-
-1. **Cuello de Botella 1: Buffer Pool y Presión de Memoria:**
-   * A 100M de registros, el conjunto de índices ($10,4 \text{ GB}$) superaría la RAM típica de máquinas de gama baja/media, obligando a lecturas continuas de páginas B-Tree desde disco NVMe (*Disk I/O thrashing*).
-   * **Solución Arquitectónica:** **Particionado Declarativo Horizontal por Rango Temporal (`PARTITION BY RANGE (time_utc)`).**
-     * Creación de particiones mensuales o anuales automáticas:
-       ```sql
-       CREATE TABLE current_earthquakes_partitioned (
-           event_id VARCHAR(64) NOT NULL,
-           time_utc TIMESTAMPTZ NOT NULL,
-           ...
-       ) PARTITION BY RANGE (time_utc);
-       ```
-     * Beneficio: *Partition Pruning*. Las consultas de las últimas 24 horas solo leen la partición del mes en curso, manteniendo el índice activo en menos de $200 \text{ MB}$ de RAM, garantizando tiempos de respuesta submilisegundo sin importar que existan 100M de filas históricas.
-
-2. **Cuello de Botella 2: Ingesta en Kafka y Consumo Paralelo:**
-   * Una sola partición de Kafka limitaría la tasa máxima de consumo a $\approx 15.000 \text{ ev/s}$ por hilo de CPU.
-   * **Solución:** Topic `earthquakes.live` con **8 particiones** particionado por hash de `event_id`, permitiendo un grupo de consumidores horizontalmente escalable de hasta 8 réplicas en Docker/Kubernetes sin riesgo de condición de carrera.
-
-3. **Estrategia de Almacenamiento en Frío (*Cold Tiering*):**
-   * Los sismos con más de 2 años de antigüedad se archivan periódicamente en formato columnar **Apache Parquet** comprimido con Snappy/ZSTD y almacenado en almacenamiento de objetos compatible S3 (AWS S3, Cloudflare R2 o MinIO).
-   * Ratio de compresión esperado: $> 75\%$, reduciendo el coste de almacenamiento histórico en más de un $85\%$.
-
+El particionado temporal y archivado en almacenamiento columnar son
+alternativas de diseño a evaluar, no garantías de mantener índices en RAM,
+latencia submilisegundo o compresión de >75%. El esquema actual particiona la
+línea histórica y versiones; `current_earthquakes` no está particionada,
+deliberadamente, para conservar el conflicto global por `event_id`.
