@@ -23,7 +23,7 @@ COUNTRY_JOIN = "JOIN dim_countries c ON c.adm0_a3 = e.adm0_a3"
 async def list_earthquakes(
     request: Request,
     filters: EventFilters = Depends(event_filters),
-    limit: int = Query(default=100, ge=1, le=500),
+    limit: int = Query(default=50, ge=1, le=500),
     offset: int = Query(default=0, ge=0),
 ) -> EarthquakePage:
     """Return a stable page of live events or one explicitly selected replay."""

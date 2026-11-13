@@ -26,7 +26,7 @@ type FilterDraft = Record<
 >;
 type SortColumn = 'time_utc' | 'mag' | 'country_name';
 
-const PAGE_SIZE = 100;
+const PAGE_SIZE = 50;
 
 function createDraft(start: Date, end: Date): FilterDraft {
   return {
@@ -60,6 +60,7 @@ export class App implements OnInit, OnDestroy {
   private readonly subscriptions = new Subscription();
   private readonly refreshRequests = new Subject<void>();
 
+  readonly pageSize = PAGE_SIZE;
   readonly viewScope = signal<'live' | 'replay'>('live');
   readonly replayState = signal<ReplayStateResponse | null>(null);
   readonly isReplayMode = computed(() => this.viewScope() === 'replay');

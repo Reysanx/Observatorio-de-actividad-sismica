@@ -145,6 +145,11 @@ class APIRouteContractTests(unittest.TestCase):
         self.assertIn("current_earthquakes", query)
         self.assertNotIn("replay_earthquakes", query)
 
+    def test_event_page_defaults_to_50_items(self) -> None:
+        response = self.client.get("/api/v1/earthquakes")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["limit"], 50)
+
     def test_replay_scope_requires_run_id_and_never_falls_back_to_live(self) -> None:
         missing_id = self.client.get("/api/v1/earthquakes?scope=replay")
         self.assertEqual(missing_id.status_code, 422)

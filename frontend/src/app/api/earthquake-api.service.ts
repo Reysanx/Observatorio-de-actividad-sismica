@@ -133,7 +133,7 @@ export class EarthquakeApiService {
 
   getEarthquakes(
     filters: DashboardFilters,
-    limit = 100,
+    limit = 50,
     offset = 0,
     scope: 'live' | 'replay' = 'live',
     runId?: string | null,
