@@ -25,7 +25,12 @@
             ],
             "styles": [
               "node_modules/leaflet/dist/leaflet.css",
+              "node_modules/mapbox-gl/dist/mapbox-gl.css",
               "src/styles.css"
+            ],
+            "allowedCommonJsDependencies": [
+              "leaflet",
+              "mapbox-gl"
             ]
           },
           "configurations": {
