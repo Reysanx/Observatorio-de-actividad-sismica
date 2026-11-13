@@ -295,8 +295,8 @@ function toGeoJson(events: EarthquakeDto[]): GeoJSON.FeatureCollection {
       color: #e2e8f0;
       font-family: inherit;
       font-size: 0.82rem;
-      max-width: 240px;
-      min-width: 180px;
+      max-width: 320px;
+      min-width: 220px;
     }
 
     ::ng-deep .mapboxgl-popup-anchor-bottom .mapboxgl-popup-tip { border-top-color:    #1a2232 !important; }
@@ -316,11 +316,11 @@ function toGeoJson(events: EarthquakeDto[]): GeoJSON.FeatureCollection {
       margin: 0;
       display: grid;
       grid-template-columns: auto 1fr;
-      gap: 2px 8px;
+      gap: 3px 12px;
     }
 
     ::ng-deep .earthquake-popup dt {
-      color: rgba(226, 232, 240, 0.5);
+      color: rgba(226, 232, 240, 0.55);
       font-weight: 500;
       white-space: nowrap;
     }
@@ -332,16 +332,18 @@ function toGeoJson(events: EarthquakeDto[]): GeoJSON.FeatureCollection {
     }
 
     ::ng-deep .mapboxgl-popup-close-button {
-      color: rgba(226, 232, 240, 0.45);
+      color: rgba(226, 232, 240, 0.5);
       font-size: 16px;
       line-height: 1;
       padding: 4px 8px;
       background: transparent;
+      border: none;
+      cursor: pointer;
     }
 
     ::ng-deep .mapboxgl-popup-close-button:hover {
-      color: #e2e8f0;
-      background: rgba(255, 255, 255, 0.06);
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.08);
     }
   `],
 })
@@ -373,6 +375,7 @@ export class EarthquakeMapComponent implements AfterViewInit, OnChanges, OnDestr
   private mapboxMap?: unknown;
   private mapboxReady = false;
   private mapboxModule?: typeof import('mapbox-gl');
+  private mapboxPopup?: unknown;
   private rotationId?: number;
   private userInteracting = false;
 
@@ -389,6 +392,7 @@ export class EarthquakeMapComponent implements AfterViewInit, OnChanges, OnDestr
 
   ngOnDestroy(): void {
     this.stopRotation();
+    this.closeMapboxPopup();
     this.leafletMap?.remove();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (this.mapboxMap as any)?.remove?.();
@@ -471,7 +475,7 @@ export class EarthquakeMapComponent implements AfterViewInit, OnChanges, OnDestr
         fillColor: depthColor(event.depth_km),
         fillOpacity: event.event_id === this.selectedEventId ? 1 : 0.88,
       });
-      marker.bindPopup(this.createLeafletPopup(event));
+      marker.bindPopup(this.createPopupContent(event));
       marker.addTo(this.markers);
       marker.on('click', () => this.eventSelected.emit(event.event_id));
       this.makeMarkerKeyboardAccessible(marker, event);
@@ -505,7 +509,7 @@ export class EarthquakeMapComponent implements AfterViewInit, OnChanges, OnDestr
     });
   }
 
-  private createLeafletPopup(event: EarthquakeDto): HTMLElement {
+  private createPopupContent(event: EarthquakeDto): HTMLElement {
     const popup = document.createElement('section');
     popup.className = 'earthquake-popup';
 
@@ -638,34 +642,44 @@ export class EarthquakeMapComponent implements AfterViewInit, OnChanges, OnDestr
     });
   }
 
-  private bindMapboxInteractions(map: mapboxgl.Map, mapboxgl: typeof import('mapbox-gl')): void {
-    const popup = new mapboxgl.default.Popup({ closeButton: true, closeOnClick: false, maxWidth: '260px' });
-
+  private bindMapboxInteractions(map: mapboxgl.Map, _mapboxgl: typeof import('mapbox-gl')): void {
     for (const layerId of [LAYER_CIRCLES, LAYER_SELECTED]) {
-      map.on('mouseenter', layerId, () => { map.getCanvas().style.cursor = 'pointer'; });
-      map.on('mouseleave', layerId, () => { map.getCanvas().style.cursor = ''; });
+      map.on('mouseenter', layerId, () => {
+        map.getCanvas().style.cursor = 'pointer';
+      });
+      map.on('mouseleave', layerId, () => {
+        map.getCanvas().style.cursor = '';
+      });
 
       map.on('click', layerId, (ev) => {
         const feature = ev.features?.[0] as mapboxgl.MapboxGeoJSONFeature | undefined;
-        if (!feature || feature.geometry.type !== 'Point') return;
+        if (!feature) return;
 
         const props = feature.properties as Record<string, unknown>;
         const eventId = props['event_id'] as string;
-        this.eventSelected.emit(eventId);
-        this.stopRotation();
+        if (!eventId) return;
 
-        const coords = [...(feature.geometry as GeoJSON.Point).coordinates] as [number, number];
-        while (Math.abs(ev.lngLat.lng - coords[0]) > 180) {
-          coords[0] += ev.lngLat.lng > coords[0] ? 360 : -360;
-        }
-        popup.setLngLat(coords).setDOMContent(this.buildMapboxPopupDom(props)).addTo(map);
+        this.stopRotation();
+        this.eventSelected.emit(eventId);
       });
     }
 
-    const pause  = () => { this.userInteracting = true;  this.stopRotation(); };
-    const resume = () => { this.userInteracting = false; this.startRotation(); };
-    map.on('mousedown',  pause);  map.on('touchstart', pause);  map.on('dragstart', pause);
-    map.on('mouseup',    resume); map.on('touchend',   resume); map.on('dragend',   resume);
+    const pause = () => {
+      this.userInteracting = true;
+      this.stopRotation();
+    };
+    const resume = () => {
+      this.userInteracting = false;
+      if (!this.selectedEventId && this.projection() === '3d') {
+        this.startRotation();
+      }
+    };
+    map.on('mousedown', pause);
+    map.on('touchstart', pause);
+    map.on('dragstart', pause);
+    map.on('mouseup', resume);
+    map.on('touchend', resume);
+    map.on('dragend', resume);
   }
 
   private renderMapbox(): void {
@@ -677,28 +691,81 @@ export class EarthquakeMapComponent implements AfterViewInit, OnChanges, OnDestr
     source.setData(toGeoJson(this.events));
 
     const selectedId = this.selectedEventId ?? '';
-    if (map.getLayer(LAYER_CIRCLES))  map.setFilter(LAYER_CIRCLES,  ['!=', ['get', 'event_id'], selectedId]);
+    if (map.getLayer(LAYER_CIRCLES)) map.setFilter(LAYER_CIRCLES, ['!=', ['get', 'event_id'], selectedId]);
     if (map.getLayer(LAYER_SELECTED)) map.setFilter(LAYER_SELECTED, ['==', ['get', 'event_id'], selectedId]);
 
     if (this.selectedEventId) {
-      const sel = this.events.find((e) => e.event_id === this.selectedEventId);
-      if (sel && Number.isFinite(sel.geom_lat) && Number.isFinite(sel.geom_lon)) {
+      const selected = this.events.find((e) => e.event_id === this.selectedEventId);
+      if (selected && Number.isFinite(selected.geom_lat) && Number.isFinite(selected.geom_lon)) {
+        this.stopRotation();
         map.flyTo({
-          center: [sel.geom_lon, sel.geom_lat],
+          center: [selected.geom_lon, selected.geom_lat],
           zoom: Math.max(map.getZoom(), 4),
-          duration: 900,
+          duration: 700,
           essential: true,
         });
+        this.openMapboxPopup(selected);
+      } else {
+        this.closeMapboxPopup();
       }
+    } else {
+      this.closeMapboxPopup();
+    }
+  }
+
+  private openMapboxPopup(event: EarthquakeDto): void {
+    if (!this.mapboxMap || !this.mapboxModule) return;
+    const map = this.mapboxMap as mapboxgl.Map;
+    const mb = this.mapboxModule;
+
+    this.closeMapboxPopup();
+
+    const popup = new mb.default.Popup({
+      closeButton: true,
+      closeOnClick: false,
+      maxWidth: '320px',
+      offset: [0, -10],
+    });
+
+    popup
+      .setLngLat([event.geom_lon, event.geom_lat])
+      .setDOMContent(this.createPopupContent(event))
+      .addTo(map);
+
+    popup.on('close', () => {
+      if (this.selectedEventId === event.event_id) {
+        this.eventSelected.emit('');
+      }
+    });
+
+    this.mapboxPopup = popup;
+  }
+
+  private closeMapboxPopup(): void {
+    if (this.mapboxPopup) {
+      (this.mapboxPopup as mapboxgl.Popup).remove();
+      this.mapboxPopup = undefined;
     }
   }
 
   // ── Rotación suave del globo ───────────────────────────────────────────────
 
   private startRotation(): void {
-    if (this.rotationId !== undefined || this.userInteracting || this.projection() !== '3d') return;
+    if (
+      this.rotationId !== undefined ||
+      this.userInteracting ||
+      this.projection() !== '3d' ||
+      this.selectedEventId
+    ) {
+      return;
+    }
     const spin = () => {
-      if (!this.mapboxMap || this.projection() !== '3d' || this.userInteracting) {
+      if (
+        !this.mapboxMap ||
+        this.projection() !== '3d' ||
+        this.userInteracting ||
+        this.selectedEventId
+      ) {
         this.rotationId = undefined;
         return;
       }
@@ -716,43 +783,6 @@ export class EarthquakeMapComponent implements AfterViewInit, OnChanges, OnDestr
       cancelAnimationFrame(this.rotationId);
       this.rotationId = undefined;
     }
-  }
-
-  // ── DOM del popup Mapbox ──────────────────────────────────────────────────
-
-  private buildMapboxPopupDom(props: Record<string, unknown>): HTMLElement {
-    const section = document.createElement('section');
-    section.className = 'earthquake-popup';
-
-    const mag     = props['mag'] as number | null;
-    const depth   = props['depth_km'] as number | null;
-    const adm0    = props['adm0_a3'] as string;
-    const country = (props['country_name'] as string) ||
-                    (props['name_es'] as string) ||
-                    (props['admin_name'] as string) || 'País no indicado';
-    const latency = props['ingestion_latency_seconds'] as number | null;
-
-    const title = document.createElement('strong');
-    title.textContent = `Magnitud ${mag === null ? 'ND' : mag.toFixed(1)}`;
-    section.append(title);
-
-    const rows: Array<[string, string]> = [
-      ['Lugar',       (props['place'] as string) || 'Lugar no indicado'],
-      ['Profundidad', depth === null ? 'ND' : `${depth.toFixed(1)} km`],
-      ['Hora UTC',    this.formatUtc(props['time_utc'] as string)],
-      ['País',        adm0 === 'N/A' ? 'Sin país asignado' : country],
-      ['ID',          props['event_id'] as string],
-    ];
-    if (latency !== null) rows.push(['Latencia ingesta', `${(latency as number).toFixed(1)} s`]);
-
-    const dl = document.createElement('dl');
-    for (const [label, value] of rows) {
-      const dt = document.createElement('dt'); dt.textContent = label;
-      const dd = document.createElement('dd'); dd.textContent = value;
-      dl.append(dt, dd);
-    }
-    section.append(dl);
-    return section;
   }
 
   // ── Utilidades compartidas ────────────────────────────────────────────────
