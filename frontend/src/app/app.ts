@@ -27,6 +27,17 @@ type FilterDraft = Record<
 type SortColumn = 'time_utc' | 'mag' | 'country_name';
 
 const PAGE_SIZE = 50;
+const SNAPSHOT_CACHE_KEY = 'sismo_last_snapshot';
+
+interface CachedSnapshot {
+  page: EarthquakePage;
+  geo: GeoStatsResponse;
+  hourly: HourlyStatsResponse;
+  distributions: DistributionResponse;
+  comparison: HistoricalComparisonResponse | null;
+  lastRefresh: string;
+  latestIngestion?: string | null;
+}
 
 function createDraft(start: Date, end: Date): FilterDraft {
   return {
@@ -131,6 +142,8 @@ export class App implements OnInit, OnDestroy {
   );
 
   ngOnInit(): void {
+    this.restoreCachedSnapshot();
+
     this.subscriptions.add(
       merge(timer(0, 60_000), this.refreshRequests)
         .pipe(
@@ -365,6 +378,41 @@ export class App implements OnInit, OnDestroy {
     };
   }
 
+  private restoreCachedSnapshot(): void {
+    try {
+      if (typeof window === 'undefined' || !window.localStorage) return;
+      const raw = window.localStorage.getItem(SNAPSHOT_CACHE_KEY);
+      if (!raw) return;
+
+      const cached = JSON.parse(raw) as CachedSnapshot;
+      if (cached && cached.page && Array.isArray(cached.page.items) && cached.page.items.length > 0) {
+        this.events.set(cached.page.items);
+        this.eventTotal.set(cached.page.total);
+        if (cached.geo?.items) {
+          this.geoStats.set(cached.geo.items);
+          this.knownGeoStats.set(cached.geo.items);
+        }
+        if (cached.hourly?.items) {
+          this.hourlyStats.set(cached.hourly.items);
+        }
+        if (cached.distributions) {
+          this.distributions.set(cached.distributions);
+        }
+        if (cached.comparison) {
+          this.comparison.set(cached.comparison);
+        }
+        if (cached.lastRefresh) {
+          this.lastRefresh.set(cached.lastRefresh);
+        }
+        if (cached.latestIngestion) {
+          this.latestIngestion.set(cached.latestIngestion);
+        }
+      }
+    } catch (error) {
+      console.warn('No se pudo restaurar la caché local previa.', error);
+    }
+  }
+
   private acceptDashboard(snapshot: {
     page: EarthquakePage;
     geo: GeoStatsResponse;
@@ -372,6 +420,7 @@ export class App implements OnInit, OnDestroy {
     distributions: DistributionResponse;
     comparison: HistoricalComparisonResponse | null;
   }): void {
+    const now = new Date().toISOString();
     this.events.set(snapshot.page.items);
     this.eventTotal.set(snapshot.page.total);
     this.geoStats.set(snapshot.geo.items);
@@ -391,14 +440,41 @@ export class App implements OnInit, OnDestroy {
     ) {
       this.selectedEventId.set(null);
     }
-    this.lastRefresh.set(new Date().toISOString());
+    this.lastRefresh.set(now);
     this.dataError.set(null);
+
+    // Persistir última instantánea en vivo en localStorage
+    if (this.viewScope() === 'live') {
+      try {
+        if (typeof window !== 'undefined' && window.localStorage) {
+          const cache: CachedSnapshot = {
+            ...snapshot,
+            lastRefresh: now,
+            latestIngestion: this.latestIngestion(),
+          };
+          window.localStorage.setItem(SNAPSHOT_CACHE_KEY, JSON.stringify(cache));
+        }
+      } catch {
+        // Ignorar si el almacenamiento está restringido
+      }
+    }
   }
 
   private acceptHealth(health: HealthResponse): void {
     this.latestIngestion.set(health.last_event_ingested_at ?? null);
     this.errorMessage.set(null);
     this.connection.set('connected');
+
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        const raw = window.localStorage.getItem(SNAPSHOT_CACHE_KEY);
+        if (raw) {
+          const cached = JSON.parse(raw) as CachedSnapshot;
+          cached.latestIngestion = health.last_event_ingested_at ?? null;
+          window.localStorage.setItem(SNAPSHOT_CACHE_KEY, JSON.stringify(cached));
+        }
+      }
+    } catch {}
   }
 
   private toBars(bins: Array<{ bin_start: number; bin_end: number; count: number }>): Array<{
