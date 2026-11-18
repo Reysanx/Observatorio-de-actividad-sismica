@@ -124,17 +124,17 @@ Aísla tres poblaciones de eventos: **Live**, **Histórico 2025** y **Replay**, 
 
 ```mermaid
 erDiagram
-    DIM_COUNTRIES ||--o{ LIVE_EVENT : clasifica
-    LIVE_EVENT ||--o{ LIVE_REVISION : conserva
-    DIM_COUNTRIES ||--o{ HISTORICAL_EVENT : clasifica
-    HISTORICAL_EVENT_KEY ||--|| HISTORICAL_EVENT : identifica
-    REPLAY_RUN ||--o{ REPLAY_EVENT : contiene
-    DIM_COUNTRIES ||--o{ REPLAY_EVENT : clasifica
-    REPLAY_EVENT ||--o{ REPLAY_REVISION : conserva
-    REPLAY_RUN o|--o{ REPLAY_QUARANTINE : registra
-    DATASET_IMPORT ||..o{ HISTORICAL_EVENT : resume
-    INGESTION_POLL }o..o{ LIVE_EVENT : audita
-    LIVE_QUARANTINE }o..o{ LIVE_EVENT : aisla
+    DIM_COUNTRIES ||--o{ LIVE_EVENT : "clasifica"
+    LIVE_EVENT ||--o{ LIVE_REVISION : "conserva"
+    DIM_COUNTRIES ||--o{ HISTORICAL_EVENT : "clasifica"
+    HISTORICAL_EVENT_KEY ||--|| HISTORICAL_EVENT : "identifica"
+    REPLAY_RUN ||--o{ REPLAY_EVENT : "contiene"
+    DIM_COUNTRIES ||--o{ REPLAY_EVENT : "clasifica"
+    REPLAY_EVENT ||--o{ REPLAY_REVISION : "conserva"
+    REPLAY_RUN |o--o{ REPLAY_QUARANTINE : "registra"
+    DATASET_IMPORT ||--o{ HISTORICAL_EVENT : "resume"
+    INGESTION_POLL }o--o{ LIVE_EVENT : "audita"
+    LIVE_QUARANTINE }o--o{ LIVE_EVENT : "aisla"
 ```
 
 ### 4.2 Modelo Lógico (Esquema Constelación de Hechos)
@@ -142,24 +142,24 @@ Las tres poblaciones actúan como tablas de hechos que comparten la dimensión d
 
 ```mermaid
 erDiagram
-    DIM_COUNTRIES ||--o{ FACT_LIVE_EVENT : adm0_a3
-    DIM_COUNTRIES ||--o{ FACT_HISTORICAL_EVENT : adm0_a3
-    DIM_COUNTRIES ||--o{ FACT_REPLAY_EVENT : adm0_a3
-    DIM_REPLAY_RUN ||--o{ FACT_REPLAY_EVENT : run_id
+    DIM_COUNTRIES ||--o{ FACT_LIVE_EVENT : "adm0_a3"
+    DIM_COUNTRIES ||--o{ FACT_HISTORICAL_EVENT : "adm0_a3"
+    DIM_COUNTRIES ||--o{ FACT_REPLAY_EVENT : "adm0_a3"
+    DIM_REPLAY_RUN ||--o{ FACT_REPLAY_EVENT : "run_id"
 ```
 
 ### 4.3 Modelo Físico Relacional en PostgreSQL
-Implementado formalmente en [`backend/db/init.sql`](../../backend/db/init.sql):
+Implementado formalmente en [`backend/db/init.sql`](../backend/db/init.sql):
 
 ```mermaid
 erDiagram
-    DIM_COUNTRIES ||--o{ CURRENT_EARTHQUAKES : adm0_a3
-    CURRENT_EARTHQUAKES ||--o{ EARTHQUAKE_VERSIONS : event_id
-    DIM_COUNTRIES ||--o{ HISTORICAL_2025 : adm0_a3
-    HISTORICAL_2025_EVENT_KEYS ||--|| HISTORICAL_2025 : event_id_time
-    REPLAY_RUNS ||--o{ REPLAY_EARTHQUAKES : run_id
-    DIM_COUNTRIES ||--o{ REPLAY_EARTHQUAKES : adm0_a3
-    REPLAY_EARTHQUAKES ||--o{ REPLAY_VERSIONS : run_id_event_id
+    DIM_COUNTRIES ||--o{ CURRENT_EARTHQUAKES : "adm0_a3"
+    CURRENT_EARTHQUAKES ||--o{ EARTHQUAKE_VERSIONS : "event_id"
+    DIM_COUNTRIES ||--o{ HISTORICAL_2025 : "adm0_a3"
+    HISTORICAL_2025_EVENT_KEYS ||--|| HISTORICAL_2025 : "event_id_time"
+    REPLAY_RUNS ||--o{ REPLAY_EARTHQUAKES : "run_id"
+    DIM_COUNTRIES ||--o{ REPLAY_EARTHQUAKES : "adm0_a3"
+    REPLAY_EARTHQUAKES ||--o{ REPLAY_VERSIONS : "run_id_event_id"
 
     DIM_COUNTRIES {
         varchar adm0_a3 PK
@@ -172,27 +172,31 @@ erDiagram
         varchar event_id PK
         timestamptz time_utc
         timestamptz updated_utc
-        double precision mag
-        double precision depth_km
+        float mag
+        float depth_km
         varchar adm0_a3 FK
-        geometry geom_point
+        text place
     }
     EARTHQUAKE_VERSIONS {
-        varchar event_id PK,FK
+        varchar event_id PK "FK"
         timestamptz updated_utc PK
         timestamptz time_utc
-        double precision mag
-        double precision depth_km
+        float mag
+        float depth_km
     }
     HISTORICAL_2025 {
-        varchar event_id PK,FK
-        timestamptz time_utc PK,FK
-        double precision mag
-        double precision depth_km
+        varchar event_id PK "FK"
+        timestamptz time_utc PK "FK"
+        float mag
+        float depth_km
         varchar adm0_a3 FK
     }
+    HISTORICAL_2025_EVENT_KEYS {
+        varchar event_id PK
+        timestamptz occurred_utc
+    }
     QUARANTINE_EVENTS {
-        bigserial quarantine_id PK
+        bigint quarantine_id PK
         varchar source_topic
         integer source_partition
         bigint source_offset
@@ -205,11 +209,18 @@ erDiagram
         varchar status
     }
     REPLAY_EARTHQUAKES {
-        varchar run_id PK,FK
+        varchar run_id PK "FK"
         varchar event_id PK
         timestamptz time_utc
-        double precision mag
+        float mag
         varchar adm0_a3 FK
+    }
+    REPLAY_VERSIONS {
+        varchar run_id PK "FK"
+        varchar event_id PK "FK"
+        timestamptz updated_utc PK
+        float mag
+        float depth_km
     }
 ```
 
