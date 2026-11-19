@@ -368,5 +368,4 @@ docker compose exec api python -m pytest tests/test_acceptance.py -v
 | **TC-10** | **Reabrir túnel ngrok** | Se vuelve a iniciar el túnel ngrok. | El frontend detecta la reconexión de forma autónoma en el siguiente polling y reanuda datos **sin recargar la pestaña**. | **Comprobado en vivo.** Recuperación automática en $\approx 5$ segundos. |
 | **TC-11** | **Reproducción histórica** | Se ejecuta `replay_producer.py` inyectando datos acelerados. | El consumidor deriva los mensajes a `replay_earthquakes` y el frontend despliega el distintivo obligatorio **«REPRODUCCIÓN»**. | `test_tc11_replay_run_is_visible_but_never_enters_live_state` (**Passed**) |
 
----
-**Conclusión de Calificación:** Este documento aglutina todas las evidencias de arquitectura, código, pruebas automatizadas, modelos matemáticos y auditoría de costes exigidas para la obtención de la máxima nota (**Sobresaliente 10/10**) en la defensa académica.
+
