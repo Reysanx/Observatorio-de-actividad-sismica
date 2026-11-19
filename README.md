@@ -117,6 +117,13 @@ El sistema cumple rigurosamente con los 5 microservicios obligatorios en Docker 
 | **`túnel`** | ngrok Agent | Terminación TLS HTTPS pública y segura | Túnel a 127.0.0.1:8000 |
 | **`frontend`** | Angular 21 (SPA en Netlify) | Dashboard reactivo (Signals), Leaflet 2D + Mapbox 3D | Dominio HTTPS Netlify |
 
+### Guías de despliegue
+
+| Guía | Cuándo consultarla |
+|---|---|
+| [Despliegue local con Docker y Angular](docs/deployment.md) | Preparar y ejecutar todos los servicios en local, probar la aplicación y consultar los logs. |
+| [Despliegue de Netlify con ngrok](docs/deployment-netlify-ngrok.md) | Publicar el frontend en Netlify y conectar con la API local mediante un túnel ngrok. |
+
 ---
 
 # 2. Criterio 1: Extracción de Datos y Deduplicación
