@@ -1,6 +1,6 @@
 # COMPENDIO INTEGRAL DE EVIDENCIAS TÉCNICAS Y RÚBRICA
 ## Observatorio de Actividad Sísmica · Big Data & IA (RA1)
-> **Objetivo de este documento:** Reunir en un único archivo maestro todas las evidencias técnicas, modelos, diagramas, mediciones, auditoría de costes (TCO) y pruebas de aceptación exigidas por el enunciado ([`Fuente_inicial.md`](../Fuente_inicial.md)) y la rúbrica oficial para alcanzar la calificación de **Sobresaliente (9–10)**.
+> **Objetivo de este documento:** Reunir en un único archivo maestro todas las evidencias técnicas, modelos, diagramas, mediciones, auditoría de costes (TCO) y pruebas de aceptación exigidas por el enunciado ([`Fuente_inicial.md`](../Fuente_inicial.md))
 
 ---
 
@@ -332,15 +332,16 @@ $$\text{TCO}_{12\text{m}} = \text{Hardware/Cloud} + \text{Energía/Red} + \text{
 #### Comparativa de Escenarios Anuales:
 | Concepto | Escenario 1: Operación Local (On-Premise) | Escenario 2: Despliegue Cloud (VPS) |
 |---|:---:|:---:|
-| **Cómputo / Servidor** | 450,00 € *(PC 900€ amortizado a 2 años)* | 288,00 € *(VPS 2 vCPU / 4 GB a 24€/mes)* |
+| **Cómputo / Servidor** | 900€ | 288,00 € *(VPS 2 vCPU / 4 GB a 24€/mes)* |
 | **Electricidad / Energía** | 118,26 € *(45W medios $\times 24 \times 365$ a 0,30€/kWh)* | 0,00 € *(incluida en tarifa cloud)* |
 | **Conectividad / Túnel / Red** | 360,00 € *(Fibra óptica 30€/mes)* + 96,00 € *(ngrok)* | 96,00 € *(ngrok / Dominio propio)* |
 | **Almacenamiento y Backups** | 45,00 € *(Disco externo NVMe)* | 18,50 € *(Snapshots S3 de 50 GB)* |
 | **Frontend CDN** | 0,00 € *(Netlify Free Tier)* | 0,00 € *(Netlify Free Tier)* |
 | **Mantenimiento Técnico** | 2.400,00 € *(48 h/año a 50 €/h)* | 1.200,00 € *(24 h/año a 50 €/h)* |
-| **COSTE TOTAL ANUAL (TCO)** | **3.469,26 € / año** *(289,10 €/mes)* | **1.602,50 € / año** *(133,54 €/mes)* |
+| **COSTE TOTAL ANUAL (TCO)** | **3.919,26 € / año** *(326,61 €/mes)* | **1.602,50 € / año** *(133,54 €/mes)* |
+| **COSTE TOTAL ANUAL SIN MANTENIMIENTO** | **1.519,26 € / año** *(126,61 €/mes)*| **402,50 € / año** *(33,55 €/mes)* |
 
-**Conclusión económica:** El coste humano de mantenimiento técnico representa entre el **70% y el 75%** del TCO total en ambos escenarios, demostrando que la automatización y la infraestructura como código son el factor clave de ahorro económico en proyectos de Big Data.
+**Conclusión económica:** Con estos supuestos, el coste humano de mantenimiento técnico representa aproximadamente el **61,2%** del TCO local y el **74,9%** del TCO cloud. Son estimaciones, no costes medidos del proyecto.
 
 ---
 
@@ -350,7 +351,7 @@ Esta suite valida exhaustivamente cada escenario del enunciado (Sección 11).
 
 ```bash
 # Comando de verificación automatizada en terminal:
-docker compose exec api pytest tests/test_acceptance.py -v
+docker compose exec api python -m pytest tests/test_acceptance.py -v
 ```
 
 | ID | Caso de Prueba | Estímulo y Comportamiento del Sistema | Resultado Esperado | Evidencia en el Proyecto |
